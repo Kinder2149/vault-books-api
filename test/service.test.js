@@ -165,3 +165,14 @@ test("livre isolé : la carte porte l'ISBN, l'éditeur et la date de l'édition 
   const r = await s.rechercher('germinal', 'fr');
   assert.deepEqual([r.resultats[0].isbn13, r.resultats[0].editeur, r.resultats[0].date], ['9782070368228', 'Gallimard', '1999-01-01']);
 });
+
+test("livre : une BnF trop lente (> 5 s) n'attend pas : réponse Hardcover seul, marquée indisponible (TTL court)", async () => {
+  const hc = { ...faux(), async livre() { return livreHc(); } };
+  const bnfLente = { editionsDe: () => new Promise(() => {}) };            // ne répond jamais
+  const s = creerService({ hardcover: hc, bnf: bnfLente, cache: cacheMemoire(), couvertures: couvFaux, delaiBnfMs: 30 });
+  const t0 = Date.now();
+  const r = await s.livre(927288, 'fr');
+  assert.ok(Date.now() - t0 < 1000);
+  assert.equal(r.sourceBnf, 'indisponible');
+  assert.equal(r.editions.length, 1);
+});

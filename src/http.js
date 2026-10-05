@@ -16,6 +16,7 @@ export function repondre(res, statut, corps, { cacheControl = 'no-store' } = {})
   for (const [k, v] of Object.entries(CORS)) res.setHeader(k, v);
   res.setHeader('content-type', 'application/json; charset=utf-8');
   res.setHeader('cache-control', cacheControl);
+  res.setHeader('vary', 'x-app-key');
   res.end(JSON.stringify(corps));
 }
 
@@ -40,5 +41,9 @@ export function gestionnaire(fn) {
   };
 }
 
-// Cache de bord (CDN Vercel) : une réponse partagée 5 min, et resservie périmée pendant qu'elle se renouvelle.
-export const CACHE_CDN = 's-maxage=300, stale-while-revalidate=86400';
+/*
+ * PAS DE CACHE PARTAGÉ (CDN). Le CDN de Vercel clef ses réponses sur l'adresse, pas sur l'en-tête x-app-key : une réponse déjà servie à l'application
+ * devenait lisible SANS clé (constaté le 2026-10-05 : le test « sans clé -> 401 » rendait 200 sur une adresse déjà demandée). Le service a son propre
+ * cache (Supabase) et répond en quelques dizaines de ms une fois chaud : le cache de bord n'apportait presque rien. private ne laisse que le cache de l'appelant.
+ */
+export const CACHE_CDN = 'private, max-age=60';

@@ -43,8 +43,9 @@ verifier((await appeler('/v1/search?q=dune&lang=de')).status === 400, 'langue in
 verifier((await appeler('/v1/series/999999999?lang=fr')).status === 404, 'série inconnue → 404');
 
 if (process.env.APP_KEY) {
-  const sansCle = await fetch(base + '/v1/search?q=dune&lang=fr').then((r) => r.status).catch(() => 0);
-  verifier(sansCle === 401, 'sans clé d\'application → 401', `statut ${sansCle}`);
+  // Sur une adresse DÉJÀ servie avec la clé (donc potentiellement en cache de bord) : un cache partagé la rendrait sans clé.
+  const sansCle = await fetch(base + '/v1/search?q=les%20chevaliers%20d%27%C3%A9meraude&lang=fr').then((r) => r.status).catch(() => 0);
+  verifier(sansCle === 401, 'sans clé d\'application → 401, même sur une adresse déjà servie', `statut ${sansCle}`);
 }
 console.log(echecs ? rouge(`\n${echecs} contrôle(s) en échec.`) : vert('\nTout est bon.'));
 process.exit(echecs ? 1 : 0);

@@ -36,7 +36,7 @@ nom français d'une saga, séries doublons à fusionner, positions à exclure. E
 ## Écarts avec le document d'architecture (étape 1)
 
 - Le rafraîchissement du cache est **synchrone** (le périmé n'est servi qu'en cas de panne de la source) ; le « sert l'ancien pendant qu'on renouvelle »
-  est assuré par le cache de bord de Vercel (`stale-while-revalidate`).
+  n'est plus assuré par le cache de bord de Vercel : il a été retiré (réponses `private`, `Vary: x-app-key`) car il servait des réponses SANS clé d'application sur une adresse déjà demandée (constaté le 2026-10-05). Le cache Supabase du service suffit : ~30 ms une fois chaud.
 - Le cache est un **clé/valeur** (`cache_entries`) ; les tables `works` / `editions` n'arrivent qu'avec l'étape 2, si elles s'avèrent utiles.
 - Les corrections sont lues depuis **Supabase** quand il est configuré (mémorisées 5 min), sinon depuis le fichier.
 

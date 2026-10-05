@@ -21,6 +21,16 @@ const CONCURRENCE_COUVERTURES = 4;
 
 export class ErreurRequete extends Error {}
 
+const DELAI_BNF_MS = 5000;
+
+/** La promesse, ou une erreur si elle met plus de `ms`. Elle continue en arrière-plan : la file de la BnF n'est pas interrompue. */
+function avecDelai(promesse, ms) {
+  let minuteur;
+  const limite = new Promise((_, rejet) => { minuteur = setTimeout(() => rejet(new Error('délai dépassé')), ms); });
+  promesse.catch(() => {});   // une panne tardive d'une promesse abandonnée ne doit pas faire tomber le processus
+  return Promise.race([promesse, limite]).finally(() => clearTimeout(minuteur));
+}
+
 /** `fn` sur chaque élément, `n` à la fois. */
 async function enParallele(elements, n, fn) {
   const file = [...elements];
@@ -29,7 +39,7 @@ async function enParallele(elements, n, fn) {
   }));
 }
 
-export function creerService({ hardcover, bnf = null, cache, overrides = { series: {}, couvertures: {} }, couvertures = null }) {
+export function creerService({ hardcover, bnf = null, cache, overrides = { series: {}, couvertures: {} }, couvertures = null, delaiBnfMs = DELAI_BNF_MS }) {
   const lireOverrides = typeof overrides === 'function' ? overrides : async () => overrides;
 
   async function lire(cle) {
@@ -183,7 +193,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
       let sourceBnf = 'non-applicable';
       if (lang === 'fr' && bnf) {
         try {
-          notices = await bnf.editionsDe(titreCourt(titreLangue), auteurs[0]);
+          // La BnF est parfois lente (mesuré : 9 s) : au-delà de 5 s on répond sans elle, avec un TTL court pour retenter bientôt.
+          notices = await avecDelai(bnf.editionsDe(titreCourt(titreLangue), auteurs[0]), delaiBnfMs);
           sourceBnf = 'ok';
         } catch {
           sourceBnf = 'indisponible';
