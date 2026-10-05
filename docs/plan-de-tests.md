@@ -1,8 +1,8 @@
 # Plan de tests — cadrer la mission, le besoin et les services
 
 > Objectif : transformer chaque phrase du besoin en un test qui passe ou échoue, **avant** d'écrire l'API.
-> Les tests A et B s'exécutent déjà (`prototype/tests/`). C, D, E sont spécifiés ici et
-> s'exécuteront contre l'API quand elle existera ; leurs jeux de cas sont dans `prototype/fixtures/`.
+> Les tests A et B s'exécutent déjà (`archive/prototype-mesures/tests/`). C, D, E sont spécifiés ici et
+> s'exécuteront contre l'API quand elle existera ; leurs jeux de cas sont dans `test/fixtures-pertinence/`.
 > Les seuils sont des **propositions** à valider par Kinder.
 
 ## Besoin → critère mesurable
@@ -19,7 +19,7 @@
 
 ## A. Santé des services (exécutable)
 
-`node prototype/tests/services.mjs` — pour chaque source : disponibilité sur 5 appels, latence médiane et pire cas,
+`node archive/prototype-mesures/tests/services.mjs` — pour chaque source : disponibilité sur 5 appels, latence médiane et pire cas,
 et vérification de **comportements dont on dépend** (déjà observés par Vault Read, qu'on veut confirmer) :
 
 - BnF : le filtre « texte imprimé » exclut-il les non-livres ? un ISBN-13 ancien ne répond-il qu'en ISBN-10 ?
@@ -29,17 +29,17 @@ et vérification de **comportements dont on dépend** (déjà observés par Vaul
 
 ## B. Couvertures (exécutable)
 
-`node prototype/tests/couvertures.mjs` — pour un échantillon d'ISBN par saga (Wikidata + BnF) :
+`node archive/prototype-mesures/tests/couvertures.mjs` — pour un échantillon d'ISBN par saga (Wikidata + BnF) :
 
 1. **Présence** : Open Library (par ISBN, `default=false`) et Google Books (par ISBN) rendent-ils une image ?
 2. **Qualité** : dimensions réelles (largeur ≥ 200 px) et poids ; détection des images « fantômes ».
 3. **Association** : le volume Google rendu porte-t-il bien l'ISBN demandé ? quel est son titre ?
-4. **Contrôle visuel** : génération d'une **planche-contact HTML** par saga (`prototype/out/couvertures.html`),
+4. **Contrôle visuel** : génération d'une **planche-contact HTML** par saga (`sorties/ ou archive/prototype-mesures/out/couvertures.html`),
    car « la bonne couverture sur le bon tome » ne se juge pas par un chiffre, mais à l'œil.
 
 ## C. Pertinence et sagas (spécifié, à exécuter contre l'API)
 
-Jeu : `prototype/fixtures/sagas.json` (sagas, tomes attendus) et `prototype/fixtures/requetes.json` (requêtes + résultat attendu).
+Jeu : `test/fixtures-pertinence/sagas.json` (sagas, tomes attendus) et `test/fixtures-pertinence/requetes.json` (requêtes + résultat attendu).
 
 - Requêtes du banc de Vault Read : harry potter, le seigneur des anneaux, le trone de fer, la quete d'ewilan, la passe-miroir,
   game of thrones, germinal, les fourmis.

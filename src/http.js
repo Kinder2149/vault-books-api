@@ -5,6 +5,10 @@
  */
 import { ErreurRequete, ErreurQuota } from './service.js';
 import { ligneDeJournal } from './journal.js';
+import { creerLimiteClient, clientDe } from './limite.js';
+
+// Une limite par client (voir limite.js) : 90 appels par minute, très au-dessus d'un usage normal (recherche au fil de la frappe comprise).
+const limiteClient = creerLimiteClient({ fenetreMs: 60_000, max: 90 });
 
 const CORS = {
   'access-control-allow-origin': '*',
@@ -41,6 +45,11 @@ export function gestionnaire(fn, { route } = {}) {
       app = obtenirApp();
       if (app.cfg.appKey && req.headers['x-app-key'] !== app.cfg.appKey) {
         return repondre(res, 401, { erreur: 'Clé d\'application manquante ou invalide.' });
+      }
+      const limite = limiteClient.verifier(clientDe(req.headers));
+      if (!limite.autorise) {
+        res.setHeader('retry-after', String(limite.reessayerDansSecondes));
+        return repondre(res, 429, { erreur: 'Trop de requêtes : réessayez dans un instant.' });
       }
       url = new URL(req.url, 'http://localhost');
       return await fn({ url, app, res });

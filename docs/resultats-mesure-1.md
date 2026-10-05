@@ -1,6 +1,6 @@
 # Mesure 1 — que contiennent les sources pour nos trois sagas ? (2026-10-05)
 
-Script : `prototype/mesure.mjs` (jetable). Réponses brutes dans `prototype/out/` (non versionné).
+Script : `archive/prototype-mesures/mesure.mjs` (jetable). Réponses brutes dans `sorties/ ou archive/prototype-mesures/out/` (non versionné).
 Couvertures et Google Books **non mesurés** dans cette passe.
 
 | | BnF (dépôt légal FR) | Open Library | Wikidata |

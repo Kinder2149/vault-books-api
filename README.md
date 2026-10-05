@@ -1,42 +1,64 @@
 # Vault Books API
 
-API de catalogue de livres pour Vault Read : recherche triée (une carte par œuvre ou par saga), sagas dans l'ordre,
-éditions et couvertures dans la langue choisie (fr/en). Source principale : Hardcover ; cache : Supabase.
+Service de catalogue de livres pour **Vault Read** : recherche triée (une carte par œuvre ou par saga), sagas dans l'ordre,
+éditions et couvertures dans la langue choisie (fr/en), scan d'ISBN. Source principale : Hardcover ; éditions françaises : BnF ;
+couvertures de repli : Open Library ; cache et corrections : Supabase ; hébergement : Vercel.
 
-Mise en service (Supabase, GitHub, Vercel) : [docs/mise-en-service.md](docs/mise-en-service.md) · Cadrage et décisions : [PROJET_CONTEXTE.md](PROJET_CONTEXTE.md) · fonctionnement : [docs/architecture-fonctionnement.md](docs/architecture-fonctionnement.md) · mesures : `docs/resultats-mesure-*.md`.
+**En ligne** : https://vault-books-api.vercel.app/v1/health
+
+## Documentation
+
+| Pour… | Lire |
+|---|---|
+| Comprendre le projet et ses décisions | [PROJET_CONTEXTE.md](PROJET_CONTEXTE.md) |
+| Savoir comment ça marche (état réel) | [docs/architecture-fonctionnement.md](docs/architecture-fonctionnement.md) |
+| Surveiller, réparer, corriger, gérer les secrets | [docs/exploitation.md](docs/exploitation.md) |
+| Savoir ce qu'il reste à faire | [docs/plan-complet.md](docs/plan-complet.md) |
+| Créer les services (Supabase, GitHub, Vercel) | [docs/mise-en-service.md](docs/mise-en-service.md) |
+| Hardcover, licences, vie privée | [docs/conformite.md](docs/conformite.md) |
 
 ## Démarrer en local
 
 ```bash
-cp .env.example .env      # puis renseigner HARDCOVER_API_KEY (permission read:catalog)
-npm run dev               # http://localhost:3000/v1/health
-npm test                  # tests unitaires, sans réseau
-npm run test:c            # test de pertinence et de sagas, contre le vrai Hardcover
-npm run planche           # contrôle des couvertures et des éditions + planche-contact à regarder
-npm run verifier:supabase  # Supabase est-il bien configuré ?
-npm run smoke -- <url>    # test de fumée d'une API déployée
+cp .env.example .env          # puis renseigner HARDCOVER_API_KEY (permission read:catalog)
+npm run dev                   # http://localhost:3000/v1/health
+npm test                      # tests unitaires, sans réseau ni secret
 ```
 
-Sans `SUPABASE_URL` et `SUPABASE_SERVICE_KEY`, le cache est en mémoire (perdu à l'arrêt).
+Sans `SUPABASE_URL` et `SUPABASE_SERVICE_KEY`, le cache est en mémoire (perdu à l'arrêt) et il n'y a pas de journal.
+
+| Commande | Rôle |
+|---|---|
+| `npm test` | Tests unitaires (aucun appel réel) |
+| `npm run test:c` | Pertinence et sagas, contre les vraies sources |
+| `npm run planche` | Contrôle des couvertures et des éditions, planche-contact dans `sorties/` |
+| `npm run smoke -- <url>` | Contrôle d'un service en ligne ou local (14 vérifications) |
+| `npm run verifier:supabase` | Supabase est-il bien configuré ? |
+| `npm run corriger -- …` | Corriger une saga ou une couverture (voir `docs/exploitation.md` §6) |
+| `npm run sauvegarder` | Recopier les corrections de Supabase dans `data/overrides.json` |
 
 ## Routes
 
 | Route | Rôle |
 |---|---|
-| `GET /v1/search?q=…&lang=fr\|en` | Cartes triées : `serie` (saga) ou `livre`. |
-| `GET /v1/books/:id?lang=fr\|en` | Les éditions d'un livre (Hardcover + BnF) : ISBN, éditeur, année, couverture vérifiée et sa source. |
-| `GET /v1/series/:id?lang=fr\|en` | La saga : tomes dans l'ordre, volumes coupés en `parties`, édition (ISBN, éditeur) et couverture par tome. |
-| `GET /v1/health` | Vivant ? Cache et clé configurés ? |
+| `GET /v1/search?q=…&lang=fr\|en` | Cartes triées : `serie` (saga) ou `livre` |
+| `GET /v1/series/:id?lang=` | La saga : tomes dans l'ordre, volumes coupés en `parties`, édition et couverture par tome |
+| `GET /v1/books/:id?lang=` | Les éditions d'un livre (Hardcover + BnF) : ISBN, éditeur, année, couverture et sa source |
+| `GET /v1/isbn/:isbn` | L'édition d'un code-barres : éditeur, date, pages, langue, couverture, livre, saga |
+| `GET /v1/status` | État détaillé : sources, quota du jour, statistiques des 24 dernières heures |
+| `GET /v1/health` | Vivant ? (sans clé) |
 
-## Corrections manuelles
+Toutes (sauf `health`) exigent l'en-tête `x-app-key`.
 
-`data/overrides.json` (développement) ; table `series_overrides` (production, voir `supabase/migrations/`) :
-nom français d'une saga, séries doublons à fusionner, positions à exclure. Elles gagnent toujours sur Hardcover.
+## Arborescence
 
-## Écarts avec le document d'architecture (étape 1)
-
-- Le rafraîchissement du cache est **synchrone** (le périmé n'est servi qu'en cas de panne de la source) ; le « sert l'ancien pendant qu'on renouvelle »
-  n'est plus assuré par le cache de bord de Vercel : il a été retiré (réponses `private`, `Vary: x-app-key`) car il servait des réponses SANS clé d'application sur une adresse déjà demandée (constaté le 2026-10-05). Le cache Supabase du service suffit : ~30 ms une fois chaud.
-- Le cache est un **clé/valeur** (`cache_entries`) ; les tables `works` / `editions` n'arrivent qu'avec l'étape 2, si elles s'avèrent utiles.
-- Les corrections sont lues depuis **Supabase** quand il est configuré (mémorisées 5 min), sinon depuis le fichier.
-
+```
+api/        points d'entrée Vercel (un fichier par route) + la tâche d'entretien
+src/        la logique : sources/ (Hardcover, BnF), rank, series, editions, covers, overrides, corrections, cache, journal, limite, service
+scripts/    contrôles et outils (smoke, test-c, planche, corriger, sauvegarder, serveur local)
+supabase/   migrations SQL (0001 cache et corrections, 0002 journal)
+test/       tests unitaires et jeux de pertinence (fixtures-pertinence/)
+data/       overrides.json : sauvegarde et repli des corrections
+docs/       documentation ; archive/ : scripts de mesure jetables
+.github/    tests à chaque push ; sauvegarde nocturne des corrections
+```

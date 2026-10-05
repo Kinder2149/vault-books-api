@@ -1,85 +1,65 @@
 # PROJET_CONTEXTE — « Vault Books API »
 
-> Document de cadrage. Il fixe les décisions prises et liste les questions ouvertes.
-> État au 2026-10-05 : **étapes 1 et 2 codées** (API locale : `/v1/search`, `/v1/series/:id`, `/v1/books/:id`, `/v1/health` ; Hardcover + BnF,
-> cascade de couvertures, corrections, 58 tests unitaires ; test C : 13/13 requêtes et 3/3 sagas ; couvertures réelles 100 %/100 %/95 %).
-> **En ligne** depuis le 2026-10-05 : https://vault-books-api.vercel.app (Vercel) + Supabase (projet vault-books-api, cache et corrections) + GitHub Kinder2149/vault-books-api.
-> Test de fumée complet vert. Prochaine étape : brancher Vault Read (étape 3). Voir README.md et docs/mise-en-service.md.
+> Document de cadrage : pourquoi ce projet existe, ce qui est décidé, où en est-on. Le fonctionnement détaillé est dans
+> `docs/architecture-fonctionnement.md`, l'exploitation dans `docs/exploitation.md`, la suite dans `docs/plan-complet.md`.
+>
+> **État au 2026-10-05 : en ligne et stable** — https://vault-books-api.vercel.app (Vercel) + Supabase + GitHub `Kinder2149/vault-books-api`.
+> 5 routes de données, journal, entretien nocturne, mode économie, limite par client, outil de correction, sauvegarde des corrections.
+> 119 tests automatiques ; contrôle en ligne `npm run smoke` : 14/14 ; pertinence 13/13 requêtes et 3/3 sagas de référence.
+> **Pas encore fait** : essai sur téléphone et fusion côté Vault Read, réponse de Hardcover, éléments de conformité (voir `docs/plan-complet.md`).
 
-## 1. Pourquoi
+## 1. Pourquoi ce projet
 
-Vault Read interroge Google Books, Open Library et la BnF en direct depuis le client.
-Résultat : recherche peu pertinente, sagas incomplètes ou mélangées entre éditeurs,
-couvertures mal associées. Toute la logique de tri vit dans l'app (`tomes.js`,
-`books.js`).
+Vault Read interrogeait Google Books, Open Library et la BnF en direct depuis le téléphone. Aucune de ces sources n'est faite pour retrouver un livre :
+l'ordre d'une saga se devinait par expression régulière sur le titre, les couvertures se rattachaient à l'œuvre et non à l'édition (couvertures du mauvais tome),
+Google tombait en panne par rafales (1 000 requêtes/jour partagées). **Décision : sortir le tri de l'application** et le confier à un service à part.
 
-**Idée :** construire notre propre catalogue *avant* la recherche de l'utilisateur.
-Les mêmes sources alimentent une base nettoyée ; l'app interroge une API qui rend
-des résultats déjà triés. La logique de tri sort de l'app.
+Cas de test fondateurs : « game of thrones », « seigneur des anneaux » (saga complète, dans l'ordre, sans mélange d'éditeurs) et « Les Chevaliers d'Émeraude » (bonne couverture sur le bon tome).
 
-## 2. Cas de test qui échouent aujourd'hui
+## 2. Décisions prises (et leur raison, mesurée)
 
-- « game of thrones » : on veut la saga complète, dans l'ordre, sans mélanger les éditeurs.
-- « seigneur des anneaux » : idem.
-- « Les Chevaliers d'Émeraude » : les couvertures étaient associées au mauvais tome.
+| Décision | Raison | Détail |
+|---|---|---|
+| **Service séparé** de Vault Read, dont l'app n'est qu'un client | Réutilisable, déployé et corrigé indépendamment | — |
+| **Hardcover** comme source principale | Meilleur pour l'ordre des sagas, la popularité et les éditions par langue ; 70 % de couvertures par ISBN | `docs/resultats-mesure-3.md` |
+| **BnF** pour les éditions françaises | Dépôt légal : éditeur, année, ISBN ; mais coupe les clients rapides | `docs/resultats-mesure-2.md` |
+| **Open Library** pour les couvertures de repli | 40 à 60 % de couverture française par ISBN | idem |
+| **Google Books abandonné** | 0 résultat constaté sur nos requêtes, quota de 1 000/jour | `docs/resultats-mesure-2.md` |
+| Hébergement **Vercel + Supabase**, gratuit | Fonctions sans mise en veille, base avec tableau de bord pour les corrections | `docs/mise-en-service.md` |
+| **Cache** plutôt que copie du catalogue | Moins de travail, moins de risque juridique, suit Hardcover à jour | `docs/architecture-fonctionnement.md` §6 |
+| **Corrections manuelles** qui gagnent toujours | Aucune source n'est parfaite (Trône de fer, Seigneur des anneaux) | `docs/exploitation.md` §6 |
+| Vault Read garde ses **anciennes sources en repli** | Le service ne doit jamais rendre l'application moins fiable | `vault-read` : tranche 33 |
 
-Ces trois cas servent de base du jeu de test (voir §6).
+## 3. Les besoins d'origine, et où ils en sont
 
-## 3. Contraintes
+| Besoin exprimé | État |
+|---|---|
+| Une recherche pertinente par titre | ✅ 13/13 requêtes de référence ; ~40 requêtes variées essayées ; jeu élargi à faire (plan, phase 2) |
+| La saga complète, dans l'ordre, sans mélange d'éditeurs | ✅ 3/3 sagas de référence, plus Dune, Harry Potter, Hunger Games… |
+| Les bonnes couvertures | ✅ 100 / 100 / 95 % de couvertures réelles sur les 3 sagas ; mesure à grande échelle à faire |
+| Français ou anglais au choix | ✅ paramètre `lang` ; noms de sagas français seulement pour les 3 de référence (plan, phase 2) |
+| Scan de code-barres | ✅ `/v1/isbn/:isbn` (pages, éditeur, couverture de l'édition) |
+| Hébergement gratuit | ✅ Vercel Hobby + Supabase Free ; limites à garder en tête dans `docs/conformite.md` §4 |
+| « Un livre qui sort demain, quand est-il dans ma base ? » | ⏳ Dès que Hardcover le connaît (≤ 24 h pour une saga en cours après le rafraîchissement nocturne, à construire) ; **non mesuré** |
+| Recherche par auteur, résumés | ⏳ non faits |
 
-- Moins de 100 utilisateurs par jour.
-- Recherche principalement **par titre** (auteur et ISBN : secondaire).
-- Choix de la langue du catalogue : **français ou anglais**.
-- **Couvertures fiables**, une bonne couverture par édition.
-- **Hébergement gratuit**, dans les services déjà connus (Render, Vercel, Firebase, Git).
-- Projet **distinct** de Vault Read ; l'app n'en sera qu'un client.
+## 4. Questions ouvertes
 
-## 4. Modèle de données (proposition)
+- **Hardcover** : cache accepté ? usage public ? attribution ? (`docs/conformite.md` §1 — message prêt, à envoyer par Kinder)
+- Statut de Vault Read : personnel, gratuit public, monétisé ? (conditionne les offres d'hébergement)
+- Fraîcheur et capacité à mesurer (`docs/plan-de-tests.md` D et E).
 
-- `works` : l'œuvre (titre normalisé, auteurs, langue, score de popularité).
-- `series` : la saga, avec l'ordre des tomes (`series_id`, `position`).
-- `editions` : ISBN-10/13, éditeur, date, langue, **couverture**, rattachées à un work.
-- `authors`.
+## 5. Index des documents
 
-Un résultat de recherche = un work (ou une série), jamais 40 éditions en vrac.
-
-## 5. Mises à jour (proposition)
-
-1. Import de fond mensuel (Open Library) et hebdomadaire (BnF).
-2. Cron quotidien sur les nouveautés (Google Books).
-3. Si une recherche ne trouve rien : interrogation en direct, puis enregistrement
-   (cache-aside).
-
-Aucune source gratuite ne garantit un livre la veille de sa sortie.
-
-## 5 ter. Orientation retenue (2026-10-05, après mesures 1 à 3)
-
-**API fine devant Hardcover** (source principale), avec cache Supabase, notre tri, corrections manuelles et sources interchangeables
-(BnF pour les éditions françaises, Open Library/Wikidata en appoint). Pas de copie complète du catalogue.
-Fonctionnement détaillé et feuille de route : `docs/architecture-fonctionnement.md`. Mesures : `docs/resultats-mesure-{1,2,3}.md`.
-
-## 5 bis. Décision d'hébergement (2026-10-05)
-
-**Supabase (Postgres)** pour la base et la recherche : plein texte, `unaccent`, `pg_trgm`,
-écritures quotidiennes sans redéploiement. Déjà utilisé par Kinder sur un autre projet.
-Limites à vérifier à l'heure du choix : ~500 Mo en offre gratuite, pause après inactivité
-(le cron quotidien garde le projet actif). Une fine API (Render/Vercel) reste optionnelle.
-
-Analyse de l'existant : `docs/analyse-vault-read.md`.
-
-## 6. Questions ouvertes
-
-- Taille réelle du catalogue filtré (à mesurer) : tient-il dans la base gratuite ?
-- Licences et quotas actuels des sources, notamment le stockage de données Google Books.
-- Reprise de la logique `tomes.js` de Vault Read : la porter telle quelle ou la réécrire ?
-- Origine des couvertures (Google, Open Library, BnF) et règle de choix.
-
-## 7. Prochaines étapes
-
-1. Lire `vault-read/client/src/{books,tomes}.js` et `sources/*.js` pour reprendre l'existant.
-2. Écrire le jeu de test de pertinence (50 à 100 recherches avec le résultat attendu),
-   en commençant par les trois cas du §2. Vault Read a déjà un banc :
-   `client/tests/banc-recherche.js`.
-3. Prototype jetable : importer un échantillon, mesurer la taille obtenue.
-4. Choisir l'hébergement d'après cette mesure, puis écrire le schéma et l'API.
-
+| Document | Contenu |
+|---|---|
+| `README.md` | Démarrer, routes, commandes |
+| `docs/architecture-fonctionnement.md` | Comment ça marche, **état réel** |
+| `docs/exploitation.md` | Surveiller, réparer, corriger ; secrets ; échéances |
+| `docs/plan-complet.md` | Ce qu'il reste à faire, en phases, avec critères |
+| `docs/mise-en-service.md` | Création de Supabase, GitHub, Vercel |
+| `docs/conformite.md` | Hardcover, BnF, Open Library, hébergement ; message à Hardcover |
+| `docs/plan-de-tests.md` | Tests A à E et leurs seuils |
+| `docs/resultats-mesure-1.md` … `-3.md` | Mesures des sources (historiques) |
+| `docs/analyse-vault-read.md` | Ce qu'on a repris de Vault Read |
+| `archive/prototype-mesures/` | Scripts de mesure jetables (non maintenus) |

@@ -1,6 +1,6 @@
 # Mesure 2 — santé des services (test A) et couvertures (test B), 2026-10-05
 
-Scripts : `prototype/tests/services.mjs`, `prototype/tests/couvertures.mjs`. Plan : `docs/plan-de-tests.md`.
+Scripts : `archive/prototype-mesures/tests/services.mjs`, `archive/prototype-mesures/tests/couvertures.mjs`. Plan : `docs/plan-de-tests.md`.
 
 ## Test A — services : 8/10 OK
 
@@ -84,4 +84,4 @@ Détectable par taille/empreinte, donc sans risque de fausse couverture, mais **
 2. **Repli par tome** : si une édition n'a pas de couverture, prendre celle d'une autre édition *du même tome* (même ISBN-groupe/œuvre), jamais celle d'un autre tome.
 3. **Couverture dessinée** (comme Vault Read, `CouvertureDessinee.jsx`) quand rien n'existe, et possibilité de **contribution manuelle** : vous envoyez la bonne couverture pour une saga, elle est stockée dans Supabase Storage.
 4. Refaire le test Google un autre jour.
-5. Contrôle visuel de `prototype/out/couvertures.html` (non versionné).
+5. Contrôle visuel de `sorties/ ou archive/prototype-mesures/out/couvertures.html` (non versionné).

@@ -1,6 +1,6 @@
 // Outils partagés des tests du prototype.
 // Charge vault-books-api/.env s'il existe (ignoré par git). Node >= 20.12.
-try { process.loadEnvFile(new URL('../.env', import.meta.url)); } catch { /* pas de .env : on continue sans clé */ }
+try { process.loadEnvFile(new URL('../../.env', import.meta.url)); } catch { /* pas de .env : on continue sans clé */ }
 
 export const UA = 'VaultBooksAPI-prototype/0.1 (vcoutry@gmail.com)';
 export const pause = (ms) => new Promise((r) => setTimeout(r, ms));

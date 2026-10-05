@@ -3,12 +3,13 @@
  *   node --env-file=.env scripts/planche-sagas.mjs
  * Pour chaque saga (fr) : d'où vient la couverture de chaque tome, l'image est-elle réelle (téléchargée, ≥ 200 px),
  * et la MÊME image est-elle utilisée pour deux tomes différents (signe d'une couverture mal associée) ?
- * Sortie : prototype/out/planche-sagas.html (non versionné) + bilan en console.
+ * Sortie : sorties/planche-sagas.html (non versionné) + bilan en console.
  */
 import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { obtenirApp } from '../src/app.js';
-import { appeler, dimensionsImage, pause } from '../prototype/lib.mjs';
+import { appeler, pause } from './outils.mjs';
+import { dimensionsImage } from '../src/images.js';
 
 const vert = (t) => `\x1b[32m${t}\x1b[0m`;
 const rouge = (t) => `\x1b[31m${t}\x1b[0m`;
@@ -77,10 +78,10 @@ for (const s of SAGAS) {
   await pause(1500);
 }
 
-writeFileSync(new URL('../prototype/out/planche-sagas.html', import.meta.url), `<!doctype html><meta charset="utf-8"><title>Planche des sagas</title>
+writeFileSync(new URL('../sorties/planche-sagas.html', import.meta.url), `<!doctype html><meta charset="utf-8"><title>Planche des sagas</title>
 <style>body{font:14px system-ui;margin:16px;background:#fafafa}.grille{display:flex;flex-wrap:wrap;gap:12px}figure{width:150px;margin:0}
 img{width:150px;height:225px;object-fit:cover;border:1px solid #ccc}.vide{width:150px;height:225px;background:#fdd;display:grid;place-items:center;color:#a00;text-align:center;font-size:12px}
 .partie img{border-color:#99c}.approx img{border:3px solid #e90}.ko img{border-color:red}figcaption{font-size:12px;margin-top:4px}small{color:#666}h2 small{font-weight:normal;color:#666}</style>
 <h1>Couvertures par tome — bordure orange = couverture approximative (image du livre, peut-être une autre langue)</h1>${html}`);
-console.log('\nPlanche : prototype/out/planche-sagas.html');
+console.log('\nPlanche : sorties/planche-sagas.html');
 console.log(bilan.every((b) => b.valides === b.total && b.doublons === 0) ? vert('\nTOUTES les couvertures sont réelles et distinctes.') : jaune('\nDes couvertures sont à examiner (voir ci-dessus).'));

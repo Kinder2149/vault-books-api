@@ -1,6 +1,6 @@
 # Mesure 3 — Hardcover (2026-10-05)
 
-Scripts : `prototype/tests/hardcover.mjs` (recherche + couvertures par ISBN), `prototype/tests/hardcover-series.mjs` (séries).
+Scripts : `archive/prototype-mesures/tests/hardcover.mjs` (recherche + couvertures par ISBN), `archive/prototype-mesures/tests/hardcover-series.mjs` (séries).
 Clé : `read:catalog` seulement, dans `.env`.
 
 ## Ce que Hardcover apporte

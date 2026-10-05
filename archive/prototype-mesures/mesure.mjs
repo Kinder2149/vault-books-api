@@ -8,7 +8,7 @@
  * Lecture seule. Écrit les réponses brutes dans prototype/out/ (ignoré par git).
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { numeroDeTome } from '../../vault-read/client/src/tomes.js'; // fonction pure, lue seulement
+import { numeroDeTome } from '../../../vault-read/client/src/tomes.js'; // fonction pure, lue seulement
 
 const UA = 'VaultBooksAPI-prototype/0.1 (vcoutry@gmail.com)';
 const OUT = new URL('./out/', import.meta.url);

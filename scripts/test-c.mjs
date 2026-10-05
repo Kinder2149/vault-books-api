@@ -14,7 +14,7 @@ import { normaliser } from '../src/text.js';
 const vert = (t) => `\x1b[32m${t}\x1b[0m`;
 const rouge = (t) => `\x1b[31m${t}\x1b[0m`;
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
-const fix = (n) => JSON.parse(readFileSync(new URL(`../prototype/fixtures/${n}.json`, import.meta.url), 'utf8'));
+const fix = (n) => JSON.parse(readFileSync(new URL(`../test/fixtures-pertinence/${n}.json`, import.meta.url), 'utf8'));
 const { service } = obtenirApp();
 
 const requetes = fix('requetes').requetes;
