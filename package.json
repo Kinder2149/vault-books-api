@@ -12,6 +12,10 @@
     "corriger": "node --env-file=.env scripts/corriger.mjs",
     "pertinence": "node --env-file=.env scripts/pertinence.mjs",
     "sauvegarder": "node --env-file=.env scripts/exporter-corrections.mjs",
+    "mesure-couvertures": "node --env-file=.env scripts/mesure-couvertures.mjs",
+    "mesure-resumes": "node --env-file=.env scripts/mesure-resumes.mjs",
+    "proposer-noms": "node --env-file=.env scripts/proposer-noms-sagas.mjs",
+    "importer-noms": "node --env-file=.env scripts/importer-noms.mjs",
     "planche": "node --env-file=.env scripts/planche-sagas.mjs",
     "verifier:supabase": "node --env-file=.env scripts/verifier-supabase.mjs",
     "smoke": "node --env-file=.env scripts/smoke.mjs"

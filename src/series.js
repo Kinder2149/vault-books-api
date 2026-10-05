@@ -32,6 +32,8 @@ function entree(position, candidats, editions, aujourdhui) {
   const couvertureEdition = utilisable(ed?.image) ? ed.image.url : null;
   const couverturePetite = petite(ed?.image) ? ed.image.url : null;
   const couvertureLivre = choisi.image?.url || null;
+  // Une AUTRE édition française du même tome, avec une image assez grande (voir hardcover.editionsEnLangue) : utile quand l'édition retenue n'a qu'une miniature.
+  const couvertureVoisine = !couvertureEdition && utilisable(ed?._imageVoisine) ? ed._imageVoisine.url : null;
   return {
     position,
     titre: ed?.title || choisi.title,
@@ -42,6 +44,7 @@ function entree(position, candidats, editions, aujourdhui) {
     couverture: couvertureEdition || couverturePetite || couvertureLivre,
     couvertureSource: couvertureEdition ? 'edition' : (couverturePetite ? 'edition-petite' : (couvertureLivre ? 'livre' : null)),
     _couverturePetite: couverturePetite,
+    _couvertureVoisine: couvertureVoisine,
     _couvertureLivre: couvertureLivre,
     edition: ed && {
       id: ed.id,

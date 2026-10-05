@@ -165,7 +165,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
     async editionParIsbn(isbn13) {
       const data = await gql(`query ($isbn: String!) { editions(where: {isbn_13: {_eq: $isbn}}, order_by: {users_count: desc}, limit: 3) {
         id title isbn_13 release_date pages edition_format language { code2 } publisher { name } image { url width }
-        book { id title image { url width } contributions { author { name } }
+        book { id title description image { url width } contributions { author { name } }
           book_series { position featured series { id name primary_books_count } } } } }`, { isbn: isbn13 });
       return (data.editions || [])[0] || null;
     },
@@ -173,7 +173,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
     /** Un livre : titre, auteurs, séries, et TOUTES ses éditions dans la langue (jusqu'à 100, les plus lues d'abord). */
     async livre(id, lang) {
       const data = await gql(`query ($id: Int!, $lang: String!) { books_by_pk(id: $id) {
-        id title users_count image { url width }
+        id title description users_count image { url width }
         contributions { author { name } }
         book_series { position series { id name primary_books_count } }
         editions(where: {language: {code2: {_eq: $lang}}}, order_by: {users_count: desc}, limit: 100) {
@@ -186,15 +186,27 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
      * La meilleure édition de chaque livre dans une langue (code ISO à 2 lettres), en un seul appel.
      * @returns {Promise<Map<number, object>>} bookId → édition
      */
-    async editionsEnLangue(bookIds, lang) {
+    async editionsEnLangue(bookIds, lang, { voisines = false } = {}) {
       const ids = [...new Set(bookIds.map(Number))].filter(Boolean);
       if (!ids.length) return new Map();
+      const champs = 'id book_id title isbn_13 release_date edition_format publisher { name } image { url width }';
+      const base = 'book_id: {_in: $ids}, language: {code2: {_eq: $lang}}';
+      const ordre = 'order_by: [{book_id: asc}, {users_count: desc}], distinct_on: book_id, limit: 500';
+      /*
+       * `voisines` : pour chaque livre, en plus de sa meilleure édition, l'image de l'édition la plus lue qui en a une d'AU MOINS 200 px
+       * (mesuré le 2026-10-05 : sur « Journal d'un dégonflé », 11 tomes sur 16 n'avaient qu'une miniature de 98 px chez Hardcover). Un second
+       * champ de la requête, donc un appel de plus décompté : réservé aux sagas, jamais aux recherches.
+       */
       const data = await gql(`query ($ids: [Int!], $lang: String!) {
-        editions(where: {book_id: {_in: $ids}, language: {code2: {_eq: $lang}}},
-                 order_by: [{book_id: asc}, {users_count: desc}], distinct_on: book_id, limit: 500) {
-          id book_id title isbn_13 release_date edition_format publisher { name } image { url width } } }`,
+        editions(where: {${base}}, ${ordre}) { ${champs} }
+        ${voisines ? `voisines: editions(where: {${base}, image: {width: {_gte: 200}}}, ${ordre}) { book_id image { url width } }` : ''} }`,
       { ids, lang });
-      return new Map((data.editions || []).map((e) => [e.book_id, e]));
+      const parLivre = new Map((data.editions || []).map((e) => [e.book_id, e]));
+      for (const v of data.voisines || []) {
+        const e = parLivre.get(v.book_id);
+        if (e) e._imageVoisine = v.image;
+      }
+      return parLivre;
     },
   };
 }

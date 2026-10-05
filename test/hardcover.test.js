@@ -85,3 +85,20 @@ test('Hardcover : ping utilise une requête d\'introspection (qui ne compte pas 
   assert.equal(await hc.ping(), true);
   assert.match(corps.query, /__typename/);
 });
+
+test("Hardcover : editionsEnLangue avec voisines — un second champ, et l'image voisine est attachée à l'édition retenue de chaque livre", async () => {
+  let corps;
+  const donnees = { data: {
+    editions: [{ id: 1, book_id: 10, title: 'T', isbn_13: '1', image: { url: 'petite', width: 98 } }, { id: 2, book_id: 11, title: 'U', isbn_13: '2', image: { url: 'ok', width: 300 } }],
+    voisines: [{ book_id: 10, image: { url: 'grande', width: 400 } }],
+  } };
+  const hc = creerHardcover({ cle: 'k', fetchImpl: async (u, o) => { corps = JSON.parse(o.body); return { status: 200, ok: true, headers: { get: () => null }, json: async () => donnees }; }, limiteur: async () => {} });
+  const m = await hc.editionsEnLangue([10, 11], 'fr', { voisines: true });
+  assert.match(corps.query, /voisines: editions/);
+  assert.match(corps.query, /width: \{_gte: 200\}/);
+  assert.equal(m.get(10)._imageVoisine.url, 'grande');
+  assert.equal(m.get(11)._imageVoisine, undefined);
+  // Sans l'option : une seule requête de champ, rien de plus décompté.
+  await hc.editionsEnLangue([10], 'fr');
+  assert.doesNotMatch(corps.query, /voisines/);
+});

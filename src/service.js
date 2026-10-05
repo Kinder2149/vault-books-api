@@ -15,6 +15,7 @@ import { indexer } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
 import { sansArticleInitial, candidatsAuteur, auteurCorrespond } from './requete.js';
 import { nomFamille } from './text.js';
+import { nettoyerResume, langueResume } from './resume.js';
 import { utilisable, petite } from './images.js';
 
 export const VERSION_CACHE = 'v5';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
@@ -240,6 +241,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
       const r = await couvertures.resoudre({
         isbn13,
         couvertureEdition: t.couvertureSource === 'edition' ? t.couverture : null,
+        couvertureVoisine: t._couvertureVoisine,
         couverturePetite: t._couverturePetite,
         couvertureLivre: t._couvertureLivre,
         correction: idx.couverture({ isbn13, serieId, position: t.position }),
@@ -269,7 +271,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         if (autre) entrees = entrees.concat(autre.book_series);
       }
 
-      const editions = await hardcover.editionsEnLangue(entrees.map((e) => e.book.id), lang);
+      const editions = await hardcover.editionsEnLangue(entrees.map((e) => e.book.id), lang, { voisines: true });
       const resultat = construireSerie({
         serie: principale, entrees, editions, lang,
         nom: idx.nom(canon, lang, principale.name),
@@ -278,7 +280,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
 
       const lignes = [...resultat.tomes, ...resultat.tomes.flatMap((t) => t.parties), ...resultat.horsSerie];
       await enrichirCouvertures(lignes, { idx, serieId: canon });
-      lignes.forEach((l) => { delete l._couvertureLivre; delete l._couverturePetite; });
+      lignes.forEach((l) => { delete l._couvertureLivre; delete l._couverturePetite; delete l._couvertureVoisine; });
       return resultat;
     });
   }
@@ -336,6 +338,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         titreLangue,
         auteurs,
         langue: lang,
+        resume: nettoyerResume(l.description),
+        resumeLangue: langueResume(nettoyerResume(l.description)),
         serie: serieLien ? { id: idx.idCanonique(serieLien.series.id), nom: idx.nom(idx.idCanonique(serieLien.series.id), lang, serieLien.series.name), position: serieLien.position } : null,
         editions,
         sourceBnf,
@@ -386,6 +390,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
           format: ed.edition_format || null,
           couverture: { url: couverture.url, source: couverture.source, approximative: couverture.approximative, basseDefinition: Boolean(couverture.basseDefinition) },
           livre: ed.book ? { id: ed.book.id, titre: ed.book.title } : null,
+          resume: nettoyerResume(ed.book?.description),
+          resumeLangue: langueResume(nettoyerResume(ed.book?.description)),
           serie: serieLien ? {
             id: canon, nom: idx.nom(canon, langue, serieLien.series.name), position: serieLien.position, total: serieLien.series.primary_books_count ?? null,
           } : null,
@@ -416,6 +422,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         format: null,
         couverture: { url: couverture.url, source: couverture.source, approximative: false, basseDefinition: false },
         livre: null,
+        resume: null,
+        resumeLangue: null,
         serie: null,
         sources: ['bnf'],
       };

@@ -309,3 +309,22 @@ test("quota bas : un cache FRAIS est servi comme d'habitude (le mode économie n
   hc.quota = () => ({ restantJour: 5 });
   assert.equal((await s.rechercher('dune', 'fr')).cache, 'frais');
 });
+
+test("isbn : le résumé de Hardcover est nettoyé et sa langue indiquée ; la BnF n'en a pas", async () => {
+  const resume = '<p>Dans un royaume où la magie est interdite, une jeune fille qui ne connaît pas son pouvoir part pour la capitale avec son frère.</p>';
+  const hc = { ...faux(), async editionParIsbn() { return editionHc({ book: { ...editionHc().book, description: resume } }); } };
+  const r = await creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couvFaux }).isbn('9782749910147');
+  assert.equal(r.resumeLangue, 'fr');
+  assert.ok(!r.resume.includes('<p>'));
+  const hc2 = { ...faux(), async editionParIsbn() { return null; } };
+  const bnf = { async parIsbn(i) { return { isbn13: i, titre: 'Irianeth', auteurs: ['A'], editeur: 'E', annee: '2014', langue: 'fre' }; } };
+  const r2 = await creerService({ hardcover: hc2, bnf, cache: cacheMemoire(), couvertures: couvFaux }).isbn('9791022400640');
+  assert.deepEqual([r2.resume, r2.resumeLangue], [null, null]);
+});
+
+test('livre : le résumé est rendu avec sa langue', async () => {
+  const hc = { ...faux(), async livre() { return { ...livreHc(), description: 'In a kingdom where magic is forbidden, a young girl who does not know her power travels to the capital with her brother.' }; } };
+  const r = await creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couvFaux }).livre(927288, 'fr');
+  assert.equal(r.resumeLangue, 'en');
+  assert.match(r.resume, /kingdom where magic/);
+});

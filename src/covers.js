@@ -1,7 +1,7 @@
 /*
  * covers.js — la couverture d'une édition, par cascade et PAR ISBN (jamais héritée d'un autre tome).
  *
- * Ordre : correction manuelle > image de l'édition chez Hardcover (≥ 200 px) > Open Library par ISBN (vérifiée) > miniature de l'édition > image du livre canonique
+ * Ordre : correction manuelle > image de l'édition chez Hardcover (≥ 200 px) > Open Library par ISBN (vérifiée) > image d'une autre édition française du même tome > miniature de l'édition > image du livre canonique
  * (marquée `approximative` : elle peut être celle d'une autre langue) > rien (l'app dessine une couverture).
  *
  * Open Library : `default=false` est indispensable, sinon elle rend une image d'un pixel avec un statut 200 (piège mesuré).
@@ -52,13 +52,15 @@ export function creerCouvertures({ cache, fetchImpl = fetch }) {
      * @param {{isbn13?: string, couvertureEdition?: string, couvertureLivre?: string, correction?: string}} p
      * @returns {Promise<{url: string|null, source: string|null, approximative: boolean}>}
      */
-    async resoudre({ isbn13, couvertureEdition, couverturePetite, couvertureLivre, correction }) {
+    async resoudre({ isbn13, couvertureEdition, couvertureVoisine, couverturePetite, couvertureLivre, correction }) {
       if (correction) return { url: correction, source: 'correction', approximative: false };
       if (couvertureEdition) return { url: couvertureEdition, source: 'hardcover', approximative: false };
       if (isbn13) {
         const ol = await openLibrary(isbn13);
         if (ol) return { url: ol, source: 'openlibrary', approximative: false };
       }
+      // Après Open Library (qui rend la couverture de CETTE édition, par ISBN) : celle d'une autre édition française du même tome.
+      if (couvertureVoisine) return { url: couvertureVoisine, source: 'hardcover-voisine', approximative: false };
       if (couverturePetite) return { url: couverturePetite, source: 'hardcover-petite', approximative: false, basseDefinition: true };
       if (couvertureLivre) return { url: couvertureLivre, source: 'hardcover-livre', approximative: true };
       return { url: null, source: null, approximative: false };

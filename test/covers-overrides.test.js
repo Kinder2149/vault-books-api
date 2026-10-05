@@ -90,3 +90,11 @@ test('cascade : Open Library passe devant une miniature Hardcover', async () => 
   const r = await c.resoudre({ isbn13: '9782749906256', couverturePetite: 'petite' });
   assert.equal(r.source, 'openlibrary');
 });
+
+test("cascade : l'image d'une édition voisine passe APRÈS Open Library (couverture de cette édition) et AVANT la miniature", async () => {
+  const sansOl = creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => reponse(404) });
+  const r = await sansOl.resoudre({ isbn13: '9782749906256', couvertureVoisine: 'voisine', couverturePetite: 'petite', couvertureLivre: 'livre' });
+  assert.deepEqual(r, { url: 'voisine', source: 'hardcover-voisine', approximative: false });
+  const avecOl = creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => reponse(200, 30000) });
+  assert.equal((await avecOl.resoudre({ isbn13: '9782749906256', couvertureVoisine: 'voisine' })).source, 'openlibrary');
+});

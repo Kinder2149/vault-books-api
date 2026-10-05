@@ -104,3 +104,18 @@ test('une édition dont l\'image fait moins de 200 px est tracée « edition-pet
   assert.equal(s.tomes[0].couvertureSource, 'edition-petite');
   assert.equal(s.tomes[0]._couverturePetite, 'https://img/p.jpg');
 });
+
+test("image voisine : quand l'édition retenue n'a qu'une miniature, l'image d'une autre édition française assez grande est proposée", () => {
+  const ed = { id: 1, title: 'Un', isbn_13: '1', image: { url: 'https://img/petite.jpg', width: 98 }, _imageVoisine: { url: 'https://img/grande.jpg', width: 400 } };
+  const s = construireSerie({ serie: SERIE, entrees: [entree(1, livre(1, 'Un', 5))], editions: new Map([[1, ed]]), lang: 'fr' });
+  assert.equal(s.tomes[0]._couvertureVoisine, 'https://img/grande.jpg');
+  assert.equal(s.tomes[0]._couverturePetite, 'https://img/petite.jpg');
+});
+
+test("image voisine : jamais proposée quand l'édition a déjà une image assez grande, ni quand la voisine est elle-même petite", () => {
+  const bonne = { id: 1, title: 'Un', isbn_13: '1', image: { url: 'https://img/bonne.jpg', width: 400 }, _imageVoisine: { url: 'https://img/autre.jpg', width: 400 } };
+  const petiteVoisine = { id: 2, title: 'Deux', isbn_13: '2', image: { url: 'https://img/p.jpg', width: 98 }, _imageVoisine: { url: 'https://img/p2.jpg', width: 120 } };
+  const s = construireSerie({ serie: SERIE, entrees: [entree(1, livre(1, 'Un', 5)), entree(2, livre(2, 'Deux', 5))], editions: new Map([[1, bonne], [2, petiteVoisine]]), lang: 'fr' });
+  assert.equal(s.tomes[0]._couvertureVoisine, null);
+  assert.equal(s.tomes[1]._couvertureVoisine, null);
+});

@@ -1,0 +1,276 @@
+{
+  "date": "2026-10-05T12:06:51.972Z",
+  "aRenommer": [
+    {
+      "id": 1097,
+      "nom": "La Roue du Temps",
+      "nomActuel": "The Wheel of Time",
+      "auteur": "Jordan"
+    },
+    {
+      "id": 10001,
+      "nom": "Fils-des-brumes",
+      "nomActuel": "The Mistborn Saga: The Original Trilogy",
+      "auteur": "Sanderson"
+    },
+    {
+      "id": 997,
+      "nom": "Les Archives de Roshar",
+      "nomActuel": "The Stormlight Archive",
+      "auteur": "Sanderson"
+    },
+    {
+      "id": 988,
+      "nom": "Chronique du tueur de roi",
+      "nomActuel": "The Kingkiller Chronicle",
+      "auteur": "Rothfuss"
+    },
+    {
+      "id": 1018,
+      "nom": "Les Annales du Disque-Monde",
+      "nomActuel": "Discworld",
+      "auteur": "Pratchett"
+    },
+    {
+      "id": 1808,
+      "nom": "Le Sorceleur",
+      "nomActuel": "The Witcher",
+      "auteur": "Sapkowski"
+    },
+    {
+      "id": 1170,
+      "nom": "Terremer",
+      "nomActuel": "Earthsea Cycle",
+      "auteur": "Guin"
+    },
+    {
+      "id": 5485,
+      "nom": "Le Monde de Narnia",
+      "nomActuel": "The Chronicles of Narnia (Publication Order)",
+      "auteur": "Lewis"
+    },
+    {
+      "id": 3413,
+      "nom": "La Tour sombre",
+      "nomActuel": "The Dark Tower",
+      "auteur": "King"
+    },
+    {
+      "id": 4910,
+      "nom": "La Compagnie noire",
+      "nomActuel": "The Chronicles of the Black Company",
+      "auteur": "Cook"
+    },
+    {
+      "id": 5464,
+      "nom": "L'Héritage",
+      "nomActuel": "The Inheritance Cycle",
+      "auteur": "Paolini"
+    },
+    {
+      "id": 5193,
+      "nom": "Percy Jackson",
+      "nomActuel": "Percy Jackson and the Olympians",
+      "auteur": "Riordan"
+    },
+    {
+      "id": 6958,
+      "nom": "Les Royaumes de feu",
+      "nomActuel": "Wings of Fire",
+      "auteur": "Sutherland"
+    },
+    {
+      "id": 11614,
+      "nom": "Les Gardiens des cités perdues",
+      "nomActuel": "Keeper of the Lost Cities",
+      "auteur": "Messenger"
+    },
+    {
+      "id": 5450,
+      "nom": "Fondation",
+      "nomActuel": "Foundation",
+      "auteur": "Asimov"
+    },
+    {
+      "id": 1044,
+      "nom": "Les Robots",
+      "nomActuel": "Robot",
+      "auteur": "Asimov"
+    },
+    {
+      "id": 1049,
+      "nom": "Hypérion",
+      "nomActuel": "Hyperion Cantos",
+      "auteur": "Simmons"
+    },
+    {
+      "id": 1059,
+      "nom": "La Stratégie Ender",
+      "nomActuel": "Ender's Saga",
+      "auteur": "Card"
+    },
+    {
+      "id": 3400,
+      "nom": "Le Guide du voyageur galactique",
+      "nomActuel": "The Hitchhiker's Guide to the Galaxy",
+      "auteur": "Adams"
+    },
+    {
+      "id": 1033,
+      "nom": "Red Rising",
+      "nomActuel": "Red Rising Saga",
+      "auteur": "Brown"
+    },
+    {
+      "id": 1584,
+      "nom": "Le Problème à trois corps",
+      "nomActuel": "Remembrance of Earth's Past",
+      "auteur": "Liu"
+    },
+    {
+      "id": 1015,
+      "nom": "Hunger Games",
+      "nomActuel": "The Hunger Games",
+      "auteur": "Collins"
+    },
+    {
+      "id": 1489,
+      "nom": "Divergente",
+      "nomActuel": "Divergent",
+      "auteur": "Roth"
+    },
+    {
+      "id": 1073,
+      "nom": "L'Épreuve",
+      "nomActuel": "The Maze Runner",
+      "auteur": "Dashner"
+    },
+    {
+      "id": 5451,
+      "nom": "Twilight",
+      "nomActuel": "The Twilight Saga",
+      "auteur": "Meyer"
+    },
+    {
+      "id": 1275,
+      "nom": "Une cour d'épines et de roses",
+      "nomActuel": "A Court of Thorns and Roses",
+      "auteur": "Maas"
+    },
+    {
+      "id": 5509,
+      "nom": "Keleana",
+      "nomActuel": "Throne of Glass",
+      "auteur": "Maas"
+    },
+    {
+      "id": 5473,
+      "nom": "La Cité des ténèbres",
+      "nomActuel": "The Mortal Instruments",
+      "auteur": "Clare"
+    },
+    {
+      "id": 2115,
+      "nom": "Millénium",
+      "nomActuel": "Millennium",
+      "auteur": "Larsson"
+    },
+    {
+      "id": 11737,
+      "nom": "Maigret",
+      "nomActuel": "Inspector Maigret",
+      "auteur": "Simenon"
+    },
+    {
+      "id": 10433,
+      "nom": "Les Rougon-Macquart",
+      "nomActuel": "Les Rougon-Macquart (Recommended Order)",
+      "auteur": "Zola"
+    },
+    {
+      "id": 4794,
+      "nom": "Les Aventures de Tintin",
+      "nomActuel": "Tintin",
+      "auteur": "Hergé"
+    },
+    {
+      "id": 152692,
+      "nom": "Boule et Bill",
+      "nomActuel": "Boule et Bill (première édition)",
+      "auteur": "Roba"
+    },
+    {
+      "id": 3472,
+      "nom": "Dragon Ball",
+      "nomActuel": "Dragon Ball (42 Books)",
+      "auteur": "Toriyama"
+    },
+    {
+      "id": 6370,
+      "nom": "L'Attaque des Titans",
+      "nomActuel": "Attack on Titan",
+      "auteur": "Isayama"
+    },
+    {
+      "id": 65209,
+      "nom": "Demon Slayer",
+      "nomActuel": "Demon Slayer: Kimetsu no Yaiba [鬼滅の刃]",
+      "auteur": "Gotouge"
+    },
+    {
+      "id": 15811,
+      "nom": "Détective Conan",
+      "nomActuel": "名探偵コナン [Meitantei Conan]",
+      "auteur": "Aoyama"
+    },
+    {
+      "id": 6224,
+      "nom": "Le Journal d'un dégonflé",
+      "nomActuel": "Diary of a Wimpy Kid",
+      "auteur": "Kinney"
+    },
+    {
+      "id": 39247,
+      "nom": "Chair de poule",
+      "nomActuel": "Goosebumps 2000",
+      "auteur": "Stine"
+    },
+    {
+      "id": 11185,
+      "nom": "Le Club des Cinq",
+      "nomActuel": "The Famous Five",
+      "auteur": "Blyton"
+    },
+    {
+      "id": 5233,
+      "nom": "Alex Rider",
+      "nomActuel": "Alex Rider (Books)",
+      "auteur": "Horowitz"
+    },
+    {
+      "id": 2965,
+      "nom": "L'Apprenti d'Araluen",
+      "nomActuel": "Ranger's Apprentice",
+      "auteur": "Flanagan"
+    },
+    {
+      "id": 1570,
+      "nom": "Les Orphelins Baudelaire",
+      "nomActuel": "A Series of Unfortunate Events",
+      "auteur": "Snicket"
+    }
+  ],
+  "dejaBon": 39,
+  "introuvables": [
+    {
+      "nom": "Miss Marple",
+      "auteur": "Christie",
+      "raison": "pas de saga, un livre : « Agatha Christie »"
+    },
+    {
+      "nom": "Spirou et Fantasio",
+      "auteur": "Franquin",
+      "raison": "aucun résultat de cet auteur"
+    }
+  ]
+}
