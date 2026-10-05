@@ -1,0 +1,23 @@
+name: Tests
+
+# Les tests de l'API tournent à chaque push et à chaque demande de fusion. Ils n'appellent AUCUN service réel et n'ont besoin d'aucun secret.
+# Une action rouge signifie « ne pas compter sur ce commit » : Vercel déploie quand même à chaque push sur main, c'est donc le signal à regarder.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Aucune dépendance à installer : le projet n'en a pas (Node seul).
+      - run: node --test test/
+      # Les fichiers qui ne sont pas couverts par un import de test doivent au moins compiler.
+      - run: |
+          for f in api/*.js scripts/*.mjs; do node --check "$f"; done
