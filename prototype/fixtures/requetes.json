@@ -1,0 +1,22 @@
+{
+  "_note": "Jeu de pertinence (test C). 'attendu' = ce qui doit sortir en tête. Statut : à exécuter contre l'API. Reprend le banc de Vault Read + variantes.",
+  "requetes": [
+    { "texte": "harry potter", "attendu": { "auteur": "Rowling", "type": "saga" } },
+    { "texte": "le seigneur des anneaux", "attendu": { "auteur": "Tolkien", "type": "saga" } },
+    { "texte": "seigneur des anneaux", "attendu": { "auteur": "Tolkien", "type": "saga" }, "variante": "sans article" },
+    { "texte": "le trone de fer", "attendu": { "auteur": "Martin", "type": "saga" }, "variante": "sans accent" },
+    { "texte": "game of thrones", "attendu": { "auteur": "Martin", "type": "saga" } },
+    { "texte": "game of throne", "attendu": { "auteur": "Martin", "type": "saga" }, "variante": "faute de frappe" },
+    { "texte": "la quete d'ewilan", "attendu": { "auteur": "Bottero", "type": "saga" } },
+    { "texte": "la passe-miroir", "attendu": { "auteur": "Dabos", "type": "saga" } },
+    { "texte": "les chevaliers d'émeraude", "attendu": { "auteur": "Robillard", "type": "saga" } },
+    { "texte": "germinal", "attendu": { "auteur": "Zola", "type": "livre" } },
+    { "texte": "les fourmis", "attendu": { "auteur": "Werber", "type": "livre" }, "variante": "titre homonyme" },
+    { "texte": "1984", "attendu": { "auteur": "Orwell", "type": "livre" }, "variante": "titre numérique" },
+    { "texte": "dune", "attendu": { "auteur": "Herbert", "type": "saga" }, "variante": "titre court" }
+  ],
+  "langue": [
+    { "texte": "game of thrones", "lang": "fr", "attendu": "titres français (Le Trône de fer…)" },
+    { "texte": "game of thrones", "lang": "en", "attendu": "titres anglais (A Game of Thrones…)" }
+  ]
+}

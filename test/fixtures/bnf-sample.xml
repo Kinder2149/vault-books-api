@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<srw:searchRetrieveResponse xmlns:srw="http://www.loc.gov/zing/srw/">
+<srw:version>1.2</srw:version><srw:numberOfRecords>3</srw:numberOfRecords>
+<srw:records>
+<srw:record><srw:recordData>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:identifier>http://catalogue.bnf.fr/ark:/12148/cb41127100x</dc:identifier>
+<dc:identifier>ISBN 978-2-7499-0625-6 (br.) : 6 EUR</dc:identifier>
+<dc:title>Le feu dans le ciel / Anne Robillard</dc:title>
+<dc:creator>Robillard, Anne (1955-....). Auteur du texte</dc:creator>
+<dc:publisher>M. Lafon (Neuilly-sur-Seine)</dc:publisher>
+<dc:date>2007</dc:date>
+<dc:language>fre</dc:language>
+</oai_dc:dc></srw:recordData></srw:record>
+<srw:record><srw:recordData>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:identifier>http://catalogue.bnf.fr/ark:/12148/cb42222222z</dc:identifier>
+<dc:identifier>ISBN 2-266-04650-0</dc:identifier>
+<dc:title>Les deux tours / J. R. R. Tolkien ; traduit par Francis Ledoux</dc:title>
+<dc:creator>Tolkien, John Ronald Reuel (1892-1973). Auteur du texte</dc:creator>
+<dc:contributor>Ledoux, Francis (1906-1988). Traducteur</dc:contributor>
+<dc:publisher>Presses pocket [éd., distrib.] (Paris)</dc:publisher>
+<dc:date>1986</dc:date>
+<dc:description>Collection : Presses pocket ; 2657-2659</dc:description>
+<dc:language>fre</dc:language>
+</oai_dc:dc></srw:recordData></srw:record>
+<srw:record><srw:recordData>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<dc:identifier>http://catalogue.bnf.fr/ark:/12148/cb43333333k</dc:identifier>
+<dc:title>Un livre ancien sans ISBN</dc:title>
+<dc:creator>Zola, Émile (1840-1902)</dc:creator>
+<dc:publisher>Charpentier (Paris)</dc:publisher>
+<dc:date>1885</dc:date>
+</oai_dc:dc></srw:recordData></srw:record>
+</srw:records></srw:searchRetrieveResponse>
+

@@ -1,0 +1,17 @@
+{
+  "name": "vault-books-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "API de catalogue de livres pour Vault Read : recherche triée, sagas dans l'ordre, couvertures fiables.",
+  "engines": { "node": ">=20.12" },
+  "scripts": {
+    "dev": "node --env-file=.env scripts/dev-server.mjs",
+    "test": "node --test test/",
+    "test:c": "node --env-file=.env scripts/test-c.mjs",
+    "planche": "node --env-file=.env scripts/planche-sagas.mjs",
+    "verifier:supabase": "node --env-file=.env scripts/verifier-supabase.mjs",
+    "smoke": "node --env-file=.env scripts/smoke.mjs"
+  }
+}
+

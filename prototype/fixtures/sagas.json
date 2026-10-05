@@ -1,0 +1,26 @@
+{
+  "_note": "Attendus à VALIDER par Kinder. 'tomesAttendus' = nombre de tomes de la saga principale en version originale ; les éditions françaises découpent parfois autrement (Trône de fer : 12+ volumes en poche).",
+  "sagas": [
+    {
+      "id": "got",
+      "requetes": ["game of thrones", "le trone de fer", "a song of ice and fire"],
+      "auteur": "Martin",
+      "tomesAttendus": 5,
+      "remarque": "Les éditions FR (J'ai lu) découpent chaque roman en plusieurs volumes numérotés ; à trancher : un résultat par volume FR ou par roman ?"
+    },
+    {
+      "id": "lotr",
+      "requetes": ["le seigneur des anneaux", "the lord of the rings"],
+      "auteur": "Tolkien",
+      "tomesAttendus": 3,
+      "remarque": "3 volumes (+ Le Hobbit, hors saga). Les coffrets et intégrales restent des cartes séparées."
+    },
+    {
+      "id": "emeraude",
+      "requetes": ["les chevaliers d'émeraude", "chevaliers d'emeraude"],
+      "auteur": "Robillard",
+      "tomesAttendus": 12,
+      "remarque": "Premier cycle : 12 tomes. Wikidata n'a pas le tome 2."
+    }
+  ]
+}
