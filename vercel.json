@@ -8,7 +8,10 @@
     { "source": "/v1/health", "destination": "/api/health" }
   ],
   "regions": ["cdg1"],
-  "crons": [{ "path": "/api/entretien", "schedule": "17 3 * * *" }],
+  "crons": [
+    { "path": "/api/entretien", "schedule": "17 3 * * *" },
+    { "path": "/api/controle-couvertures", "schedule": "7 5 * * 1" }
+  ],
   "functions": {
     "api/books.js": { "maxDuration": 30 },
     "api/series.js": { "maxDuration": 30 }

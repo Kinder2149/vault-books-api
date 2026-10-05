@@ -47,7 +47,7 @@ test("entretien : purge les anciennes versions SAUF les clés sans version (cove
 
   const suppressions = appels.filter((a) => a.methode === 'DELETE');
   assert.equal(suppressions.length, 3);
-  assert.match(suppressions[0].url, /cache_entries\?and=\(key\.not\.like\.\*:v4:\*,key\.not\.like\.cover:\*,key\.not\.like\.quota:\*\)/);
+  assert.match(suppressions[0].url, /cache_entries\?and=\(key\.not\.like\.\*:v4:\*,key\.not\.like\.cover:\*,key\.not\.like\.quota:\*,key\.not\.like\.controle:\*\)/);
   assert.match(suppressions[1].url, new RegExp(`cache_entries\\?fetched_at=lt\\.${new Date(t - AGE_MAX_CACHE_MS).toISOString().replace(/[.]/g, '\\.')}`));
   assert.match(suppressions[2].url, new RegExp(`request_log\\?at=lt\\.${new Date(t - AGE_MAX_JOURNAL_MS).toISOString().replace(/[.]/g, '\\.')}`));
   assert.equal(r.anciennesVersions, 101);

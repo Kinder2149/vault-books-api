@@ -26,6 +26,9 @@ export default gestionnaire(async ({ url, app, res }) => {
     : { ok: null, note: 'non testée (ajouter ?profond=1)' };
 
   const stats24h = app.journal ? await app.journal.stats(24) : null;
+  // Dernier contrôle hebdomadaire des couvertures corrigées à la main (adresses mortes à remplacer).
+  let couverturesCorrigees = null;
+  try { couverturesCorrigees = (await app.cache.get('controle:couvertures'))?.valeur || null; } catch { /* le statut ne dépend pas de ce détail */ }
   const ok = supabase.ok && hardcover.ok && bnf.ok !== false;
 
   repondre(res, ok ? 200 : 503, {
@@ -35,6 +38,7 @@ export default gestionnaire(async ({ url, app, res }) => {
     hardcover,
     bnf,
     stats24h,
+    couverturesCorrigees,
     // Le quota du jour restant, en clair : sous 1 000, le service passe en mode économie (cache seul).
     modeEconomie: Number.isFinite(hardcover.quota?.restantJour) && hardcover.quota.restantJour < 1000,
   });

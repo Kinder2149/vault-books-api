@@ -5,7 +5,7 @@
  *  1. GARDER SUPABASE ACTIF. Un projet gratuit se met en pause après ~7 jours sans activité ; l'entretien lit et écrit chaque jour.
  *  2. PURGER le cache : les entrées d'une ancienne version du format (`search:v3:…` quand la version courante est v4) ne servent plus
  *     à personne, et celles plus vieilles que 60 jours sont périmées de toute façon (le plus long TTL est de 30 jours). Les clés de
- *     couvertures (`cover:…`) et de quota (`quota:…`) n'ont pas de version : elles ne partent que par l'âge.
+ *     couvertures (`cover:…`), de quota (`quota:…`) et de contrôle (`controle:…`) n'ont pas de version : elles ne partent que par l'âge.
  *  3. PURGER le journal des appels au-delà de 30 jours (aucune donnée personnelle n'y est écrite, mais la durée est bornée par principe).
  *
  * Tout passe par l'API REST de Supabase : aucune dépendance.
@@ -51,7 +51,7 @@ export function creerEntretien({ url, cle, version, fetchImpl = fetch, maintenan
 
       // Les clés versionnées (search/serie/livre/isbn) d'une AUTRE version que la courante. Les clés sans version (cover:, quota:) sont exclues.
       const anciennesVersions = await supprimer('cache_entries',
-        `and=(key.not.like.*:${version}:*,key.not.like.cover:*,key.not.like.quota:*)`);
+        `and=(key.not.like.*:${version}:*,key.not.like.cover:*,key.not.like.quota:*,key.not.like.controle:*)`);
 
       const limiteCache = new Date(debut - AGE_MAX_CACHE_MS).toISOString();
       const tropVieilles = await supprimer('cache_entries', `fetched_at=lt.${limiteCache}`);
