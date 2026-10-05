@@ -8,12 +8,40 @@
 const URL_API = 'https://api.hardcover.app/v1/graphql';
 const DELAI_MAX_MS = 10000;
 const PAUSES_REESSAI_MS = [500, 1500];   // 429 et 503 : l'API dit « sans danger de réessayer »
+const PAUSE_MAX_MS = 5000;
 
-export function creerHardcover({ cle, fetchImpl = fetch } = {}) {
+/**
+ * Limiteur de débit (seau à jetons) : au plus `capacite` appels d'un coup, puis `parSeconde` par seconde. Il FAIT ATTENDRE au lieu de laisser
+ * échouer. Hardcover autorise 60 requêtes/minute et une rafale de 10 : une recherche jamais faite coûte 2 appels, et chaque saga dépliée
+ * par l'application en coûte 2 de plus — trois sagas en parallèle suffisent à saturer la rafale (mesuré le 2026-10-05 sur « dune » et
+ * « les fourmis » : sagas dépliées en échec, résultats dégradés). Par processus : sans coordination entre instances, mais avec moins de
+ * 100 utilisateurs par jour l'ordre de grandeur est le bon, et le réessai sur 429 couvre le reste.
+ */
+export function creerLimiteur({ capacite = 8, parSeconde = 0.9, maintenant = Date.now, attendre = (ms) => new Promise((ok) => setTimeout(ok, ms)) } = {}) {
+  let jetons = capacite;
+  let dernier = maintenant();
+  let file = Promise.resolve();
+  return function acquerir() {
+    const tache = file.then(async () => {
+      for (;;) {
+        const t = maintenant();
+        jetons = Math.min(capacite, jetons + ((t - dernier) / 1000) * parSeconde);
+        dernier = t;
+        if (jetons >= 1) { jetons -= 1; return; }
+        await attendre(Math.ceil(((1 - jetons) / parSeconde) * 1000));
+      }
+    });
+    file = tache.catch(() => {});
+    return tache;
+  };
+}
+
+export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteur(), pausesReessaiMs = PAUSES_REESSAI_MS } = {}) {
   if (!cle) throw new Error('HARDCOVER_API_KEY manquante');
   const auth = `Bearer ${cle.replace(/^bearer /i, '')}`;
 
   async function gql(requete, variables = {}, essai = 0) {
+    await limiteur();
     const arret = new AbortController();
     const minuteur = setTimeout(() => arret.abort(), DELAI_MAX_MS);
     try {
@@ -23,8 +51,11 @@ export function creerHardcover({ cle, fetchImpl = fetch } = {}) {
         body: JSON.stringify({ query: requete, variables }),
         signal: arret.signal,
       });
-      if ((r.status === 429 || r.status === 503) && essai < PAUSES_REESSAI_MS.length) {
-        await new Promise((ok) => setTimeout(ok, PAUSES_REESSAI_MS[essai]));
+      if ((r.status === 429 || r.status === 503) && essai < pausesReessaiMs.length) {
+        // Si Hardcover dit combien attendre (en-tête Retry-After, en secondes), on l'écoute ; sinon pause croissante.
+        const demande = Number(r.headers?.get?.('retry-after')) * 1000;
+        const pause = Math.min(PAUSE_MAX_MS, Math.max(pausesReessaiMs[essai], Number.isFinite(demande) ? demande : 0));
+        await new Promise((ok) => setTimeout(ok, pause));
         return gql(requete, variables, essai + 1);
       }
       const corps = await r.json().catch(() => ({}));

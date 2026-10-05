@@ -157,3 +157,11 @@ test('saga : la couverture des tomes passe par la cascade (correction par tome >
   assert.equal(r.tomes[1].couvertureSource, 'correction');
   assert.equal(r.tomes[0]._couvertureLivre, undefined);          // détail interne jamais exposé
 });
+
+test("livre isolé : la carte porte l'ISBN, l'éditeur et la date de l'édition dans la langue (de quoi l'ajouter sans second appel)", async () => {
+  const hits = [doc(1, 'Germinal')];
+  const editions = new Map([[1, { title: 'Germinal', isbn_13: '978-2-07-036822-8', publisher: { name: 'Gallimard' }, release_date: '1999-01-01', image: { url: 'https://img/e.jpg' } }]]);
+  const s = creerService({ hardcover: faux({ hits, editions }), cache: cacheMemoire() });
+  const r = await s.rechercher('germinal', 'fr');
+  assert.deepEqual([r.resultats[0].isbn13, r.resultats[0].editeur, r.resultats[0].date], ['9782070368228', 'Gallimard', '1999-01-01']);
+});

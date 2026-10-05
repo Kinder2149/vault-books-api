@@ -12,6 +12,7 @@ import { construireCartes } from './rank.js';
 import { construireSerie } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer } from './overrides.js';
+import { versIsbn13 } from './isbn.js';
 
 const VERSION_CACHE = 'v2';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
@@ -87,6 +88,10 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         if (c.type === 'livre' && edition) {
           carte.titre = edition.title || c.titre;
           carte.couverture = edition.image?.url || c.couverture;
+          // Ce qu'il faut pour AJOUTER ce livre sans second appel : l'ISBN, l'éditeur et la date de l'édition choisie.
+          carte.isbn13 = versIsbn13(edition.isbn_13);
+          carte.editeur = edition.publisher?.name || null;
+          carte.date = edition.release_date || null;
         }
         return carte;
       }).sort((a, b) => b.score - a.score);
