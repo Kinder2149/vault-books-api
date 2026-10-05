@@ -15,12 +15,18 @@ import { indexer } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
 import { utilisable, petite } from './images.js';
 
-const VERSION_CACHE = 'v4';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
+export const VERSION_CACHE = 'v4';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
 const NB_RESULTATS = 20;
 const CONCURRENCE_COUVERTURES = 4;
 
 export class ErreurRequete extends Error {}
+
+// Le quota du jour de la source est presque épuisé : on ne sert plus que ce qu'on a déjà (voir vecCache).
+export class ErreurQuota extends Error {}
+
+// En dessous de ce nombre de requêtes restantes sur les 5 000 du jour (20 %), le service passe en mode économie.
+export const SEUIL_QUOTA_JOUR = 1000;
 
 const DELAI_BNF_MS = 5000;
 
@@ -40,7 +46,7 @@ async function enParallele(elements, n, fn) {
   }));
 }
 
-export function creerService({ hardcover, bnf = null, cache, overrides = { series: {}, couvertures: {} }, couvertures = null, delaiBnfMs = DELAI_BNF_MS }) {
+export function creerService({ hardcover, bnf = null, cache, overrides = { series: {}, couvertures: {} }, couvertures = null, delaiBnfMs = DELAI_BNF_MS, seuilQuotaJour = SEUIL_QUOTA_JOUR }) {
   const lireOverrides = typeof overrides === 'function' ? overrides : async () => overrides;
 
   async function lire(cle) {
@@ -54,6 +60,18 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
   async function avecCache(cle, ttl, calculer) {
     const c = await lire(cle);
     if (c && c.ageMs < (typeof ttl === 'function' ? ttl(c.valeur) : ttl)) return { ...c.valeur, cache: 'frais' };
+
+    /*
+     * MODE ÉCONOMIE. Hardcover donne 5 000 requêtes par jour ; quand il en reste moins de seuilQuotaJour, on ne sollicite plus la source :
+     * on sert ce qu'on a (même périmé), et sans rien en cache on refuse proprement (503) — l'application retombe alors sur ses
+     * anciennes sources. Mieux vaut un service un peu moins frais jusqu'à minuit qu'un service coupé le reste de la journée.
+     */
+    const restant = hardcover.quota ? hardcover.quota().restantJour : null;
+    if (Number.isFinite(restant) && restant < seuilQuotaJour) {
+      if (c) return { ...c.valeur, cache: 'perime' };
+      throw new ErreurQuota('quota de la source presque épuisé');
+    }
+
     try {
       const valeur = await calculer();
       if (valeur) await ecrire(cle, valeur);

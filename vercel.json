@@ -4,9 +4,11 @@
     { "source": "/v1/series/:id", "destination": "/api/series?id=:id" },
     { "source": "/v1/books/:id", "destination": "/api/books?id=:id" },
     { "source": "/v1/isbn/:isbn", "destination": "/api/isbn?isbn=:isbn" },
+    { "source": "/v1/status", "destination": "/api/status" },
     { "source": "/v1/health", "destination": "/api/health" }
   ],
   "regions": ["cdg1"],
+  "crons": [{ "path": "/api/entretien", "schedule": "17 3 * * *" }],
   "functions": {
     "api/books.js": { "maxDuration": 30 },
     "api/series.js": { "maxDuration": 30 }

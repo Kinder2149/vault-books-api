@@ -36,9 +36,29 @@ export function creerLimiteur({ capacite = 8, parSeconde = 0.9, maintenant = Dat
   };
 }
 
-export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteur(), pausesReessaiMs = PAUSES_REESSAI_MS } = {}) {
+/**
+ * L'en-tête `RateLimit` de Hardcover : `"Free";r=8;t=0, "daily";r=4231;t=51234` — `r` = requêtes restantes, `t` = secondes avant remise à zéro.
+ * La première entrée est la minute (le nom du plan varie : Free, Supporter…), « daily » est le quota du jour.
+ * @returns {{restantMinute: number|null, restantJour: number|null}|null} null si l'en-tête est absent ou illisible
+ */
+export function lireRateLimit(entete) {
+  if (!entete) return null;
+  const jour = String(entete).match(/"daily"\s*;\s*r\s*=\s*(\d+)/i);
+  const minute = String(entete).match(/^\s*"(?!daily")[^"]*"\s*;\s*r\s*=\s*(\d+)/i);
+  if (!jour && !minute) return null;
+  return { restantMinute: minute ? Number(minute[1]) : null, restantJour: jour ? Number(jour[1]) : null };
+}
+
+export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteur(), pausesReessaiMs = PAUSES_REESSAI_MS, maintenant = Date.now } = {}) {
   if (!cle) throw new Error('HARDCOVER_API_KEY manquante');
   const auth = `Bearer ${cle.replace(/^bearer /i, '')}`;
+
+  // Le dernier état connu du quota, d'après les en-têtes des réponses : il ne coûte aucune requête de plus.
+  let quota = { restantMinute: null, restantJour: null, vuA: null };
+  function noterQuota(entete) {
+    const lu = lireRateLimit(entete);
+    if (lu) quota = { ...quota, ...Object.fromEntries(Object.entries(lu).filter(([, v]) => v !== null)), vuA: maintenant() };
+  }
 
   async function gql(requete, variables = {}, essai = 0) {
     await limiteur();
@@ -51,6 +71,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
         body: JSON.stringify({ query: requete, variables }),
         signal: arret.signal,
       });
+      noterQuota(r.headers?.get?.('ratelimit'));
       if ((r.status === 429 || r.status === 503) && essai < pausesReessaiMs.length) {
         // Si Hardcover dit combien attendre (en-tête Retry-After, en secondes), on l'écoute ; sinon pause croissante.
         const demande = Number(r.headers?.get?.('retry-after')) * 1000;
@@ -71,6 +92,15 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
   }
 
   return {
+    /** Le quota, tel que vu dans la dernière réponse (valeurs nulles tant qu'aucun appel n'a eu lieu dans ce processus). */
+    quota: () => ({ ...quota }),
+
+    /** Hardcover répond-il ? `__typename` est une requête d'introspection : elle ne compte pas dans le quota (doc officielle). */
+    async ping() {
+      await gql('query { __typename }');
+      return true;
+    },
+
     /** Recherche de livres. Rend les documents tels que Hardcover les indexe. */
     async rechercher(texte, perPage = 25) {
       const data = await gql(

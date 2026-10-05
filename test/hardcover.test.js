@@ -60,3 +60,28 @@ test('Hardcover : un 429 qui persiste finit en erreur claire', async () => {
   const hc = creerHardcover({ cle: 'k', fetchImpl: async () => reponse(429, { error: 'Too Many Requests' }), limiteur: async () => {}, pausesReessaiMs: [1, 1] });
   await assert.rejects(() => hc.rechercher('dune'), /429/);
 });
+
+import { lireRateLimit } from '../src/sources/hardcover.js';
+
+test("quota : l'en-tête RateLimit est lu (minute et jour), quel que soit le nom du plan", () => {
+  assert.deepEqual(lireRateLimit('"Free";r=8;t=0, "daily";r=4231;t=51234'), { restantMinute: 8, restantJour: 4231 });
+  assert.deepEqual(lireRateLimit('"Supporter";r=12;t=3, "daily";r=49000;t=100'), { restantMinute: 12, restantJour: 49000 });
+  assert.deepEqual(lireRateLimit('"daily";r=10;t=5'), { restantMinute: null, restantJour: 10 });
+  assert.equal(lireRateLimit(null), null);
+  assert.equal(lireRateLimit('illisible'), null);
+});
+
+test("quota : Hardcover mémorise le dernier état vu dans les en-têtes de ses réponses, sans appel de plus", async () => {
+  const rep = (entete) => ({ status: 200, ok: true, headers: { get: (k) => (k.toLowerCase() === 'ratelimit' ? entete : null) }, json: async () => ({ data: { search: { results: { hits: [] } } } }) });
+  const hc = creerHardcover({ cle: 'k', fetchImpl: async () => rep('"Free";r=3;t=0, "daily";r=950;t=100'), limiteur: async () => {}, maintenant: () => 42 });
+  assert.deepEqual(hc.quota(), { restantMinute: null, restantJour: null, vuA: null });   // rien de connu avant le premier appel
+  await hc.rechercher('dune');
+  assert.deepEqual(hc.quota(), { restantMinute: 3, restantJour: 950, vuA: 42 });
+});
+
+test('Hardcover : ping utilise une requête d\'introspection (qui ne compte pas dans le quota)', async () => {
+  let corps;
+  const hc = creerHardcover({ cle: 'k', fetchImpl: async (u, o) => { corps = JSON.parse(o.body); return { status: 200, ok: true, headers: { get: () => null }, json: async () => ({ data: { __typename: 'query_root' } }) }; }, limiteur: async () => {} });
+  assert.equal(await hc.ping(), true);
+  assert.match(corps.query, /__typename/);
+});

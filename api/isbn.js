@@ -6,4 +6,4 @@ export default gestionnaire(async ({ url, app, res }) => {
   const donnees = await app.service.isbn(url.searchParams.get('isbn'));
   if (!donnees) return repondre(res, 404, { erreur: 'ISBN inconnu.' });
   repondre(res, 200, donnees, { cacheControl: CACHE_CDN });
-});
+}, { route: 'isbn' });

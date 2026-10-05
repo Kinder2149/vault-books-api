@@ -5,4 +5,4 @@ export default gestionnaire(async ({ url, app, res }) => {
   const donnees = await app.service.serie(url.searchParams.get('id'), url.searchParams.get('lang'));
   if (!donnees) return repondre(res, 404, { erreur: 'Série introuvable.' });
   repondre(res, 200, donnees, { cacheControl: CACHE_CDN });
-});
+}, { route: 'series' });

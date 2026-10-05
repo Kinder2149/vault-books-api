@@ -270,3 +270,42 @@ test('isbn : miniature Hardcover sous 200 px → Open Library d\'abord (cascade 
   const s = creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couv });
   assert.equal((await s.isbn('9782749910147')).couverture.source, 'openlibrary');
 });
+
+// ------------------------------------------------------------------ mode économie (quota)
+
+import { ErreurQuota } from '../src/service.js';
+
+test("quota bas : cache périmé servi, SANS appeler la source", async () => {
+  let appels = 0;
+  const hc = { ...faux(), quota: () => ({ restantJour: 500 }), async rechercher() { appels += 1; return []; } };
+  const vieux = { async get() { return { valeur: { requete: 'dune', langue: 'fr', resultats: [{ titre: 'Dune' }] }, ageMs: 99 * 24 * 3600 * 1000 }; }, async set() {} };
+  const s = creerService({ hardcover: hc, cache: vieux });
+  const r = await s.rechercher('dune', 'fr');
+  assert.equal(r.cache, 'perime');
+  assert.equal(appels, 0);
+});
+
+test("quota bas et rien en cache : ErreurQuota (503 côté HTTP), la source n'est pas sollicitée", async () => {
+  let appels = 0;
+  const hc = { ...faux(), quota: () => ({ restantJour: 10 }), async rechercher() { appels += 1; return []; } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire() });
+  await assert.rejects(() => s.rechercher('dune', 'fr'), ErreurQuota);
+  assert.equal(appels, 0);
+});
+
+test("quota suffisant, ou inconnu : le service travaille normalement", async () => {
+  for (const quota of [{ restantJour: 4000 }, { restantJour: null }]) {
+    const hc = { ...faux({ hits: [doc(1, 'Dune')] }), quota: () => quota };
+    const s = creerService({ hardcover: hc, cache: cacheMemoire() });
+    assert.equal((await s.rechercher('dune', 'fr')).cache, 'absent');
+  }
+});
+
+test("quota bas : un cache FRAIS est servi comme d'habitude (le mode économie ne dégrade que ce qui exigerait un appel)", async () => {
+  const cache = cacheMemoire();
+  const hc = { ...faux({ hits: [doc(1, 'Dune')] }), quota: () => ({ restantJour: 4000 }) };
+  const s = creerService({ hardcover: hc, cache });
+  await s.rechercher('dune', 'fr');
+  hc.quota = () => ({ restantJour: 5 });
+  assert.equal((await s.rechercher('dune', 'fr')).cache, 'frais');
+});

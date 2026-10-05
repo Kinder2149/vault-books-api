@@ -8,6 +8,8 @@ import series from '../api/series.js';
 import books from '../api/books.js';
 import isbn from '../api/isbn.js';
 import health from '../api/health.js';
+import status from '../api/status.js';
+import entretien from '../api/entretien.js';
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -21,6 +23,8 @@ createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   if (url.pathname === '/v1/search') return search(req, res);
   if (url.pathname === '/v1/health') return health(req, res);
+  if (url.pathname === '/v1/status') return status(req, res);
+  if (url.pathname === '/api/entretien') return entretien(req, res);
   for (const [nom, r] of Object.entries(ROUTES)) {
     const m = url.pathname.match(r.motif);
     if (m) {
