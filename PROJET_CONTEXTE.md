@@ -3,7 +3,8 @@
 > Document de cadrage. Il fixe les décisions prises et liste les questions ouvertes.
 > État au 2026-10-05 : **étapes 1 et 2 codées** (API locale : `/v1/search`, `/v1/series/:id`, `/v1/books/:id`, `/v1/health` ; Hardcover + BnF,
 > cascade de couvertures, corrections, 58 tests unitaires ; test C : 13/13 requêtes et 3/3 sagas ; couvertures réelles 100 %/100 %/95 %).
-> **Pas encore déployée** : Supabase, GitHub et Vercel restent à créer (docs/mise-en-service.md). Voir README.md.
+> **En ligne** depuis le 2026-10-05 : https://vault-books-api.vercel.app (Vercel) + Supabase (projet vault-books-api, cache et corrections) + GitHub Kinder2149/vault-books-api.
+> Test de fumée complet vert. Prochaine étape : brancher Vault Read (étape 3). Voir README.md et docs/mise-en-service.md.
 
 ## 1. Pourquoi
 
