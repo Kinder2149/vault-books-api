@@ -60,7 +60,7 @@ Cas de test fondateurs : « game of thrones », « seigneur des anneaux » (saga
 ## 5. Ce qui reste à faire
 
 **Par Kinder** (détail pas à pas : `docs/a-faire-par-kinder.md`)
-1. Secrets GitHub : `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `HARDCOVER_API_KEY` — **ajoutés le 5 octobre** ; vérifier que les workflows « Sauvegarde des corrections » et « Test de fraîcheur » passent au vert (§6.4 ci-dessous : liens directs).
+1. Secrets GitHub : `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `HARDCOVER_API_KEY` — **ajoutés et vérifiés le 5 octobre** (sauvegarde, fraîcheur et réchauffement BnF : exécutions manuelles au vert). **Fait.**
 2. Révoquer l'ancienne clé Google qui a fuité.
 3. Message à Hardcover ; surveillance externe (UptimeRobot) sur `/v1/health`.
 4. Essai sur téléphone (`docs/fiche-essai-telephone.md`) ; 30 vraies recherches ; valider les 43 noms de sagas.

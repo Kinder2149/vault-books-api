@@ -18,7 +18,7 @@ Le fichier `.env` du service est ici : `C:\Users\v.coutry\Dev\Projects\vault-boo
 4. Onglet **Deployments** → le dernier déploiement → **⋯** → **Redeploy**.
 *Vérifier :* dis-moi « c'est fait », je teste moi-même (la route doit répondre 401 au lieu de 503).
 
-### 2. Secrets GitHub (~4 min) — ajoutés le 5 octobre ✅ ; **reste à vérifier que les workflows passent au vert**
+### 2. Secrets GitHub (~4 min) — ajoutés et vérifiés le 5 octobre ✅ (les trois workflows manuels sont passés au vert : sauvegarde, fraîcheur, réchauffement BnF)
 *Pourquoi :* sauvegarde nocturne des corrections, suivi de fraîcheur, réchauffement BnF.
 **Liens directs** (si les menus sont difficiles à trouver) :
 - les secrets : https://github.com/Kinder2149/vault-books-api/settings/secrets/actions
