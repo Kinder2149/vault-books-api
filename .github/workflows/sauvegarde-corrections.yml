@@ -1,0 +1,42 @@
+name: Sauvegarde des corrections
+
+# Chaque nuit, les corrections de Supabase (sagas et couvertures corrigées à la main : les seules données précieuses du projet, tout le reste
+# est un cache qu'on peut reconstruire) sont recopiées dans data/overrides.json et versionnées dans git.
+#
+# À FAIRE UNE FOIS par Kinder : dans GitHub, Settings > Secrets and variables > Actions > New repository secret, créer
+#   SUPABASE_URL           (l'adresse du projet Supabase)
+#   SUPABASE_SERVICE_KEY   (la clé secrète)
+# Tant qu'ils n'existent pas, l'action échoue avec un message clair : elle ne fait rien d'autre.
+on:
+  schedule:
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sauvegarde:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Exporter les corrections
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node scripts/exporter-corrections.mjs
+      - name: Enregistrer dans git si le contenu a changé
+        run: |
+          git config user.name "sauvegarde-corrections"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/overrides.json
+          if git diff --cached --quiet; then
+            echo "Rien à enregistrer."
+          else
+            git commit -m "Sauvegarde automatique des corrections (Supabase)"
+            git push
+          fi

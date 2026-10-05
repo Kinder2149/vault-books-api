@@ -1,20 +1,39 @@
 {
-  "_note": "Corrections manuelles : elles GAGNENT toujours sur les sources. En production, la même chose vit dans les tables Supabase `series_overrides` (voir supabase/migrations). Ce fichier sert au développement local et d'amorçage.",
+  "_note": "SAUVEGARDE automatique des corrections de Supabase (réécrite chaque nuit par scripts/exporter-corrections.mjs). Source de vérité : les tables series_overrides et cover_overrides. Sert aussi de repli au service si Supabase ne répond pas. Pour corriger : npm run corriger.",
   "couvertures": {},
   "series": {
     "981": {
-      "_commentaire": "Le Trône de fer / A Song of Ice and Fire. Hardcover y mélange coffrets, traductions et volumes français coupés (positions 1.1, 1.2…).",
-      "noms": { "fr": "Le Trône de fer", "en": "A Song of Ice and Fire" }
+      "_commentaire": "Hardcover y mélange coffrets, traductions et volumes français coupés.",
+      "noms": {
+        "fr": "Le Trône de fer",
+        "en": "A Song of Ice and Fire"
+      },
+      "fusionner": [],
+      "exclurePositions": []
     },
     "1130": {
-      "_commentaire": "Le Seigneur des anneaux. Les séries 87481-87483 sont des doublons français incomplets de la série 1130.",
-      "noms": { "fr": "Le Seigneur des anneaux", "en": "The Lord of the Rings" },
-      "fusionner": [87481, 87482, 87483],
-      "exclurePositions": [1.5]
+      "_commentaire": "Séries 87481-87483 = doublons français incomplets ; 1.5 = Tom Bombadil.",
+      "noms": {
+        "fr": "Le Seigneur des anneaux",
+        "en": "The Lord of the Rings"
+      },
+      "fusionner": [
+        87481,
+        87482,
+        87483
+      ],
+      "exclurePositions": [
+        1.5
+      ]
     },
     "25608": {
-      "_commentaire": "Les Chevaliers d'Émeraude (premier cycle, 12 tomes).",
-      "noms": { "fr": "Les Chevaliers d'Émeraude", "en": "Emerald Knights" }
+      "_commentaire": "Premier cycle, 12 tomes.",
+      "noms": {
+        "fr": "Les Chevaliers d'Émeraude",
+        "en": "Emerald Knights"
+      },
+      "fusionner": [],
+      "exclurePositions": []
     }
   }
 }
