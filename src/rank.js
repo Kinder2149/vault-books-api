@@ -3,7 +3,7 @@
  * Fonctions pures. La logique de pertinence vient de Vault Read (tomes.js : correspondance de titre,
  * pénalité de longueur), complétée par la popularité Hardcover (nombre de lecteurs), qui y manquait.
  */
-import { normaliser, sansArticle, mots } from './text.js';
+import { normaliser, sansArticle, mots, nomFamille } from './text.js';
 
 /** Correspondance titre/requête de 0 à 100 : exact > début > contient > mots présents. */
 export function correspondance(titre, requete) {
@@ -102,6 +102,30 @@ export function construireCartes(hits, requete, { idCanonique = (x) => x, nom = 
       _meilleurLivre: Number(hit.id),
     };
   }).sort((a, b) => b.score - a.score);
+}
+
+/*
+ * ÉCARTER LE BRUIT, quand une réponse franche existe. Mesuré le 2026-10-05 sur « le petit prince » : l'œuvre de Saint-Exupéry (5 581 lecteurs)
+ * était suivie d'une série de contes (2 lecteurs) et d'un manga, qui n'ont en commun que d'avoir un livre intitulé exactement « Le Petit Prince » ;
+ * sur « fondation asimov », d'un coffret au score négatif. Même signal que le filtre du hors-sujet de Vault Read : l'auteur de l'œuvre dominante.
+ *
+ * Deux règles, et elles ne s'appliquent QU'EN PRÉSENCE d'une tête de liste sûre (score ≥ 50) :
+ *  1. un score négatif — un titre bien plus long que la recherche, sans rien pour le sauver — disparaît ;
+ *  2. si la tête est très lue (≥ 500 lecteurs), disparaît ce qui est CENT FOIS moins lu ET d'un autre auteur.
+ * Le seuil de 100 est large exprès : « les fourmis » garde Boris Vian (9 lecteurs) à côté de Werber (≈ 170) — un homonyme réel reste ; un inconnu, non.
+ * Le premier résultat reste toujours.
+ */
+export function ecarterBruit(cartes) {
+  const tete = cartes[0];
+  if (!tete || tete.score < 50) return cartes;
+  const famille = new Set((tete.auteurs || []).map(nomFamille).filter(Boolean));
+  return cartes.filter((c, i) => {
+    if (i === 0) return true;
+    if (c.score <= 0) return false;
+    const memeAuteur = (c.auteurs || []).some((a) => famille.has(nomFamille(a)));
+    const quasiInconnu = tete.lecteurs >= 500 && c.lecteurs * 100 < tete.lecteurs;
+    return memeAuteur || !quasiInconnu;
+  });
 }
 
 const MOTIF_SERIE_BRUIT = /split[- ]volume|publication order|omnibus|boxed|box set|graphic novel|sequels?\b/i;

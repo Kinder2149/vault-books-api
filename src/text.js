@@ -24,3 +24,8 @@ export function sansArticle(normalise) {
   const m = mots(normalise);
   return m.length > 1 && ARTICLES.has(m[0]) ? m.slice(1).join(' ') : normalise;
 }
+
+/** Le nom de famille d'un auteur (dernier mot, sans accents) : « J.R.R. Tolkien » et « John Ronald Reuel Tolkien » donnent « tolkien ». */
+export function nomFamille(nom) {
+  return normaliser(nom).split(' ').filter(Boolean).pop() || '';
+}

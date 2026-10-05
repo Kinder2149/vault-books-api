@@ -8,7 +8,7 @@
  *    mieux vaut une édition manquante qu'une édition d'un autre livre (même principe que Vault Read : « une carte en trop vaut mieux
  *    qu'une fusion fausse »).
  */
-import { normaliser, sansArticle } from './text.js';
+import { normaliser, sansArticle, nomFamille } from './text.js';
 import { versIsbn13 } from './isbn.js';
 import { utilisable, petite } from './images.js';
 
@@ -22,8 +22,6 @@ export function titreCorrespond(titreNotice, titreLivre) {
   const l = sansArticle(normaliser(String(titreLivre).split(/ : /)[0]));
   return Boolean(l) && n.includes(` ${l} `);
 }
-
-const nomFamille = (nom) => normaliser(nom).split(' ').filter(Boolean).pop() || '';
 
 export function auteurCorrespond(auteursNotice, auteur) {
   const f = nomFamille(auteur);

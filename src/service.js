@@ -8,13 +8,13 @@
  */
 import { TTL, LANGUES, LANGUE_PAR_DEFAUT } from './config.js';
 import { normaliser } from './text.js';
-import { construireCartes } from './rank.js';
+import { construireCartes, ecarterBruit } from './rank.js';
 import { construireSerie } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
 
-const VERSION_CACHE = 'v2';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
+const VERSION_CACHE = 'v3';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
 const NB_RESULTATS = 20;
 const CONCURRENCE_COUVERTURES = 4;
@@ -96,6 +96,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         return carte;
       }).sort((a, b) => b.score - a.score);
 
+      // Le bruit s'écarte APRÈS le bonus de langue : c'est le classement final qui désigne la tête de liste.
+      cartes = ecarterBruit(cartes);
       const dansLaLangue = cartes.filter((c) => c.langueDisponible);
       const retenues = (dansLaLangue.length ? dansLaLangue : cartes).slice(0, NB_RESULTATS);
       return {

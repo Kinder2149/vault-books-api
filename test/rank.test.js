@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normaliser, sansArticle } from '../src/text.js';
-import { correspondance, popularite, construireCartes } from '../src/rank.js';
+import { correspondance, popularite, construireCartes, ecarterBruit } from '../src/rank.js';
 
 const hit = (o) => ({ id: String(o.id), title: o.title, author_names: o.auteurs || ['X'], users_count: o.lecteurs ?? 0,
   image: { url: 'https://img/x.jpg' }, alternative_titles: o.alt || [], compilation: false,
@@ -90,4 +90,39 @@ test('les corrections renomment une saga et fusionnent ses doublons', () => {
   });
   assert.equal(cartes.length, 1);
   assert.equal(cartes[0].titre, 'Le Seigneur des anneaux');
+});
+
+// ------------------------------------------------------------------ bruit
+
+const carte = (titre, auteur, lecteurs, score) => ({ titre, auteurs: [auteur], lecteurs, score });
+
+test("bruit : un homonyme quasi inconnu d'un autre auteur disparaît derrière une œuvre très lue (le petit prince)", () => {
+  const cartes = [
+    carte('Le Petit Prince', 'Antoine de Saint-Exupéry', 5581, 154),
+    carte('Les Contes Interdits', 'L.P. Sicard', 2, 119.7),
+    carte('Le Petit Prince raconté aux enfants', 'Antoine de Saint-Exupéry', 1, 75.6),
+    carte('Reborn!', 'Akira Amano', 1, 41.6),
+  ];
+  assert.deepEqual(ecarterBruit(cartes).map((c) => c.titre), ['Le Petit Prince', 'Le Petit Prince raconté aux enfants']);
+});
+
+test('bruit : un homonyme réellement lu reste (les fourmis : Werber et Vian)', () => {
+  const cartes = [carte('La Saga des Fourmis', 'Bernard Werber', 170, 140), carte('Les Fourmis', 'Boris Vian', 9, 126)];
+  assert.equal(ecarterBruit(cartes).length, 2);
+});
+
+test('bruit : un score négatif disparaît, mais seulement derrière une tête sûre', () => {
+  assert.deepEqual(ecarterBruit([carte('Foundation', 'Isaac Asimov', 6079, 72), carte('Coffret en 5 volumes', 'Isaac Asimov', 1, -13)]).map((c) => c.titre), ['Foundation']);
+  const faible = [carte('Un', 'A', 1, 30), carte('Deux', 'B', 1, -5)];
+  assert.equal(ecarterBruit(faible).length, 2);             // aucune réponse franche : on ne juge pas
+});
+
+test('bruit : sans œuvre dominante (moins de 500 lecteurs en tête), seuls les scores négatifs partent', () => {
+  const cartes = [carte('Les Chevaliers d\'Émeraude', 'Anne Robillard', 36, 102), carte('Autre', 'Quelqu\'un', 0, 60)];
+  assert.equal(ecarterBruit(cartes).length, 2);
+});
+
+test('bruit : le premier résultat reste toujours, même seul', () => {
+  assert.equal(ecarterBruit([carte('X', 'Y', 0, 80)]).length, 1);
+  assert.deepEqual(ecarterBruit([]), []);
 });
