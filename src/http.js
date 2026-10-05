@@ -10,6 +10,12 @@ import { creerLimiteClient, clientDe } from './limite.js';
 // Une limite par client (voir limite.js) : 90 appels par minute, très au-dessus d'un usage normal (recherche au fil de la frappe comprise).
 const limiteClient = creerLimiteClient({ fenetreMs: 60_000, max: 90 });
 
+/** Sans clé configurée, tout passe (développement). Sinon : la clé courante, ou l'ancienne pendant une rotation. */
+export function cleAcceptee(recue, cfg) {
+  if (!cfg.appKey) return true;
+  return recue === cfg.appKey || (Boolean(cfg.appKeyPrecedente) && recue === cfg.appKeyPrecedente);
+}
+
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-headers': 'content-type, x-app-key',
@@ -43,7 +49,7 @@ export function gestionnaire(fn, { route } = {}) {
       if (req.method !== 'GET') return repondre(res, 405, { erreur: 'Méthode non autorisée.' });
       const { obtenirApp } = await import('./app.js');
       app = obtenirApp();
-      if (app.cfg.appKey && req.headers['x-app-key'] !== app.cfg.appKey) {
+      if (!cleAcceptee(req.headers['x-app-key'], app.cfg)) {
         return repondre(res, 401, { erreur: 'Clé d\'application manquante ou invalide.' });
       }
       const limite = limiteClient.verifier(clientDe(req.headers));

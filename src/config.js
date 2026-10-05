@@ -20,6 +20,8 @@ export function lireConfig(env = process.env) {
     supabaseKey: (env.SUPABASE_SERVICE_KEY || '').trim(),
     // Clé d'application facultative : sert à limiter l'abus, pas à protéger un secret (un APK ne garde rien de secret).
     appKey: (env.APP_KEY || '').trim(),
+    // Ancienne clé, acceptée le temps de la rotation (les applications déjà installées gardent l'ancienne jusqu'à leur mise à jour).
+    appKeyPrecedente: (env.APP_KEY_PRECEDENTE || '').trim(),
     // Secret de la tâche planifiée (Vercel Cron l'envoie en Authorization: Bearer …). Sans lui, la route d'entretien refuse tout.
     cronSecret: (env.CRON_SECRET || '').trim(),
   };

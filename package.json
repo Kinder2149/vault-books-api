@@ -6,6 +6,7 @@
   "description": "API de catalogue de livres pour Vault Read : recherche triée, sagas dans l'ordre, couvertures fiables.",
   "engines": { "node": ">=20.12" },
   "scripts": {
+    "contrat": "node scripts/contrat.mjs",
     "dev": "node --env-file=.env scripts/dev-server.mjs",
     "test": "node --test test/",
     "test:c": "node --env-file=.env scripts/test-c.mjs",
