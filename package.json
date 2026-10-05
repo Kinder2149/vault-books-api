@@ -13,6 +13,7 @@
     "test:c": "node --env-file=.env scripts/test-c.mjs",
     "corriger": "node --env-file=.env scripts/corriger.mjs",
     "pertinence": "node --env-file=.env scripts/pertinence.mjs",
+    "validation": "node scripts/validation-catalogue.mjs",
     "sauvegarder": "node --env-file=.env scripts/exporter-corrections.mjs",
     "mesure-couvertures": "node --env-file=.env scripts/mesure-couvertures.mjs",
     "mesure-resumes": "node --env-file=.env scripts/mesure-resumes.mjs",
