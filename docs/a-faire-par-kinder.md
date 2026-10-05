@@ -9,7 +9,7 @@ Le fichier `.env` du service est ici : `C:\Users\v.coutry\Dev\Projects\vault-boo
 
 ## 🔴 Urgent (avant le 12 octobre)
 
-### 1. `CRON_SECRET` dans Vercel (~3 min)
+### 1. `CRON_SECRET` dans Vercel (~3 min) — variable ajoutée le 5 octobre ✅ (reste à vérifier après redéploiement)
 *Pourquoi :* sans lui, l'entretien nocturne est désactivé (je l'ai vérifié : il répond « non configuré ») et Supabase se met en pause après 7 jours sans activité.
 1. Dans `.env`, repère la ligne `CRON_SECRET=…` et copie ce qui est **après** le `=`.
 2. vercel.com → ton projet **vault-books-api** → **Settings** → **Environment Variables**.
