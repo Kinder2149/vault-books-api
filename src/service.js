@@ -253,14 +253,15 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     });
   }
 
-  async function serie(id, langue) {
+  async function serie(id, langue, { rafraichir = false } = {}) {
     const lang = verifierLangue(langue);
     const numero = verifierId(id, 'série');
     const ov = await lireOverrides();
     const idx = indexer(ov);
     const canon = idx.idCanonique(numero);
 
-    return avecCache(`serie:${VERSION_CACHE}:${lang}:${canon}`, TTL.serie, async () => {
+    // `rafraichir` : recalculer même si le cache est frais (rafraîchissement nocturne des sagas en cours, voir rafraichissement.js).
+    return avecCache(`serie:${VERSION_CACHE}:${lang}:${canon}`, rafraichir ? 0 : TTL.serie, async () => {
       const principale = await hardcover.serie(canon);
       if (!principale) return null;
 

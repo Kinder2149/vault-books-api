@@ -29,6 +29,8 @@ export default gestionnaire(async ({ url, app, res }) => {
   // Dernier contrôle hebdomadaire des couvertures corrigées à la main (adresses mortes à remplacer).
   let couverturesCorrigees = null;
   try { couverturesCorrigees = (await app.cache.get('controle:couvertures'))?.valeur || null; } catch { /* le statut ne dépend pas de ce détail */ }
+  let nouveautes = null;
+  try { nouveautes = (await app.cache.get('controle:nouveautes'))?.valeur?.evenements?.slice(0, 10) || null; } catch { /* idem */ }
   const ok = supabase.ok && hardcover.ok && bnf.ok !== false;
 
   repondre(res, ok ? 200 : 503, {
@@ -39,6 +41,8 @@ export default gestionnaire(async ({ url, app, res }) => {
     bnf,
     stats24h,
     couverturesCorrigees,
+    // Les derniers tomes devenus disponibles, vus par la relecture nocturne des sagas en cours.
+    nouveautes,
     // Le quota du jour restant, en clair : sous 1 000, le service passe en mode économie (cache seul).
     modeEconomie: Number.isFinite(hardcover.quota?.restantJour) && hardcover.quota.restantJour < 1000,
   });

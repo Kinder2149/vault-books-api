@@ -57,7 +57,7 @@
 
 | Tâche | Réf. | Taille | Qui | Critère de réussite |
 |---|---|---|---|---|
-| **Entretien quotidien** : route `/api/entretien` appelée par une tâche planifiée (Vercel Cron ; limite du plan gratuit à vérifier dans la doc à ce moment-là). Elle lit Supabase (garde le projet actif), **purge** les entrées d'anciennes versions et celles plus vieilles que 60 jours, enregistre la taille de la base | 1 | M | C ; **K** ajoute la variable `CRON_SECRET` dans Vercel | Après 48 h : tâche exécutée 2 fois, entrées mortes = 0, appel sans secret refusé (401) |
+| **Entretien quotidien** : route `/api/entretien` appelée par une tâche planifiée (Vercel Cron ; limite du plan gratuit à vérifier dans la doc à ce moment-là). Elle lit Supabase (garde le projet actif), **purge** les entrées d'anciennes versions et celles plus vieilles que 30 jours (60 à l origine ; voir la mesure de capacité), enregistre la taille de la base | 1 | M | C ; **K** ajoute la variable `CRON_SECRET` dans Vercel | Après 48 h : tâche exécutée 2 fois, entrées mortes = 0, appel sans secret refusé (401) |
 | **Journal des appels** : table `request_log` (route, statut, durée, cache frais/périmé/absent, source utilisée, erreur). **Aucun texte de recherche, aucune IP** (voir 18) ; conservation 30 jours | 2, 18 | M | C | Requête SQL « taux d'erreur et latence p50/p95 sur 24 h » fonctionne ; vérifié qu'aucune donnée personnelle n'est écrite |
 | **État détaillé** `/v1/status` (protégé) : Supabase lisible, Hardcover joignable, BnF joignable, âge du cache, requêtes Hardcover du jour | 2 | M | C | Réponse correcte avec une source simulée en panne (test) |
 | **Surveillance externe** : un moniteur gratuit (p. ex. UptimeRobot) interroge `/v1/health` toutes les 5 min et prévient par e-mail | 2 | S | **K** (compte) + C (doc) | E-mail reçu lors d'une panne provoquée |
@@ -105,6 +105,8 @@
 | **Préparation Play Store** (déjà listée dans `PROJET_CONTEXTE.md` §11 de Vault Read) | — | L | K + C | Hors périmètre de ce plan, dépend des points ci-dessus |
 
 ### Phase 5 — Mesures dans la durée et évolutions · après la mise en service
+
+> **État au 5 octobre 2026** : capacité mesurée, relevés de fraîcheur lancés (rapport le 19 octobre), relecture nocturne des sagas en cours et réchauffement BnF livrés. Détail et chiffres : docs/resultats-mesure-5.md. Reste : suggestions / « tome suivant » et nouveautés (dépendent de l'essai téléphone et du relevé du 19).
 
 | Tâche | Réf. | Taille | Qui | Critère de réussite |
 |---|---|---|---|---|

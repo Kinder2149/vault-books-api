@@ -1,0 +1,38 @@
+name: Test de fraîcheur
+
+# Chaque jour, un relevé des 10 livres suivis (5 anglais, 5 français, parus ou annoncés autour du 5 octobre 2026) : sont-ils présents, avec ISBN,
+# couverture et pages, chez Hardcover, la BnF et Open Library ? Les relevés s'accumulent dans data/fraicheur.json ; `node scripts/fraicheur.mjs rapport`
+# donne les délais. À FAIRE UNE FOIS par Kinder : secret de dépôt HARDCOVER_API_KEY (la clé de .env). Sans lui, l'action échoue avec un message clair.
+on:
+  schedule:
+    - cron: '45 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  releve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Relevé du jour
+        env:
+          HARDCOVER_API_KEY: ${{ secrets.HARDCOVER_API_KEY }}
+        run: node scripts/fraicheur.mjs releve
+      - name: Enregistrer dans git
+        run: |
+          git config user.name "fraicheur"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/fraicheur.json
+          if git diff --cached --quiet; then
+            echo "Rien à enregistrer."
+          else
+            git commit -m "Relevé de fraîcheur du jour"
+            git pull --rebase
+            git push
+          fi

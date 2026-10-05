@@ -14,7 +14,8 @@
   ],
   "functions": {
     "api/books.js": { "maxDuration": 30 },
-    "api/series.js": { "maxDuration": 30 }
+    "api/series.js": { "maxDuration": 30 },
+    "api/entretien.js": { "maxDuration": 60 }
   }
 }
 

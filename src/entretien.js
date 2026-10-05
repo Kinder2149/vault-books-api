@@ -4,7 +4,7 @@
  * Il fait trois choses, et la première est la plus importante :
  *  1. GARDER SUPABASE ACTIF. Un projet gratuit se met en pause après ~7 jours sans activité ; l'entretien lit et écrit chaque jour.
  *  2. PURGER le cache : les entrées d'une ancienne version du format (`search:v3:…` quand la version courante est v4) ne servent plus
- *     à personne, et celles plus vieilles que 60 jours sont périmées de toute façon (le plus long TTL est de 30 jours). Les clés de
+ *     à personne, et celles plus vieilles que 30 jours sont périmées de toute façon (le plus long TTL est de 30 jours ; mesuré le 2026-10-05, 60 jours de cache laissaient moins de 3× de marge sur les 500 Mo gratuits). Les clés de
  *     couvertures (`cover:…`), de quota (`quota:…`) et de contrôle (`controle:…`) n'ont pas de version : elles ne partent que par l'âge.
  *  3. PURGER le journal des appels au-delà de 30 jours (aucune donnée personnelle n'y est écrite, mais la durée est bornée par principe).
  *
@@ -13,7 +13,7 @@
 import { entetesSupabase } from './supabase.js';
 
 const JOUR = 24 * 60 * 60 * 1000;
-export const AGE_MAX_CACHE_MS = 60 * JOUR;
+export const AGE_MAX_CACHE_MS = 30 * JOUR;
 export const AGE_MAX_JOURNAL_MS = 30 * JOUR;
 
 /** La tâche planifiée de Vercel envoie `Authorization: Bearer <CRON_SECRET>`. Sans secret configuré, on refuse TOUT. */

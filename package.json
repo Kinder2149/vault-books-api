@@ -7,6 +7,7 @@
   "engines": { "node": ">=20.12" },
   "scripts": {
     "contrat": "node scripts/contrat.mjs",
+    "charge": "node scripts/charge.mjs",
     "dev": "node --env-file=.env scripts/dev-server.mjs",
     "test": "node --test test/",
     "test:c": "node --env-file=.env scripts/test-c.mjs",

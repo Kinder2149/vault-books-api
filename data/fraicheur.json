@@ -1,0 +1,268 @@
+{
+  "livres": [
+    {
+      "id": "en-427920",
+      "langue": "en",
+      "bookId": 427920,
+      "titre": "Victorious",
+      "auteur": "V. E. Schwab",
+      "date": "2026-10-06",
+      "isbns": [
+        "9781250192240",
+        "9781250192233",
+        "9781250468147"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "en-2473588",
+      "langue": "en",
+      "bookId": 2473588,
+      "titre": "As You Wake, Break the Shell",
+      "auteur": "Becky Chambers",
+      "date": "2026-10-13",
+      "isbns": [
+        "9780062936080",
+        "9781529340594",
+        "9780062936066",
+        "9798228989481"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "en-2180002",
+      "langue": "en",
+      "bookId": 2180002,
+      "titre": "The Thrice-Bound Fool",
+      "auteur": "Christopher Buehlman",
+      "date": "2026-10-13",
+      "isbns": [
+        "9781473231238",
+        "9781250621214",
+        "9781250621207"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "en-2707026",
+      "langue": "en",
+      "bookId": 2707026,
+      "titre": "He Who Fights with Monsters 13: A LitRPG Adventure",
+      "auteur": "Shirtaloon",
+      "date": "2026-10-06",
+      "isbns": [
+        "9798347009046"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "en-2549388",
+      "langue": "en",
+      "bookId": 2549388,
+      "titre": "The Witch",
+      "auteur": "Freida McFadden",
+      "date": "2026-10-06",
+      "isbns": [
+        "9781464249648"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "fr-2564166",
+      "langue": "fr",
+      "bookId": 2564166,
+      "titre": "La Sixième Faction - La nouvelle série Divergente - Version Française",
+      "auteur": "Veronica Roth",
+      "date": "2026-10-08",
+      "isbns": [
+        "9782095078690",
+        "9780063462595",
+        "9780008790431",
+        "9780063462540"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "fr-2798732",
+      "langue": "fr",
+      "bookId": 2798732,
+      "titre": "Et vous brûlerez dans ma haine",
+      "auteur": "Justine Tiphagne",
+      "date": "2026-10-06",
+      "isbns": [
+        "9782381991627"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "fr-2799232",
+      "langue": "fr",
+      "bookId": 2799232,
+      "titre": "Superman / Spider-Man",
+      "auteur": "Brad Meltzer",
+      "date": "2026-10-02",
+      "isbns": [
+        "9791026857426",
+        "9791026856924"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "fr-2807253",
+      "langue": "fr",
+      "bookId": 2807253,
+      "titre": "Tranches de vie",
+      "auteur": "Qu",
+      "date": "2026-10-08",
+      "isbns": [
+        "9791032410707",
+        "9781737130178"
+      ],
+      "choisiLe": "2026-10-05"
+    },
+    {
+      "id": "fr-3018263",
+      "langue": "fr",
+      "bookId": 3018263,
+      "titre": "Fille des corbeaux",
+      "auteur": "Mark Lawrence",
+      "date": "2026-10-14",
+      "isbns": [
+        "9791028131777"
+      ],
+      "choisiLe": "2026-10-05"
+    }
+  ],
+  "releves": [
+    {
+      "date": "2026-10-05",
+      "livre": "en-427920",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": null,
+        "olNotice": true,
+        "olCouverture": false
+      },
+      "editions": 4
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "en-2473588",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": null,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 5
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "en-2180002",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": null,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 4
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "en-2707026",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": null,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 4
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "en-2549388",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": null,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 2
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "fr-2564166",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": false,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 4
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "fr-2798732",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": false,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 1
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "fr-2799232",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": false,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 2
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "fr-2807253",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": false,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 2
+    },
+    {
+      "date": "2026-10-05",
+      "livre": "fr-3018263",
+      "criteres": {
+        "hcIsbn": true,
+        "hcImage": true,
+        "hcPages": true,
+        "bnf": false,
+        "olNotice": false,
+        "olCouverture": false
+      },
+      "editions": 1
+    }
+  ]
+}

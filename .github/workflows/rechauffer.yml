@@ -1,0 +1,25 @@
+name: Réchauffement des éditions françaises (BnF)
+
+# Chaque semaine, relit les tomes des sagas connues du service pour que leurs éditions françaises (BnF) soient en cache avant qu'on les demande.
+# La BnF coupe les connexions trop rapides : l'adaptateur espace ses requêtes (≥ 1,1 s). Reprenable : ce qui est déjà frais ne coûte rien.
+# Secrets nécessaires (les mêmes que la sauvegarde, plus la clé Hardcover) : SUPABASE_URL, SUPABASE_SERVICE_KEY, HARDCOVER_API_KEY.
+on:
+  schedule:
+    - cron: '30 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  rechauffer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Relire les tomes
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          HARDCOVER_API_KEY: ${{ secrets.HARDCOVER_API_KEY }}
+        run: node scripts/rechauffer.mjs --max 80

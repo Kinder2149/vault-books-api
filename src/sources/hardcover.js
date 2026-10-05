@@ -101,6 +101,40 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       return true;
     },
 
+    /**
+     * Les livres parus (ou annoncés) entre deux dates, du plus lu au moins lu — pour les MESURES (fraîcheur), pas pour les routes du service.
+     * En anglais : des livres (leurs éditions les plus lues). En français : des éditions françaises, puisque c'est l'édition qui porte la date.
+     * @returns {Promise<object[]>} { bookId, titre, auteur, date, lecteurs, isbns: [..] }
+     */
+    async parutions({ du, au, langue = 'en', limite = 25 }) {
+      if (langue === 'fr') {
+        const data = await gql(`query ($du: date!, $au: date!, $n: Int!) { editions(where: {language: {code2: {_eq: "fr"}}, isbn_13: {_is_null: false}, release_date: {_gte: $du, _lte: $au}}, order_by: {book: {users_count: desc}}, limit: $n) {
+          isbn_13 title release_date book { id title users_count created_at contributions { author { name } } } } }`, { du, au, n: limite * 3 });
+        const vus = new Set();
+        return (data.editions || []).filter((e) => !vus.has(e.book.id) && vus.add(e.book.id)).slice(0, limite).map((e) => ({
+          bookId: e.book.id, titre: e.title, auteur: e.book.contributions?.[0]?.author?.name || null, date: e.release_date, lecteurs: e.book.users_count, creeLe: e.book.created_at, isbns: [e.isbn_13],
+        }));
+      }
+      const data = await gql(`query ($du: date!, $au: date!, $n: Int!) { books(where: {compilation: {_eq: false}, release_date: {_gte: $du, _lte: $au}}, order_by: {users_count: desc}, limit: $n) {
+        id title release_date users_count created_at contributions { author { name } } editions(where: {isbn_13: {_is_null: false}}, limit: 3, order_by: {users_count: desc}) { isbn_13 } } }`, { du, au, n: limite });
+      return (data.books || []).map((b) => ({
+        bookId: b.id, titre: b.title, auteur: b.contributions?.[0]?.author?.name || null, date: b.release_date, lecteurs: b.users_count, creeLe: b.created_at, isbns: b.editions.map((e) => e.isbn_13),
+      }));
+    },
+
+    /** L'état d'un livre chez Hardcover : combien d'éditions, d'ISBN, d'images, et ce qu'on sait de lui (pour suivre son enrichissement). */
+    async etatLivre(id) {
+      const data = await gql(`query ($id: Int!) { books_by_pk(id: $id) { id release_date description image { url }
+        editions { isbn_13 pages image { url } language { code2 } } } }`, { id });
+      const b = data.books_by_pk;
+      if (!b) return null;
+      return {
+        date: b.release_date, description: Boolean(b.description), imageLivre: Boolean(b.image?.url),
+        editions: b.editions.length, isbns: b.editions.filter((e) => e.isbn_13).map((e) => e.isbn_13),
+        avecImage: b.editions.filter((e) => e.image?.url).length, avecPages: b.editions.filter((e) => e.pages).length,
+      };
+    },
+
     /** Recherche de livres. Rend les documents tels que Hardcover les indexe. */
     async rechercher(texte, perPage = 25) {
       const data = await gql(
