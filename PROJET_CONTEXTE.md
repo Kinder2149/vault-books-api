@@ -9,6 +9,9 @@
 > retrait d'images, rotation de clé, relecture nocturne des sagas en cours, outil de correction, sauvegarde des corrections.
 > 175 tests automatiques (`node --test test/`) ; côté Vault Read 384 tests (`npx vitest run` dans `client/`) ; contrôle en ligne `npm run smoke` 14/14 ; contrat `npm run contrat -- --live` conforme.
 > **Ce qui reste dépend de Kinder** : voir §5 et `docs/a-faire-par-kinder.md`.
+>
+> **MISSION EN COURS (2026-10-05) — validation du catalogue, branche `validation-catalogue`** : jeu de 117 cas + lanceur rejouable ; mesure de départ **71/116 (61 %)**.
+> **Point de reprise : `docs/resultats-validation-1.md`** (critère validé, causes des échecs, étapes restantes). Premier geste : récupérer le `.env` du service (§6.2) — sans lui, pas de corrections.
 
 ## 1. Pourquoi ce projet
 
@@ -98,7 +101,7 @@ Puis, dans chaque dépôt : `npm install` (dans `vault-read`, aussi dans `client
 
 ### 6.3 Vérifier que tout est sain (5 minutes)
 ```bash
-cd vault-books-api && node --test test/      # 175 tests, 0 échec
+cd vault-books-api && node --test test/*.test.js   # 175 tests, 0 échec (Node 24 : `node --test test/` échoue ; la CI Node 20 garde l'ancienne forme)
 npm run smoke                                 # 14/14 contre le service en ligne
 npm run contrat -- --live                     # 5 réponses conformes au contrat
 cd ../vault-read/client && npx vitest run     # 384 tests, 0 échec
@@ -117,7 +120,8 @@ Et `https://vault-books-api.vercel.app/v1/health` doit répondre `"ok":true`.
 - Une correction de saga ou de couverture se fait avec `npm run corriger -- …` (`docs/exploitation.md` §6), jamais en modifiant le code.
 
 ### 6.6 Dire à Claude pour reprendre
-Ouvrir une session dans `vault-books-api` et écrire par exemple : *« Lis PROJET_CONTEXTE.md et docs/a-faire-par-kinder.md. Voici ce que j'ai fait depuis : … »* — puis donner les retours (fiche d'essai remplie, noms de sagas validés, réponse de Hardcover, décisions du §4).
+**Validation du catalogue en cours** : `git fetch && git checkout validation-catalogue`, copier le `.env` du service, puis dire : *« Lis PROJET_CONTEXTE.md et docs/resultats-validation-1.md, puis continue la validation du catalogue à l'étape 1 des « Ce qui reste à faire ». »*
+Autre reprise : ouvrir une session dans `vault-books-api` et écrire par exemple : *« Lis PROJET_CONTEXTE.md et docs/a-faire-par-kinder.md. Voici ce que j'ai fait depuis : … »* — puis donner les retours (fiche d'essai remplie, noms de sagas validés, réponse de Hardcover, décisions du §4).
 
 ## 7. Index des documents
 
@@ -133,6 +137,9 @@ Ouvrir une session dans `vault-books-api` et écrire par exemple : *« Lis PROJE
 | `docs/statut-projet.md` | Personnel / public gratuit / payant, comparaison |
 | `docs/fiche-essai-telephone.md` | Les 16 gestes de l'essai sur téléphone |
 | `docs/plan-de-tests.md` | Tests A à E et leurs seuils |
+| `docs/resultats-validation-1.md` | **Validation du catalogue : critère, mesure de départ, causes, étapes restantes (reprise)** |
+| `docs/resultats-validation-1-brut.md` | Tableau cas par cas de la mesure de départ |
+| `test/fixtures-pertinence/requetes-kinder.json` | Jeu de 117 cas (rejouable : `scripts/validation-catalogue.mjs`) |
 | `docs/resultats-mesure-1.md` … `-5.md` | Mesures (sources, couvertures, résumés, fraîcheur et capacité) |
 | `docs/noms-sagas-a-valider.md` | 43 noms français proposés |
 | `docs/analyse-vault-read.md` | Ce qu'on a repris de Vault Read |
