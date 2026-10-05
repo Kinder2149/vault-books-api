@@ -13,6 +13,7 @@ import { construireSerie } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
+import { utilisable, petite } from './images.js';
 
 const VERSION_CACHE = 'v4';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
@@ -231,6 +232,86 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     });
   }
 
-  return { rechercher, serie, livre };
+  // ---------------------------------------------------------------- scan d'un ISBN
+  const LANGUES_BNF = { fre: 'fr', eng: 'en' };
+
+  /**
+   * L'édition qui porte cet ISBN, pour le scan de code-barres. Hardcover d'abord (éditeur, date, pages, langue, couverture, livre et saga),
+   * la BnF en repli pour ce qu'il ignore (ISBN récents en 979, éditions québécoises) : elle ne donne ni pages ni saga, mais assez pour ajouter le livre.
+   * AUCUN filtre de langue : un ISBN désigne une édition précise, souvent en version originale.
+   * @returns {Promise<object|null>} null si aucune source ne connaît cet ISBN
+   */
+  async function isbn(brut) {
+    const isbn13 = versIsbn13(brut);
+    if (!isbn13) throw new ErreurRequete('ISBN invalide : 10 ou 13 chiffres, clé de contrôle comprise.');
+    const ttl = (v) => (v.trouve ? TTL.isbn : (v.incertain ? TTL.isbnIncertain : TTL.isbnAbsent));
+
+    const r = await avecCache(`isbn:${VERSION_CACHE}:${isbn13}`, ttl, async () => {
+      const idx = indexer(await lireOverrides());
+      const ed = await hardcover.editionParIsbn(isbn13);
+
+      if (ed) {
+        const serieLien = (ed.book?.book_series || []).find((s) => s.featured) || ed.book?.book_series?.[0] || null;
+        const canon = serieLien ? idx.idCanonique(serieLien.series.id) : null;
+        const langue = LANGUES.includes(ed.language?.code2) ? ed.language.code2 : LANGUE_PAR_DEFAUT;
+        const couverture = couvertures
+          ? await couvertures.resoudre({
+            isbn13,
+            couvertureEdition: utilisable(ed.image) ? ed.image.url : null,
+            couverturePetite: petite(ed.image) ? ed.image.url : null,
+            couvertureLivre: ed.book?.image?.url || null,
+            correction: idx.couverture({ isbn13, serieId: canon, position: serieLien?.position }),
+          })
+          : { url: utilisable(ed.image) ? ed.image.url : null, source: ed.image ? 'hardcover' : null, approximative: false };
+        return {
+          trouve: true,
+          isbn13,
+          titre: ed.title,
+          auteurs: [...new Set((ed.book?.contributions || []).map((c) => c.author?.name).filter(Boolean))],
+          editeur: ed.publisher?.name || null,
+          date: ed.release_date || null,
+          langue: ed.language?.code2 || null,
+          nbPages: ed.pages || null,
+          format: ed.edition_format || null,
+          couverture: { url: couverture.url, source: couverture.source, approximative: couverture.approximative, basseDefinition: Boolean(couverture.basseDefinition) },
+          livre: ed.book ? { id: ed.book.id, titre: ed.book.title } : null,
+          serie: serieLien ? {
+            id: canon, nom: idx.nom(canon, langue, serieLien.series.name), position: serieLien.position, total: serieLien.series.primary_books_count ?? null,
+          } : null,
+          sources: ['hardcover'],
+        };
+      }
+
+      // Inconnu de Hardcover : la BnF, avec un délai borné. Une BnF muette ne prouve PAS que l'ISBN n'existe pas.
+      let notice = null;
+      let bnfMuette = !bnf;
+      if (bnf) {
+        try { notice = await avecDelai(bnf.parIsbn(isbn13), delaiBnfMs); } catch { bnfMuette = true; }
+      }
+      if (!notice) return { trouve: false, incertain: bnfMuette, isbn13 };
+
+      const couverture = couvertures
+        ? await couvertures.resoudre({ isbn13, correction: idx.couverture({ isbn13 }) })
+        : { url: null, source: null, approximative: false };
+      return {
+        trouve: true,
+        isbn13,
+        titre: notice.titre,
+        auteurs: notice.auteurs,
+        editeur: notice.editeur,
+        date: notice.annee,
+        langue: LANGUES_BNF[notice.langue] || null,
+        nbPages: null,
+        format: null,
+        couverture: { url: couverture.url, source: couverture.source, approximative: false, basseDefinition: false },
+        livre: null,
+        serie: null,
+        sources: ['bnf'],
+      };
+    });
+    return r.trouve ? r : null;
+  }
+
+  return { rechercher, serie, livre, isbn };
 }
 

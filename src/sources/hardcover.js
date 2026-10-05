@@ -88,6 +88,19 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       return data.series_by_pk || null;
     },
 
+    /**
+     * L'édition qui porte cet ISBN-13 : métadonnées (éditeur, date, pages, langue, image), le livre et sa saga.
+     * AUCUN filtre de langue : un ISBN désigne une édition précise, souvent en version originale.
+     * Si plusieurs lignes portent le même ISBN, la plus lue d'abord.
+     */
+    async editionParIsbn(isbn13) {
+      const data = await gql(`query ($isbn: String!) { editions(where: {isbn_13: {_eq: $isbn}}, order_by: {users_count: desc}, limit: 3) {
+        id title isbn_13 release_date pages edition_format language { code2 } publisher { name } image { url width }
+        book { id title image { url width } contributions { author { name } }
+          book_series { position featured series { id name primary_books_count } } } } }`, { isbn: isbn13 });
+      return (data.editions || [])[0] || null;
+    },
+
     /** Un livre : titre, auteurs, séries, et TOUTES ses éditions dans la langue (jusqu'à 100, les plus lues d'abord). */
     async livre(id, lang) {
       const data = await gql(`query ($id: Int!, $lang: String!) { books_by_pk(id: $id) {

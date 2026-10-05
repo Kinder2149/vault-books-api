@@ -176,3 +176,97 @@ test("livre : une BnF trop lente (> 5 s) n'attend pas : réponse Hardcover seul,
   assert.equal(r.sourceBnf, 'indisponible');
   assert.equal(r.editions.length, 1);
 });
+
+// ------------------------------------------------------------------ scan d'un ISBN
+
+const editionHc = (o = {}) => ({
+  id: 32230226, title: 'Les dieux déchus', isbn_13: '9782749910147', release_date: '2009-05-14', pages: 435, edition_format: 'Paperback',
+  language: { code2: 'fr' }, publisher: { name: 'Michel Lafon' }, image: { url: 'https://img/e.jpg', width: 323 },
+  book: { id: 1099977, title: 'Les dieux déchus', image: { url: 'https://img/livre.jpg', width: 300 },
+    contributions: [{ author: { name: 'Anne Robillard' } }, { author: { name: 'Anne Robillard' } }],
+    book_series: [{ position: 8, featured: true, series: { id: 25608, name: "Les Chevaliers d'Émeraude", primary_books_count: 12 } }] },
+  ...o,
+});
+
+test("isbn : l'édition de Hardcover avec éditeur, date, pages, langue, couverture, livre et saga", async () => {
+  const appels = [];
+  const hc = { ...faux(), async editionParIsbn(i) { appels.push(i); return editionHc(); } };
+  const overrides = { series: { 25608: { noms: { fr: "Les Chevaliers d'Émeraude (cycle 1)" } } }, couvertures: {} };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire(), overrides, couvertures: couvFaux });
+  const r = await s.isbn('978-2-7499-1014-7');                 // écrit avec des tirets
+  assert.deepEqual(appels, ['9782749910147']);                 // normalisé avant l'appel, et AUCUN filtre de langue
+  assert.deepEqual([r.isbn13, r.titre, r.editeur, r.date, r.langue, r.nbPages], ['9782749910147', 'Les dieux déchus', 'Michel Lafon', '2009-05-14', 'fr', 435]);
+  assert.deepEqual(r.auteurs, ['Anne Robillard']);              // sans doublon
+  assert.deepEqual(r.serie, { id: 25608, nom: "Les Chevaliers d'Émeraude (cycle 1)", position: 8, total: 12 });
+  assert.deepEqual(r.livre, { id: 1099977, titre: 'Les dieux déchus' });
+  assert.deepEqual(r.couverture, { url: 'https://img/e.jpg', source: 'hardcover', approximative: false, basseDefinition: false });
+  assert.deepEqual(r.sources, ['hardcover']);
+});
+
+test('isbn : un ISBN-10 est converti en ISBN-13 ; un ISBN invalide est une erreur de requête', async () => {
+  const appels = [];
+  const hc = { ...faux(), async editionParIsbn(i) { appels.push(i); return null; } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire() });
+  await s.isbn('2226052577');
+  assert.deepEqual(appels, ['9782226052575']);
+  await assert.rejects(() => s.isbn('9782226052579'), ErreurRequete);      // clé de contrôle fausse
+  await assert.rejects(() => s.isbn('abc'), ErreurRequete);
+  await assert.rejects(() => s.isbn(''), ErreurRequete);
+});
+
+test('isbn : une édition en version originale n\'est pas écartée (aucun filtre de langue)', async () => {
+  const hc = { ...faux(), async editionParIsbn() { return editionHc({ title: 'A Game of Thrones', language: { code2: 'en' } }); } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couvFaux });
+  assert.equal((await s.isbn('9782749910147')).langue, 'en');
+});
+
+test("isbn : inconnu de Hardcover, la BnF prend le relais (ISBN 979 récent), sans pages ni saga", async () => {
+  const hc = { ...faux(), async editionParIsbn() { return null; } };
+  const bnf = { async parIsbn(i) { return { isbn13: i, titre: 'Irianeth', auteurs: ['Anne Robillard'], editeur: 'Michel Lafon', annee: '2014', langue: 'fre' }; } };
+  const couv = { async resoudre({ isbn13 }) { return { url: `https://ol/${isbn13}.jpg`, source: 'openlibrary', approximative: false }; } };
+  const s = creerService({ hardcover: hc, bnf, cache: cacheMemoire(), couvertures: couv });
+  const r = await s.isbn('9791022400640');
+  assert.deepEqual([r.titre, r.editeur, r.date, r.langue, r.nbPages, r.serie, r.livre, r.sources], ['Irianeth', 'Michel Lafon', '2014', 'fr', null, null, null, ['bnf']]);
+  assert.equal(r.couverture.source, 'openlibrary');
+});
+
+test('isbn : inconnu partout → null, et l\'absence est mémorisée (pas de rappel des sources)', async () => {
+  let appels = 0;
+  const hc = { ...faux(), async editionParIsbn() { appels += 1; return null; } };
+  const bnf = { async parIsbn() { appels += 1; return null; } };
+  const s = creerService({ hardcover: hc, bnf, cache: cacheMemoire() });
+  assert.equal(await s.isbn('9780000000002'), null);
+  assert.equal(await s.isbn('9780000000002'), null);
+  assert.equal(appels, 2);                                      // Hardcover + BnF une seule fois
+});
+
+test("isbn : une BnF muette ne prouve pas l'absence → réponse null mais « incertaine », réessayée bientôt", async () => {
+  const cache = cacheMemoire();
+  const hc = { ...faux(), async editionParIsbn() { return null; } };
+  const bnf = { async parIsbn() { throw new Error('BnF injoignable (ECONNRESET)'); } };
+  const s = creerService({ hardcover: hc, bnf, cache });
+  assert.equal(await s.isbn('9780000000002'), null);
+  const gardee = await cache.get('isbn:v4:9780000000002');
+  assert.equal(gardee.valeur.incertain, true);
+});
+
+test('isbn : trouvé une fois, servi par le cache ensuite', async () => {
+  let appels = 0;
+  const hc = { ...faux(), async editionParIsbn() { appels += 1; return editionHc(); } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couvFaux });
+  await s.isbn('9782749910147');
+  const r = await s.isbn('9782749910147');
+  assert.equal(appels, 1);
+  assert.equal(r.cache, 'frais');
+});
+
+test('isbn : miniature Hardcover sous 200 px → Open Library d\'abord (cascade par ISBN)', async () => {
+  const hc = { ...faux(), async editionParIsbn() { return editionHc({ image: { url: 'https://img/petite.jpg', width: 98 } }); } };
+  const couv = { async resoudre({ isbn13, couvertureEdition, couverturePetite }) {
+    assert.equal(couvertureEdition, null);
+    assert.equal(couverturePetite, 'https://img/petite.jpg');
+    return { url: `https://ol/${isbn13}.jpg`, source: 'openlibrary', approximative: false };
+  } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couv });
+  assert.equal((await s.isbn('9782749910147')).couverture.source, 'openlibrary');
+});

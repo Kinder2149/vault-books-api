@@ -98,3 +98,22 @@ test('fusion : une miniature Hardcover (< 200 px) n\'est pas une couverture, mai
   assert.equal(e.couverture, null);
   assert.equal(e.couverturePetite, 'https://img/petite.jpg');
 });
+
+test("BnF par ISBN : tente l'ISBN-13, PUIS sa forme ISBN-10 (livres d'avant 2007), et rend l'ISBN demandé", async () => {
+  const requetes = [];
+  const fetchImpl = async (url) => {
+    const q = new URL(url).searchParams.get('query');
+    requetes.push(q);
+    return { ok: true, text: async () => (q.includes('2226052577') ? XML : '<srw:numberOfRecords>0</srw:numberOfRecords>') };
+  };
+  const bnf = creerBnf({ fetchImpl, ecartMs: 0 });
+  const notice = await bnf.parIsbn('9782226052575');
+  assert.deepEqual(requetes, ['bib.isbn all "9782226052575"', 'bib.isbn all "2226052577"']);
+  assert.equal(notice.titre, 'Le feu dans le ciel');          // 1re notice de la fixture
+  assert.equal(notice.isbn13, '9782226052575');               // celui du code-barres scanné, pas celui de la notice
+});
+
+test('BnF par ISBN : aucune des deux formes → null', async () => {
+  const bnf = creerBnf({ fetchImpl: async () => ({ ok: true, text: async () => '<srw:numberOfRecords>0</srw:numberOfRecords>' }), ecartMs: 0 });
+  assert.equal(await bnf.parIsbn('9780000000002'), null);
+});

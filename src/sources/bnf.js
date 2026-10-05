@@ -9,7 +9,7 @@
  *  - format dublincore : « Titre : sous-titre / mention de responsabilité », auteur « Nom, Prénom (dates). Rôle »,
  *    éditeur « Nom (Ville) » ; l'ISBN est du texte libre qui peut contenir le prix.
  */
-import { extraireIsbn13 } from '../isbn.js';
+import { extraireIsbn13, isbn13Vers10 } from '../isbn.js';
 
 const BASE = 'https://catalogue.bnf.fr/api/SRU';
 const DELAI_MAX_MS = 6000;
@@ -101,6 +101,21 @@ export function creerBnf({ fetchImpl = fetch, ecartMs = ECART_MIN_MS, pauseReess
   }
 
   return {
+    /**
+     * La notice d'un ISBN. Tente l'ISBN-13, PUIS sa forme ISBN-10 : la BnF indexe les livres antérieurs à 2007 en ISBN-10 seulement
+     * (mesuré : « 9782226052575 » ne rend rien, « 2226052577 » rend Les Fourmis). Rend null si aucune des deux formes ne répond.
+     */
+    parIsbn(isbn13) {
+      const formes = [isbn13, isbn13Vers10(isbn13)].filter(Boolean);
+      return sequencer(async () => {
+        for (const forme of formes) {
+          const [notice] = lireNotices(await appeler(`bib.isbn all "${forme}"`, 3));
+          if (notice) return { ...notice, isbn13 };   // on rend l'ISBN demandé : c'est celui du code-barres scanné
+        }
+        return null;
+      });
+    },
+
     /** Les éditions d'un texte : même titre, même auteur, texte imprimé. */
     editionsDe(titre, auteur, max = 40) {
       const morceaux = [`bib.title all "${sansGuillemets(titre)}"`];

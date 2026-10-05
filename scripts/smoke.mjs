@@ -38,6 +38,15 @@ verifier(livre?.status === 200 && livre.corps.editions?.length > 0, 'GET /v1/boo
 const encore = await appeler('/v1/search?q=les%20chevaliers%20d%27%C3%A9meraude&lang=fr');
 verifier(encore.corps?.cache === 'frais' || encore.ms < recherche.ms, '2e recherche identique plus rapide / servie par le cache', `${encore.ms} ms, cache ${encore.corps?.cache}`);
 
+const scan = await appeler('/v1/isbn/9782749910147');
+verifier(scan.status === 200 && scan.corps?.titre === 'Les dieux déchus' && scan.corps?.nbPages === 435 && scan.corps?.serie?.position === 8,
+  'GET /v1/isbn/:isbn (Hardcover : titre, pages, saga)', `${scan.ms} ms, « ${scan.corps?.titre} », ${scan.corps?.nbPages} p., tome ${scan.corps?.serie?.position}, couv ${scan.corps?.couverture?.source}`);
+const scanBnf = await appeler('/v1/isbn/9791022400640');
+verifier(scanBnf.status === 200 && scanBnf.corps?.sources?.includes('bnf'), 'GET /v1/isbn/:isbn (repli BnF, ISBN récent)', `${scanBnf.ms} ms, « ${scanBnf.corps?.titre} », ${scanBnf.corps?.editeur}`);
+const inconnu = await appeler('/v1/isbn/9789999999991');
+verifier(inconnu.status === 404, 'ISBN valide mais inconnu partout → 404', `${inconnu.ms} ms);
+verifier((await appeler('/v1/isbn/9782226052579')).status === 400, 'ISBN à clé de contrôle fausse → 400');
+
 verifier((await appeler('/v1/search?q=a&lang=fr')).status === 400, 'recherche trop courte → 400');
 verifier((await appeler('/v1/search?q=dune&lang=de')).status === 400, 'langue inconnue → 400');
 verifier((await appeler('/v1/series/999999999?lang=fr')).status === 404, 'série inconnue → 404');
