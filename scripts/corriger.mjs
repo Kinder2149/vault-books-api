@@ -8,6 +8,8 @@
  *   npm run corriger -- couverture isbn:9782749910147 https://exemple.org/image.jpg
  *   npm run corriger -- couverture serie:25608:3 https://exemple.org/image.jpg --note "tome 3, bonne édition"
  *   npm run corriger -- couverture-supprimer isbn:9782749910147
+ *   npm run corriger -- masquer https://assets.hardcover.app/…/image.jpg --note "demande de retrait du 2026-10-12"   (retrait d'image, immédiat)
+ *   npm run corriger -- masquer-supprimer https://assets.hardcover.app/…/image.jpg
  *   npm run corriger -- alias "journal d'un dégonflé" "diary of a wimpy kid"        (titre français absent de l'index de Hardcover)
  *   npm run corriger -- alias-supprimer "journal d'un dégonflé"
  *
@@ -22,7 +24,8 @@ const c = creerCorrections({ url: cfg.supabaseUrl, cle: cfg.supabaseKey });
 
 const AIDE = `Commandes : lister | serie <id> [--nom-fr ..] [--nom-en ..] [--fusionner a,b] [--exclure 1.5] [--note ..] | serie-supprimer <id>
             | couverture <isbn:978… | serie:id:position> <url https> [--note ..] | couverture-supprimer <clé>
-            | alias <requête> <cible> [--note ..] | alias-supprimer <requête>`;
+            | alias <requête> <cible> [--note ..] | alias-supprimer <requête>
+            | masquer <url https de l'image> [--note ..] | masquer-supprimer <url>`;
 
 try {
   const { positionnels: [commande, a, b], options } = analyser(process.argv.slice(2));
@@ -50,6 +53,12 @@ try {
   } else if (commande === 'alias-supprimer' && a) {
     const r = await c.supprimerAlias(a);
     console.log(`Alias « ${r.requete} » supprimé. ${r.invalidees} réponse(s) du cache invalidée(s).`);
+  } else if (commande === 'masquer' && a) {
+    await c.masquerImage(a, options.note || null);
+    console.log(`Image retirée : ${a} ne sera plus rendue (ni dans les recherches, ni dans les sagas, ni au scan).`);
+  } else if (commande === 'masquer-supprimer' && a) {
+    await c.demasquerImage(a);
+    console.log(`Image rétablie : ${a}.`);
   } else if (commande === 'couverture-supprimer' && a) {
     const r = await c.supprimerCouverture(a);
     console.log(`Correction de couverture ${a} supprimée. ${r.invalidees} réponse(s) du cache invalidée(s).`);

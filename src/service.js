@@ -11,7 +11,7 @@ import { normaliser } from './text.js';
 import { construireCartes, ecarterBruit } from './rank.js';
 import { construireSerie } from './series.js';
 import { fusionnerEditions } from './editions.js';
-import { indexer } from './overrides.js';
+import { indexer, urlsMasquees } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
 import { sansArticleInitial, candidatsAuteur, auteurCorrespond } from './requete.js';
 import { nomFamille } from './text.js';
@@ -431,6 +431,32 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     return r.trouve ? r : null;
   }
 
-  return { rechercher, rechercherAuteur, serie, livre, isbn };
+  /*
+   * IMAGES RETIRÉES. Une image que son ayant droit a demandé de retirer (`npm run corriger -- masquer <adresse>`) n'est plus jamais rendue,
+   * quelle que soit la route, le champ ou la source, et SANS attendre l'expiration du cache : le retrait s'applique à la sortie, sur une copie.
+   * Le client affiche alors une couverture dessinée.
+   */
+  const avecRetraits = (fn) => async (...args) => {
+    const resultat = await fn(...args);
+    let masquees = new Set();
+    try { masquees = urlsMasquees(await lireOverrides()); } catch { /* sans corrections lisibles, on rend ce qu'on a */ }
+    return masquees.size ? sansImages(resultat, masquees) : resultat;
+  };
+
+  return {
+    rechercher: avecRetraits(rechercher),
+    rechercherAuteur: avecRetraits(rechercherAuteur),
+    serie: avecRetraits(serie),
+    livre: avecRetraits(livre),
+    isbn: avecRetraits(isbn),
+  };
+}
+
+/** Copie de `valeur` où toute chaîne égale à une adresse retirée devient null. Ne modifie jamais l'original (il peut venir du cache mémoire). */
+export function sansImages(valeur, masquees) {
+  if (typeof valeur === 'string') return masquees.has(valeur) ? null : valeur;
+  if (Array.isArray(valeur)) return valeur.map((v) => sansImages(v, masquees));
+  if (valeur && typeof valeur === 'object') return Object.fromEntries(Object.entries(valeur).map(([k, v]) => [k, sansImages(v, masquees)]));
+  return valeur;
 }
 

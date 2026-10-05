@@ -9,6 +9,7 @@
 import { entetesSupabase } from './supabase.js';
 import { dimensionsImage, LARGEUR_MIN } from './images.js';
 import { normaliser } from './text.js';
+import { PREFIXE_MASQUE } from './overrides.js';
 
 // ---------------------------------------------------------------- lecture de la ligne de commande
 
@@ -160,6 +161,20 @@ export function creerCorrections({ url, cle, fetchImpl = fetch }) {
       await appeler(`search_aliases?query_norm=eq.${encodeURIComponent(norm)}`, { method: 'DELETE', headers: entetesSupabase(cle, { prefer: 'return=minimal' }) });
       return { requete: norm, invalidees: await invalider(aInvalider({ type: 'alias', id: requete })) };
     },
+
+    /** Retire une image : elle n'est plus jamais rendue (voir `sansImages` dans service.js). Visible dans les 5 minutes, sans invalider le cache. */
+    async masquerImage(adresse, note = null) {
+      if (!/^https:\/\/\S+$/i.test(adresse)) throw new Error("L'adresse de l'image doit commencer par https:// et ne pas contenir d'espace.");
+      await appeler('cover_overrides?on_conflict=key', { method: 'POST', headers: { ...json, prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ key: `${PREFIXE_MASQUE}${adresse}`, url: adresse, note, updated_at: new Date().toISOString() }) });
+      return { adresse };
+    },
+
+    async demasquerImage(adresse) {
+      await appeler(`cover_overrides?key=eq.${encodeURIComponent(`${PREFIXE_MASQUE}${adresse}`)}`, { method: 'DELETE', headers: entetesSupabase(cle, { prefer: 'return=minimal' }) });
+      return { adresse };
+    },
+
     async supprimerCouverture(clef) {
       if (!cleCouvertureValide(clef)) throw new Error('Clé invalide : isbn:<13 chiffres> ou serie:<id>:<position>.');
       await appeler(`cover_overrides?key=eq.${encodeURIComponent(clef)}`, { method: 'DELETE', headers: entetesSupabase(cle, { prefer: 'return=minimal' }) });

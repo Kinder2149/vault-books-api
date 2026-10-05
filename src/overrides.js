@@ -67,6 +67,14 @@ export function overridesSupabase({ url, cle, repli = chargerOverrides(), fetchI
   };
 }
 
+/** Préfixe des clés de `cover_overrides` qui désignent une image RETIRÉE (demande d'un ayant droit) : `masque:<adresse https de l'image>`. */
+export const PREFIXE_MASQUE = 'masque:';
+
+/** L'ensemble des adresses d'images à ne plus jamais rendre. */
+export function urlsMasquees(overrides) {
+  return new Set(Object.keys(overrides?.couvertures || {}).filter((k) => k.startsWith(PREFIXE_MASQUE)).map((k) => k.slice(PREFIXE_MASQUE.length)));
+}
+
 /** Vue pratique : id doublon → id canonique, nom d'une série dans une langue, correction de couverture. */
 export function indexer(overrides) {
   const alias = new Map();
