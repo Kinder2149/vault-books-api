@@ -85,7 +85,9 @@ Kind regards,
 
 ## 6. À produire avant la publication de Vault Read
 
-- [ ] **Attribution** « Données Hardcover » visible dans l'application (écran Réglages / À propos), avec lien.
-- [ ] **Procédure de retrait d'images (DMCA)** : une page publique, une adresse de contact, un processus de retrait en moins de 24 h (outil `npm run corriger` : couverture à remplacer ou à masquer).
-- [ ] **Politique de confidentialité** réécrite : les termes cherchés et les ISBN scannés partent vers notre service (Vercel, Supabase) puis, selon le cas, vers Hardcover, la BnF, Open Library ; aucun compte, aucun identifiant, aucune adresse IP conservée ; journal d'appels de 30 jours sans texte de recherche.
-- [ ] **Décision sur le statut** du projet (personnel, gratuit public, monétisé) et sur les offres d'hébergement correspondantes.
+- [x] **Attribution** « Données Hardcover » dans l'application : carte « Sources des données » dans Réglages (Hardcover cité seulement si le catalogue est actif ; BnF, Open Library, Google Books toujours). Test : famille 19. *(À vérifier sur téléphone : les liens s'ouvrent dans le navigateur — ligne ajoutée à la fiche d'essai.)*
+- [x] **Procédure de retrait d'images** : page publique `vault-read/docs/retrait-images.html` (contact `vcoutry@gmail.com`, **à confirmer par Kinder**), commande `npm run corriger -- masquer <adresse>`, runbook `exploitation.md` §10. **Retrait simulé en production le 2026-10-05 : image rendue → `null` en 216 s, puis rétablie.** Critère « < 24 h » atteint.
+- [x] **Politique de confidentialité** réécrite (`vault-read/docs/index.html`, 5 octobre 2026), vérifiée contre le code : journal sans texte ni ISBN ni IP (`src/journal.js`), purge à 30 jours (journal) et 60 jours (cache) (`src/entretien.js`), clé de cache contenant le terme cherché (dit), IP lue en mémoire pour la limite de 90 appels/minute (dit), Vercel peut garder une trace technique (dit). **À relire par Kinder.** Elle n'est publiée qu'à la fusion de la branche dans `main`.
+- [ ] **Décision sur le statut** du projet : voir `docs/statut-projet.md` (à trancher par Kinder).
+- [ ] **Réponse de Hardcover** (section 5) : message à envoyer.
+- [ ] Adresse publique de la politique (GitHub Pages) à renseigner dans la fiche Play Store ; ajouter le lien dans l'application une fois l'adresse connue.
