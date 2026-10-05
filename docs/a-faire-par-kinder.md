@@ -9,7 +9,8 @@ Le fichier `.env` du service est ici : `C:\Users\v.coutry\Dev\Projects\vault-boo
 
 ## 🔴 Urgent (avant le 12 octobre)
 
-### 1. `CRON_SECRET` dans Vercel (~3 min) — variable ajoutée le 5 octobre ✅ (reste à vérifier après redéploiement)
+### 1. `CRON_SECRET` dans Vercel (~3 min) — fait et vérifié le 5 octobre ✅ (sans secret : 401 ; bon secret : 200, entretien exécuté)
+*(Texte d'origine, pour mémoire :)* — variable ajoutée le 5 octobre ✅ (reste à vérifier après redéploiement)
 *Pourquoi :* sans lui, l'entretien nocturne est désactivé (je l'ai vérifié : il répond « non configuré ») et Supabase se met en pause après 7 jours sans activité.
 1. Dans `.env`, repère la ligne `CRON_SECRET=…` et copie ce qui est **après** le `=`.
 2. vercel.com → ton projet **vault-books-api** → **Settings** → **Environment Variables**.
@@ -17,8 +18,13 @@ Le fichier `.env` du service est ici : `C:\Users\v.coutry\Dev\Projects\vault-boo
 4. Onglet **Deployments** → le dernier déploiement → **⋯** → **Redeploy**.
 *Vérifier :* dis-moi « c'est fait », je teste moi-même (la route doit répondre 401 au lieu de 503).
 
-### 2. Secrets GitHub (~4 min)
+### 2. Secrets GitHub (~4 min) — ajoutés le 5 octobre ✅ ; **reste à vérifier que les workflows passent au vert**
 *Pourquoi :* sauvegarde nocturne des corrections, suivi de fraîcheur, réchauffement BnF.
+**Liens directs** (si les menus sont difficiles à trouver) :
+- les secrets : https://github.com/Kinder2149/vault-books-api/settings/secrets/actions
+- les workflows : https://github.com/Kinder2149/vault-books-api/actions (dans la colonne de gauche : « Sauvegarde des corrections », « Test de fraîcheur », « Réchauffement… », puis bouton **Run workflow** à droite)
+
+Pas à pas d'origine :
 1. github.com/Kinder2149/vault-books-api → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
 2. Crée trois secrets, un par un (nom exact → valeur à copier depuis `.env`) :
    - `SUPABASE_URL` → la valeur de `SUPABASE_URL`
