@@ -44,7 +44,7 @@ verifier(scan.status === 200 && scan.corps?.titre === 'Les dieux déchus' && sca
 const scanBnf = await appeler('/v1/isbn/9791022400640');
 verifier(scanBnf.status === 200 && scanBnf.corps?.sources?.includes('bnf'), 'GET /v1/isbn/:isbn (repli BnF, ISBN récent)', `${scanBnf.ms} ms, « ${scanBnf.corps?.titre} », ${scanBnf.corps?.editeur}`);
 const inconnu = await appeler('/v1/isbn/9789999999991');
-verifier(inconnu.status === 404, 'ISBN valide mais inconnu partout → 404', `${inconnu.ms} ms);
+verifier(inconnu.status === 404, 'ISBN valide mais inconnu partout → 404', `${inconnu.ms} ms`);
 verifier((await appeler('/v1/isbn/9782226052579')).status === 400, 'ISBN à clé de contrôle fausse → 400');
 
 verifier((await appeler('/v1/search?q=a&lang=fr')).status === 400, 'recherche trop courte → 400');
