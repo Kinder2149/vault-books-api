@@ -152,6 +152,42 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     return meilleur.cartes;
   }
 
+  /**
+   * La fin commune de toute recherche : quelles œuvres existent dans la langue demandée (UN appel pour toutes les cartes), titre, couverture,
+   * ISBN et éditeur de l'ÉDITION dans la langue pour un livre isolé, tri, filtre de langue. `ecarter` retire le bruit (recherche par titre
+   * seulement : une recherche par auteur n'a pas de « tête de liste sûre » à juger).
+   */
+  async function finaliser(cartes, lang, { ecarter }) {
+    const ids = cartes.slice(0, NB_RESULTATS).flatMap((c) => c._livres).slice(0, MAX_LIVRES_VERIFIES);
+    const editions = await hardcover.editionsEnLangue(ids, lang);
+
+    let finales = cartes.map((c) => {
+      const edition = editions.get(c._meilleurLivre) || c._livres.map((id) => editions.get(id)).find(Boolean) || null;
+      const dispo = Boolean(edition);
+      const carte = { ...c, langueDisponible: dispo, score: c.score + (dispo ? 10 : 0) };
+      // Pour un livre isolé, titre et couverture de l'ÉDITION dans la langue : c'est celle que l'utilisateur possède.
+      if (c.type === 'livre' && edition) {
+        carte.titre = edition.title || c.titre;
+        carte.couverture = edition.image?.url || c.couverture;
+        // Ce qu'il faut pour AJOUTER ce livre sans second appel : l'ISBN, l'éditeur et la date de l'édition choisie.
+        carte.isbn13 = versIsbn13(edition.isbn_13);
+        carte.editeur = edition.publisher?.name || null;
+        carte.date = edition.release_date || null;
+      }
+      return carte;
+    }).sort((a, b) => b.score - a.score);
+
+    // Le bruit s'écarte APRÈS le bonus de langue : c'est le classement final qui désigne la tête de liste.
+    if (ecarter) finales = ecarterBruit(finales);
+    const dansLaLangue = finales.filter((c) => c.langueDisponible);
+    const retenues = (dansLaLangue.length ? dansLaLangue : finales).slice(0, NB_RESULTATS);
+    return {
+      langueNonDisponible: dansLaLangue.length === 0 && finales.length > 0,
+      // Les champs de travail (préfixés « _ ») ne quittent jamais le service.
+      resultats: retenues.map((c) => Object.fromEntries(Object.entries(c).filter(([k]) => !k.startsWith('_')))),
+    };
+  }
+
   async function rechercher(texte, langue) {
     const lang = verifierLangue(langue);
     const q = normaliser(texte);
@@ -159,42 +195,43 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
 
     return avecCache(`search:${VERSION_CACHE}:${lang}:${q}`, TTL.recherche, async () => {
       const idx = indexer(await lireOverrides());
-      let cartes = await meilleuresCartes(texte, idx, lang);
-
-      // Quelles œuvres existent dans la langue demandée ? Un seul appel pour toutes les cartes.
-      const ids = cartes.slice(0, NB_RESULTATS).flatMap((c) => c._livres).slice(0, MAX_LIVRES_VERIFIES);
-      const editions = await hardcover.editionsEnLangue(ids, lang);
-
-      cartes = cartes.map((c) => {
-        const edition = editions.get(c._meilleurLivre) || c._livres.map((id) => editions.get(id)).find(Boolean) || null;
-        const dispo = Boolean(edition);
-        const carte = { ...c, langueDisponible: dispo, score: c.score + (dispo ? 10 : 0) };
-        // Pour un livre isolé, titre et couverture de l'ÉDITION dans la langue : c'est celle que l'utilisateur possède.
-        if (c.type === 'livre' && edition) {
-          carte.titre = edition.title || c.titre;
-          carte.couverture = edition.image?.url || c.couverture;
-          // Ce qu'il faut pour AJOUTER ce livre sans second appel : l'ISBN, l'éditeur et la date de l'édition choisie.
-          carte.isbn13 = versIsbn13(edition.isbn_13);
-          carte.editeur = edition.publisher?.name || null;
-          carte.date = edition.release_date || null;
-        }
-        return carte;
-      }).sort((a, b) => b.score - a.score);
-
-      // Le bruit s'écarte APRÈS le bonus de langue : c'est le classement final qui désigne la tête de liste.
-      cartes = ecarterBruit(cartes);
-      const dansLaLangue = cartes.filter((c) => c.langueDisponible);
-      const retenues = (dansLaLangue.length ? dansLaLangue : cartes).slice(0, NB_RESULTATS);
-      return {
-        requete: texte,
-        langue: lang,
-        langueNonDisponible: dansLaLangue.length === 0 && cartes.length > 0,
-        // Les champs de travail (préfixés « _ ») ne quittent jamais le service.
-        resultats: retenues.map((c) => Object.fromEntries(Object.entries(c).filter(([k]) => !k.startsWith('_')))),
-      };
+      const cartes = await meilleuresCartes(texte, idx, lang);
+      return { requete: texte, langue: lang, ...(await finaliser(cartes, lang, { ecarter: true })) };
     });
   }
 
+  /**
+   * Recherche PAR AUTEUR : les sagas et les livres de l'auteur, du plus lu au moins lu, regroupés comme pour une recherche par titre.
+   * L'auteur retenu est le premier que Hardcover propose dont le nom contient tous les mots tapés (« tolkien » → J.R.R. Tolkien) ; les
+   * suivants sont rendus dans `autresAuteurs` pour qu'on puisse proposer « vous cherchiez peut-être… ».
+   */
+  async function rechercherAuteur(texte, langue) {
+    const lang = verifierLangue(langue);
+    const q = normaliser(texte);
+    if (q.length < 2) throw new ErreurRequete('Recherche trop courte (2 caractères minimum).');
+
+    return avecCache(`auteur:${VERSION_CACHE}:${lang}:${q}`, TTL.recherche, async () => {
+      const idx = indexer(await lireOverrides());
+      const docs = await hardcover.rechercherAuteurs(texte, 5);
+      const mots = q.split(' ');
+      // Parmi les auteurs dont le nom contient TOUS les mots tapés, le plus FOURNI (« dumas » : Alexandre Dumas, pas un homonyme à 2 livres).
+      const correspondants = docs.filter((d) => mots.every((m) => [d.name, ...(d.alternate_names || [])].some((nom) => normaliser(nom).split(' ').includes(m))));
+      const retenu = [...correspondants].sort((a, b) => (Number(b.books_count) || 0) - (Number(a.books_count) || 0))[0] || docs[0];
+      if (!retenu) return { requete: texte, langue: lang, mode: 'auteur', auteur: null, autresAuteurs: [], langueNonDisponible: false, resultats: [] };
+
+      const livres = await hardcover.livresDeLAuteur(retenu.id);
+      // Pas de titre à comparer à la requête (c'est un nom d'auteur) : le classement vient de la popularité.
+      const cartes = construireCartes(livres, texte, { idCanonique: idx.idCanonique, nom: idx.nom, lang });
+      return {
+        requete: texte,
+        langue: lang,
+        mode: 'auteur',
+        auteur: { id: Number(retenu.id), nom: retenu.name, livres: Number(retenu.books_count) || null },
+        autresAuteurs: docs.filter((d) => d !== retenu).slice(0, 3).map((d) => ({ id: Number(d.id), nom: d.name, livres: Number(d.books_count) || null })),
+        ...(await finaliser(cartes, lang, { ecarter: false })),
+      };
+    });
+  }
   // ---------------------------------------------------------------- saga
   async function enrichirCouvertures(lignes, { idx, serieId }) {
     if (!couvertures) return;
@@ -386,6 +423,6 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     return r.trouve ? r : null;
   }
 
-  return { rechercher, serie, livre, isbn };
+  return { rechercher, rechercherAuteur, serie, livre, isbn };
 }
 

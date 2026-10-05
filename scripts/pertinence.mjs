@@ -24,7 +24,7 @@ const gris = (t) => `\x1b[90m${t}\x1b[0m`;
 const jeu = process.argv[2] || 'fr';
 const detail = process.argv.includes('--detail');
 const fichier = new URL(`../test/fixtures-pertinence/requetes-${jeu}.json`, import.meta.url);
-const { lang, requetes } = JSON.parse(readFileSync(fichier, 'utf8'));
+const { lang, requetes, mode } = JSON.parse(readFileSync(fichier, 'utf8'));
 
 // Mémoire seule : ni cache Supabase (il servirait d'anciennes réponses), ni journal. Les corrections viennent du fichier, comme en repli.
 const { service } = obtenirApp({ ...process.env, SUPABASE_URL: '', SUPABASE_SERVICE_KEY: '' });
@@ -39,7 +39,22 @@ const t0 = Date.now();
 
 for (const q of requetes) {
   let r;
-  try { r = await service.rechercher(q.texte, q.lang || lang); } catch (e) { r = { resultats: [], erreur: e.message }; }
+  try { r = mode === 'auteur' ? await service.rechercherAuteur(q.texte, q.lang || lang) : await service.rechercher(q.texte, q.lang || lang); } catch (e) { r = { resultats: [], erreur: e.message }; }
+  if (mode === 'auteur') {
+    const ok = !r.erreur && r.auteur && nomFamille(r.auteur.nom) === nomFamille(q.auteur) && r.resultats.length >= (q.minimum || 1)
+      && (!q.saga || r.resultats.slice(0, 6).some((c) => c.type === 'serie' && normaliser(c.titre).includes(normaliser(q.saga))));
+    const cause = r.erreur ? `erreur : ${r.erreur}` : (!r.auteur ? 'aucun auteur trouvé' : (nomFamille(r.auteur.nom) !== nomFamille(q.auteur) ? `auteur retenu : ${r.auteur.nom}` : (r.resultats.length < (q.minimum || 1) ? `seulement ${r.resultats.length} carte(s)` : `saga « ${q.saga} » absente des 6 premières`)));
+    if (ok) nbOk += 1;
+    parCategorie[q.categorie || 'auteur'] ||= { ok: 0, total: 0 };
+    parCategorie[q.categorie || 'auteur'].total += 1;
+    if (ok) parCategorie[q.categorie || 'auteur'].ok += 1;
+    rapport.push({ texte: q.texte, ok, cause: ok ? '' : cause, auteur: r.auteur, nb: r.resultats.length, top: r.resultats.slice(0, 6).map((c) => ({ type: c.type, titre: c.titre, tomes: c.tomes })) });
+    if (!ok || detail) {
+      console.log(` « ${q.texte} » → ${r.auteur ? r.auteur.nom : 'aucun auteur'} (${r.resultats.length} cartes)${ok ? '' : rouge(` — ${cause}`)}`);
+      r.resultats.slice(0, 6).forEach((c, i) => console.log(gris(`       ${i + 1}. [${c.type}] ${c.titre}${c.tomes ? ` (${c.tomes} tomes)` : ''}`)));
+    }
+    continue;
+  }
   const top = r.resultats.slice(0, 3);
   const rang = r.resultats.findIndex((c) => memeAuteur(c, q.auteur));
   const auteurOk = rang >= 0 && rang < 3;

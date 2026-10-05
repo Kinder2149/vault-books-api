@@ -117,6 +117,37 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       return (data.search?.results?.hits || []).map((h) => h.document).filter(Boolean);
     },
 
+    /**
+     * Les livres d'un auteur, du plus lu au moins lu (compilations exclues), rendus sous la MÊME forme que les résultats de recherche :
+     * ils passent ainsi par le même regroupement en cartes (sagas en une carte, livres isolés).
+     */
+    async livresDeLAuteur(auteurId, limite = 60) {
+      const data = await gql(`query ($id: Int!, $n: Int!) { authors_by_pk(id: $id) { id name
+        contributions(where: {book: {compilation: {_eq: false}}}, order_by: {book: {users_count: desc}}, limit: $n) {
+          book { id title users_count release_year image { url width } book_series { position featured series { id name primary_books_count } } } } } }`,
+      { id: Number(auteurId), n: limite });
+      const a = data.authors_by_pk;
+      if (!a) return [];
+      return a.contributions.filter((c) => c.book).map(({ book }) => {
+        // La série mise en avant ; à défaut (fréquent : Zola), la plus fournie qui n'est pas un regroupement d'éditions.
+        const liens = book.book_series || [];
+        const technique = /split[- ]volume|publication order|omnibus|boxed|box set/i;
+        const lien = liens.find((s) => s.featured)
+          || [...liens].filter((s) => !technique.test(s.series?.name || '')).sort((a, b) => (b.series?.primary_books_count || 0) - (a.series?.primary_books_count || 0))[0]
+          || null;
+        return {
+          id: String(book.id),
+          title: book.title,
+          author_names: [a.name],
+          users_count: book.users_count,
+          release_year: book.release_year,
+          image: book.image,
+          alternative_titles: [],
+          compilation: false,
+          featured_series: lien ? { position: lien.position, series: lien.series } : null,
+        };
+      });
+    },
     /** Une série et ses entrées numérotées (position ≥ 1), sans les compilations. */
     async serie(id) {
       const data = await gql(`query ($id: Int!) { series_by_pk(id: $id) {

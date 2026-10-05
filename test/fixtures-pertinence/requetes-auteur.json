@@ -1,0 +1,25 @@
+{
+  "_note": "Jeu de la recherche PAR AUTEUR (mode=auteur, lang=fr). 'auteur' = nom de famille attendu de l'auteur retenu ; 'saga' (facultatif) = nom ou morceau de nom d'une saga qui doit figurer parmi les 6 premières cartes ; 'minimum' = nombre minimal de cartes. Attentes écrites par Claude : un échec peut venir d'une attente fausse.",
+  "lang": "fr",
+  "mode": "auteur",
+  "requetes": [
+    { "texte": "tolkien", "auteur": "Tolkien", "saga": "anneaux", "minimum": 5, "categorie": "auteur" },
+    { "texte": "stephen king", "auteur": "King", "minimum": 8, "categorie": "auteur" },
+    { "texte": "bernard werber", "auteur": "Werber", "saga": "fourmis", "minimum": 5, "categorie": "auteur" },
+    { "texte": "victor hugo", "auteur": "Hugo", "minimum": 5, "categorie": "auteur" },
+    { "texte": "agatha christie", "auteur": "Christie", "minimum": 8, "categorie": "auteur" },
+    { "texte": "anne robillard", "auteur": "Robillard", "saga": "chevaliers", "minimum": 3, "categorie": "auteur" },
+    { "texte": "pierre bottero", "auteur": "Bottero", "minimum": 3, "categorie": "auteur" },
+    { "texte": "j.k. rowling", "auteur": "Rowling", "saga": "harry potter", "minimum": 3, "categorie": "auteur" },
+    { "texte": "isaac asimov", "auteur": "Asimov", "saga": "fondation", "minimum": 5, "categorie": "auteur" },
+    { "texte": "albert camus", "auteur": "Camus", "minimum": 3, "categorie": "auteur" },
+    { "texte": "emile zola", "auteur": "Zola", "saga": "rougon", "minimum": 5, "categorie": "auteur" },
+    { "texte": "george r r martin", "auteur": "Martin", "saga": "trône", "minimum": 3, "categorie": "auteur" },
+    { "texte": "christelle dabos", "auteur": "Dabos", "minimum": 1, "categorie": "auteur" },
+    { "texte": "goscinny", "auteur": "Goscinny", "saga": "astérix", "minimum": 3, "categorie": "auteur" },
+    { "texte": "tolkein", "auteur": "Tolkien", "minimum": 3, "categorie": "auteur, faute de frappe" },
+    { "texte": "dumas", "auteur": "Dumas", "minimum": 3, "categorie": "auteur, nom seul" },
+    { "texte": "verne", "auteur": "Verne", "minimum": 3, "categorie": "auteur, nom seul" },
+    { "texte": "sanderson", "auteur": "Sanderson", "saga": "mistborn", "minimum": 3, "categorie": "auteur, nom seul" }
+  ]
+}
