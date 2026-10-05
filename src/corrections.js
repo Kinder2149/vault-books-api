@@ -8,6 +8,7 @@
  */
 import { entetesSupabase } from './supabase.js';
 import { dimensionsImage, LARGEUR_MIN } from './images.js';
+import { normaliser } from './text.js';
 
 // ---------------------------------------------------------------- lecture de la ligne de commande
 
@@ -87,6 +88,7 @@ export function aInvalider({ type, id, isbn }) {
   if (type === 'serie') return [`serie:*:${id}`, 'search:*', 'livre:*', 'isbn:*'];       // le nom d'une saga apparaît partout
   if (type === 'couverture-isbn') return [`isbn:*:${isbn}`, 'serie:*', 'livre:*'];
   if (type === 'couverture-serie') return [`serie:*:${id}`];
+  if (type === 'alias') return [`search:*:${normaliser(id)}`];                                  // la recherche concernée, dans les deux langues
   return [];
 }
 
@@ -111,11 +113,12 @@ export function creerCorrections({ url, cle, fetchImpl = fetch }) {
 
   return {
     async lister() {
-      const [series, couvertures] = await Promise.all([
+      const [series, couvertures, alias] = await Promise.all([
         appeler('series_overrides?select=*&order=series_id', { headers: entetesSupabase(cle) }).then((r) => r.json()),
         appeler('cover_overrides?select=*&order=key', { headers: entetesSupabase(cle) }).then((r) => r.json()),
+        appeler('search_aliases?select=*&order=query_norm', { headers: entetesSupabase(cle) }).then((r) => r.json()),
       ]);
-      return { series, couvertures };
+      return { series, couvertures, alias };
     },
 
     async enregistrerSerie(id, options) {
@@ -141,6 +144,22 @@ export function creerCorrections({ url, cle, fetchImpl = fetch }) {
       return { image: verif, invalidees: await invalider(motifs) };
     },
 
+    /** Un alias de recherche : « journal d'un dégonflé » → « diary of a wimpy kid ». La requête est enregistrée NORMALISÉE. */
+    async enregistrerAlias(requete, cible, note = null) {
+      const norm = normaliser(requete);
+      if (norm.length < 2) throw new Error('Requête trop courte.');
+      if (!String(cible || '').trim()) throw new Error('Il faut une cible : ce qu\'on cherche vraiment chez Hardcover.');
+      if (normaliser(cible) === norm) throw new Error('La cible est identique à la requête : inutile.');
+      await appeler('search_aliases?on_conflict=query_norm', { method: 'POST', headers: { ...json, prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ query_norm: norm, target: String(cible).trim(), note, updated_at: new Date().toISOString() }) });
+      return { requete: norm, invalidees: await invalider(aInvalider({ type: 'alias', id: requete })) };
+    },
+
+    async supprimerAlias(requete) {
+      const norm = normaliser(requete);
+      await appeler(`search_aliases?query_norm=eq.${encodeURIComponent(norm)}`, { method: 'DELETE', headers: entetesSupabase(cle, { prefer: 'return=minimal' }) });
+      return { requete: norm, invalidees: await invalider(aInvalider({ type: 'alias', id: requete })) };
+    },
     async supprimerCouverture(clef) {
       if (!cleCouvertureValide(clef)) throw new Error('Clé invalide : isbn:<13 chiffres> ou serie:<id>:<position>.');
       await appeler(`cover_overrides?key=eq.${encodeURIComponent(clef)}`, { method: 'DELETE', headers: entetesSupabase(cle, { prefer: 'return=minimal' }) });

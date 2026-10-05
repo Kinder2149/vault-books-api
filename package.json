@@ -10,6 +10,7 @@
     "test": "node --test test/",
     "test:c": "node --env-file=.env scripts/test-c.mjs",
     "corriger": "node --env-file=.env scripts/corriger.mjs",
+    "pertinence": "node --env-file=.env scripts/pertinence.mjs",
     "sauvegarder": "node --env-file=.env scripts/exporter-corrections.mjs",
     "planche": "node --env-file=.env scripts/planche-sagas.mjs",
     "verifier:supabase": "node --env-file=.env scripts/verifier-supabase.mjs",

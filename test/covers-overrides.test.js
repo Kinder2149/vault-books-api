@@ -73,7 +73,7 @@ test("corrections Supabase : fusionnées avec le fichier, gardées en mémoire, 
   assert.deepEqual(o.series[5].exclurePositions, [1.5]);
   assert.equal(o.series[1].noms.fr, 'Un');
   assert.equal(o.couvertures['isbn:1'], 'u');
-  await obtenir(); assert.equal(appels, 2);                   // 2e lecture dans le TTL : mémoire
+  await obtenir(); assert.equal(appels, 3);                   // 2e lecture dans le TTL : mémoire (3 tables lues la 1re fois : séries, couvertures, alias)
   panne = true;
   await new Promise((r) => setTimeout(r, 30));
   assert.equal((await obtenir()).series[5].noms.fr, 'Cinq');  // panne : dernière version connue

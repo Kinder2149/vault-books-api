@@ -17,8 +17,8 @@ const lues = await lireOverridesSupabase({ url: cfg.supabaseUrl, cle: cfg.supaba
 // Garde-fou : ne jamais écraser une sauvegarde riche par un export vide (base vidée par erreur, mauvaise clé…).
 let avant = {};
 try { avant = JSON.parse(readFileSync(chemin, 'utf8')); } catch { /* pas de fichier */ }
-const nbAvant = Object.keys(avant.series || {}).length + Object.keys(avant.couvertures || {}).length;
-const nbApres = Object.keys(lues.series).length + Object.keys(lues.couvertures).length;
+const nbAvant = Object.keys(avant.series || {}).length + Object.keys(avant.couvertures || {}).length + Object.keys(avant.recherches || {}).length;
+const nbApres = Object.keys(lues.series).length + Object.keys(lues.couvertures).length + Object.keys(lues.recherches).length;
 if (nbApres === 0 && nbAvant > 0) {
   console.error(`Export vide alors que la sauvegarde contient ${nbAvant} correction(s) : refusé (si c'est voulu, éditez data/overrides.json à la main).`);
   process.exit(1);
@@ -27,6 +27,7 @@ if (nbApres === 0 && nbAvant > 0) {
 const contenu = {
   _note: 'SAUVEGARDE automatique des corrections de Supabase (réécrite chaque nuit par scripts/exporter-corrections.mjs). Source de vérité : les tables series_overrides et cover_overrides. Sert aussi de repli au service si Supabase ne répond pas. Pour corriger : npm run corriger.',
   couvertures: lues.couvertures,
+  recherches: lues.recherches,
   series: Object.fromEntries(Object.entries(lues.series).map(([id, s]) => {
     const { note, ...reste } = s;
     return [id, { ...(note ? { _commentaire: note } : {}), ...reste }];

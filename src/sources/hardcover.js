@@ -109,6 +109,14 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       return (data.search?.results?.hits || []).map((h) => h.document).filter(Boolean);
     },
 
+    /** Recherche d'AUTEURS (nom, noms alternatifs, nombre de livres) : sert à reconnaître un nom d'auteur dans une requête. */
+    async rechercherAuteurs(texte, perPage = 3) {
+      const data = await gql(
+        'query ($q: String!, $n: Int!) { search(query: $q, query_type: "Author", per_page: $n, page: 1) { results } }',
+        { q: texte, n: perPage });
+      return (data.search?.results?.hits || []).map((h) => h.document).filter(Boolean);
+    },
+
     /** Une série et ses entrées numérotées (position ≥ 1), sans les compilations. */
     async serie(id) {
       const data = await gql(`query ($id: Int!) { series_by_pk(id: $id) {

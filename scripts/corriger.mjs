@@ -8,6 +8,8 @@
  *   npm run corriger -- couverture isbn:9782749910147 https://exemple.org/image.jpg
  *   npm run corriger -- couverture serie:25608:3 https://exemple.org/image.jpg --note "tome 3, bonne édition"
  *   npm run corriger -- couverture-supprimer isbn:9782749910147
+ *   npm run corriger -- alias "journal d'un dégonflé" "diary of a wimpy kid"        (titre français absent de l'index de Hardcover)
+ *   npm run corriger -- alias-supprimer "journal d'un dégonflé"
  *
  * Utilise SUPABASE_URL et SUPABASE_SERVICE_KEY de .env (jamais affichés).
  */
@@ -19,17 +21,20 @@ if (!cfg.supabaseUrl || !cfg.supabaseKey) { console.error('SUPABASE_URL et SUPAB
 const c = creerCorrections({ url: cfg.supabaseUrl, cle: cfg.supabaseKey });
 
 const AIDE = `Commandes : lister | serie <id> [--nom-fr ..] [--nom-en ..] [--fusionner a,b] [--exclure 1.5] [--note ..] | serie-supprimer <id>
-            | couverture <isbn:978… | serie:id:position> <url https> [--note ..] | couverture-supprimer <clé>`;
+            | couverture <isbn:978… | serie:id:position> <url https> [--note ..] | couverture-supprimer <clé>
+            | alias <requête> <cible> [--note ..] | alias-supprimer <requête>`;
 
 try {
   const { positionnels: [commande, a, b], options } = analyser(process.argv.slice(2));
 
   if (commande === 'lister') {
-    const { series, couvertures } = await c.lister();
+    const { series, couvertures, alias } = await c.lister();
     console.log(`\n${series.length} série(s) corrigée(s) :`);
     series.forEach((s) => console.log(`  #${s.series_id}  fr « ${s.name_fr || '—'} »  en « ${s.name_en || '—'} »  fusionner [${s.merge_ids}]  exclure [${s.exclude_positions}]${s.note ? `  — ${s.note}` : ''}`));
     console.log(`\n${couvertures.length} couverture(s) corrigée(s) :`);
     couvertures.forEach((x) => console.log(`  ${x.key}  →  ${x.url}${x.note ? `  — ${x.note}` : ''}`));
+    console.log(`\n${alias.length} alias de recherche :`);
+    alias.forEach((x) => console.log(`  « ${x.query_norm} »  →  « ${x.target} »${x.note ? `  — ${x.note}` : ''}`));
   } else if (commande === 'serie' && a) {
     const r = await c.enregistrerSerie(a, options);
     console.log(`Série #${r.ligne.series_id} enregistrée (fr « ${r.ligne.name_fr || '—'} », fusionner [${r.ligne.merge_ids}], exclure [${r.ligne.exclude_positions}]). ${r.invalidees} réponse(s) du cache invalidée(s).`);
@@ -39,6 +44,12 @@ try {
   } else if (commande === 'couverture' && a && b) {
     const r = await c.enregistrerCouverture(a, b, options.note || null);
     console.log(`Couverture ${a} enregistrée (image ${r.image.dim.l}×${r.image.dim.h}, ${r.image.octets} octets). ${r.invalidees} réponse(s) du cache invalidée(s).`);
+  } else if (commande === 'alias' && a && b) {
+    const r = await c.enregistrerAlias(a, b, options.note || null);
+    console.log(`Alias enregistré : « ${r.requete} » → « ${b} ». ${r.invalidees} réponse(s) du cache invalidée(s).`);
+  } else if (commande === 'alias-supprimer' && a) {
+    const r = await c.supprimerAlias(a);
+    console.log(`Alias « ${r.requete} » supprimé. ${r.invalidees} réponse(s) du cache invalidée(s).`);
   } else if (commande === 'couverture-supprimer' && a) {
     const r = await c.supprimerCouverture(a);
     console.log(`Correction de couverture ${a} supprimée. ${r.invalidees} réponse(s) du cache invalidée(s).`);

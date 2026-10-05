@@ -144,3 +144,13 @@ test('construireCartes : une série « Split-Volume Translation » est marquée 
   const cartes = construireCartes([h(1, 'Dune'), h(2, 'Dune Split-Volume Translation')], 'dune');
   assert.deepEqual(cartes.map((c) => [c.titre, c._technique]).sort((a, b) => a[0].localeCompare(b[0])), [['Dune', false], ['Dune Split-Volume Translation', true]]);
 });
+
+test("nom de saga : une carte série est aussi notée sur son NOM affiché (nom français corrigé), pas seulement sur ses livres", () => {
+  const livres = [
+    { id: '1', title: 'The Smurfs and the Magic Flute', author_names: ['Peyo'], users_count: 20, image: { url: 'x' }, alternative_titles: [], compilation: false,
+      featured_series: { position: 1, series: { id: 77, name: 'The Smurfs', primary_books_count: 20 } } },
+  ];
+  const sans = construireCartes(livres, 'les schtroumpfs')[0].score;
+  const avec = construireCartes(livres, 'les schtroumpfs', { nom: (id, lang, d) => (id === 77 ? 'Les Schtroumpfs' : d), lang: 'fr' })[0].score;
+  assert.ok(avec > sans + 50, `${avec} devrait dépasser ${sans} d'au moins 50`);
+});

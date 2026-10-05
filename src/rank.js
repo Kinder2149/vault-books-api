@@ -69,6 +69,10 @@ export function construireCartes(hits, requete, { idCanonique = (x) => x, nom = 
       (a.hit.featured_series?.position ?? 99) - (b.hit.featured_series?.position ?? 99))[0];
     const hit = meilleur.hit;
     const nomSerie = g.serie ? nom(g.serieId, lang, g.serie.name) : null;
+    // Le NOM affiché d'une saga compte aussi : « Les Schtroumpfs » (nom français corrigé) doit répondre à « les schtroumpfs », même si les livres de la série portent des titres anglais.
+    const lecteursMax = Math.max(...g.membres.map((m) => m.hit.users_count || 0));
+    const noteNom = nomSerie ? correspondance(nomSerie, requete) + popularite(lecteursMax) + 4 : -Infinity;
+    const noteCarte = Math.max(meilleur.note, noteNom);
 
     /*
      * UN ROMAN CHERCHÉ PAR SON TITRE, AU MILIEU D'UN GRAND CYCLE, EST UN LIVRE, PAS UNE SAGA.
@@ -96,7 +100,7 @@ export function construireCartes(hits, requete, { idCanonique = (x) => x, nom = 
       serie: !commeSerie && g.serie ? { id: g.serieId, nom: nomSerie, position } : undefined,
       lecteurs: Math.max(...g.membres.map((m) => m.hit.users_count || 0)),
       annee: hit.release_year || null,
-      score: Math.round((meilleur.note - bruit) * 10) / 10,
+      score: Math.round((noteCarte - bruit) * 10) / 10,
       // Pour la suite du traitement : les livres Hardcover derrière la carte (jamais envoyés à l'app).
       _livres: g.membres.map((m) => Number(m.hit.id)),
       _meilleurLivre: Number(hit.id),

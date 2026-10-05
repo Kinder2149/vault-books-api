@@ -13,9 +13,11 @@ import { construireSerie } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
+import { sansArticleInitial, candidatsAuteur, auteurCorrespond } from './requete.js';
+import { nomFamille } from './text.js';
 import { utilisable, petite } from './images.js';
 
-export const VERSION_CACHE = 'v4';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
+export const VERSION_CACHE = 'v5';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
 const NB_RESULTATS = 20;
 const CONCURRENCE_COUVERTURES = 4;
@@ -27,6 +29,11 @@ export class ErreurQuota extends Error {}
 
 // En dessous de ce nombre de requêtes restantes sur les 5 000 du jour (20 %), le service passe en mode économie.
 export const SEUIL_QUOTA_JOUR = 1000;
+
+// Une tête de liste au-dessus de ce score est une réponse franche : on n'essaie pas de reformuler la requête (chaque variante coûte une requête Hardcover).
+const SEUIL_FRANC = 70;
+// Bonus donné aux résultats de l'auteur reconnu dans la requête (« tolkien hobbit » : les livres de Tolkien passent devant les guides sur le Hobbit).
+const BONUS_AUTEUR = 40;
 
 const DELAI_BNF_MS = 5000;
 
@@ -95,6 +102,56 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
   }
 
   // ---------------------------------------------------------------- recherche
+  /**
+   * Les cartes de la meilleure reformulation de la requête. On cherche d'abord comme tapé (ou selon un alias, voir `recherches` dans les corrections) ;
+   * seulement si la tête de liste est faible, on essaie — dans l'ordre, en gardant la meilleure :
+   *  1. SANS L'ARTICLE DE TÊTE (« le da vinci code » ne rend rien chez Hardcover, « da vinci code » rend Dan Brown) ;
+   *  2. en RECONNAISSANT L'AUTEUR dans la requête (« tolkien hobbit » : on cherche « hobbit » et on favorise Tolkien).
+   * Chaque variante coûte une requête Hardcover : on ne reformule donc jamais une réponse franche, ni quand le quota du jour est bas.
+   */
+  async function meilleuresCartes(texte, idx, lang) {
+    // Un alias s'écrit sans article (« journal d'un dégonflé ») : on essaie la requête telle quelle, puis sans son article de tête (« le journal d'un dégonflé »).
+    const sansArt = sansArticleInitial(texte);
+    const alias = idx.alias(normaliser(texte)) || (sansArt ? idx.alias(sansArt) : null);
+    const cible = alias || texte;
+    const evaluer = async (requeteHc, auteur = null) => {
+      const hits = await hardcover.rechercher(requeteHc);
+      let cartes = construireCartes(hits, requeteHc, { idCanonique: idx.idCanonique, nom: idx.nom, lang });
+      if (auteur) {
+        const famille = nomFamille(auteur.name);
+        cartes = cartes.map((c) => ((c.auteurs || []).some((a) => nomFamille(a) === famille) ? { ...c, score: c.score + BONUS_AUTEUR } : c))
+          .sort((a, b) => b.score - a.score);
+      }
+      return { cartes, tete: cartes.length ? cartes[0].score : -Infinity };
+    };
+    const quotaBas = () => {
+      const restant = hardcover.quota ? hardcover.quota().restantJour : null;
+      return Number.isFinite(restant) && restant < 2 * seuilQuotaJour;
+    };
+
+    let meilleur = await evaluer(cible);
+    if (meilleur.tete >= SEUIL_FRANC || quotaBas()) return meilleur.cartes;
+
+    const sansArticle = sansArticleInitial(cible);
+    if (sansArticle) {
+      const v = await evaluer(sansArticle);
+      if (v.tete > meilleur.tete) meilleur = v;
+      if (meilleur.tete >= SEUIL_FRANC) return meilleur.cartes;
+    }
+
+    // Une seule hypothèse d'auteur est retenue : la première qui correspond à un auteur connu de Hardcover.
+    for (const candidat of candidatsAuteur(cible)) {
+      let docs = [];
+      try { docs = await hardcover.rechercherAuteurs(candidat.texte, 3); } catch { continue; }
+      const auteur = docs.find((d) => auteurCorrespond(d, candidat));
+      if (!auteur) continue;
+      const v = await evaluer(candidat.reste, auteur);
+      if (v.tete > meilleur.tete) meilleur = v;
+      break;
+    }
+    return meilleur.cartes;
+  }
+
   async function rechercher(texte, langue) {
     const lang = verifierLangue(langue);
     const q = normaliser(texte);
@@ -102,8 +159,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
 
     return avecCache(`search:${VERSION_CACHE}:${lang}:${q}`, TTL.recherche, async () => {
       const idx = indexer(await lireOverrides());
-      const hits = await hardcover.rechercher(texte);
-      let cartes = construireCartes(hits, texte, { idCanonique: idx.idCanonique, nom: idx.nom, lang });
+      let cartes = await meilleuresCartes(texte, idx, lang);
 
       // Quelles œuvres existent dans la langue demandée ? Un seul appel pour toutes les cartes.
       const ids = cartes.slice(0, NB_RESULTATS).flatMap((c) => c._livres).slice(0, MAX_LIVRES_VERIFIES);

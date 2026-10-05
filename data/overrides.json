@@ -1,6 +1,12 @@
 {
   "_note": "SAUVEGARDE automatique des corrections de Supabase (réécrite chaque nuit par scripts/exporter-corrections.mjs). Source de vérité : les tables series_overrides et cover_overrides. Sert aussi de repli au service si Supabase ne répond pas. Pour corriger : npm run corriger.",
   "couvertures": {},
+  "recherches": {
+    "et il n en resta plus aucun": "and then there were none",
+    "journal d un degonfle": "diary of a wimpy kid",
+    "les hommes qui n aimaient pas les femmes": "the girl with the dragon tattoo",
+    "millenium": "the girl with the dragon tattoo"
+  },
   "series": {
     "981": {
       "_commentaire": "Hardcover y mélange coffrets, traductions et volumes français coupés.",
@@ -31,6 +37,15 @@
       "noms": {
         "fr": "Les Chevaliers d'Émeraude",
         "en": "Emerald Knights"
+      },
+      "fusionner": [],
+      "exclurePositions": []
+    },
+    "105239": {
+      "_commentaire": "nom FR : la saga doit répondre à 'les schtroumpfs'",
+      "noms": {
+        "fr": "Les Schtroumpfs",
+        "en": "The Smurfs"
       },
       "fusionner": [],
       "exclurePositions": []

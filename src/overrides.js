@@ -9,12 +9,12 @@
 import { readFileSync } from 'node:fs';
 import { entetesSupabase } from './supabase.js';
 
-const VIDE = { series: {}, couvertures: {} };
+const VIDE = { series: {}, couvertures: {}, recherches: {} };
 
 export function chargerOverrides(chemin = new URL('../data/overrides.json', import.meta.url)) {
   try {
     const o = JSON.parse(readFileSync(chemin, 'utf8'));
-    return { series: o.series || {}, couvertures: o.couvertures || {} };
+    return { series: o.series || {}, couvertures: o.couvertures || {}, recherches: o.recherches || {} };
   } catch {
     return { ...VIDE };
   }
@@ -26,13 +26,13 @@ export function chargerOverrides(chemin = new URL('../data/overrides.json', impo
  */
 export async function lireOverridesSupabase({ url, cle, fetchImpl = fetch }) {
   const entetes = entetesSupabase(cle);
-  async function lire(table) {
-    const r = await fetchImpl(`${url}/rest/v1/${table}?select=*&order=${table === 'cover_overrides' ? 'key' : 'series_id'}`, { headers: entetes });
+  async function lire(table, { optionnelle = false } = {}) {
+    const r = await fetchImpl(`${url}/rest/v1/${table}?select=*&order=${{ cover_overrides: 'key', search_aliases: 'query_norm' }[table] || 'series_id'}`, { headers: entetes });
     if (!r.ok) throw new Error(`Supabase (${table}) a répondu ${r.status}`);
     return r.json();
   }
-  const [series, couvertures] = await Promise.all([lire('series_overrides'), lire('cover_overrides')]);
-  const resultat = { series: {}, couvertures: {} };
+  const [series, couvertures, alias] = await Promise.all([lire('series_overrides'), lire('cover_overrides'), lire('search_aliases', { optionnelle: true })]);
+  const resultat = { series: {}, couvertures: {}, recherches: {} };
   for (const s of series) {
     resultat.series[String(s.series_id)] = {
       noms: { fr: s.name_fr || undefined, en: s.name_en || undefined },
@@ -42,6 +42,7 @@ export async function lireOverridesSupabase({ url, cle, fetchImpl = fetch }) {
     };
   }
   for (const c of couvertures) resultat.couvertures[c.key] = c.url;
+  for (const a of alias) resultat.recherches[a.query_norm] = a.target;
   return resultat;
 }
 
@@ -57,7 +58,7 @@ export function overridesSupabase({ url, cle, repli = chargerOverrides(), fetchI
     if (memo && Date.now() - pose < ttlMs) return memo;
     try {
       const lues = await lireOverridesSupabase({ url, cle, fetchImpl });
-      memo = { series: { ...repli.series, ...lues.series }, couvertures: { ...repli.couvertures, ...lues.couvertures } };
+      memo = { series: { ...repli.series, ...lues.series }, couvertures: { ...repli.couvertures, ...lues.couvertures }, recherches: { ...repli.recherches, ...lues.recherches } };
       pose = Date.now();
       return memo;
     } catch {
@@ -71,6 +72,7 @@ export function indexer(overrides) {
   const alias = new Map();
   const series = overrides?.series || {};
   const couvertures = overrides?.couvertures || {};
+  const recherches = overrides?.recherches || {};
   for (const [canon, o] of Object.entries(series)) {
     (o.fusionner || []).forEach((id) => alias.set(Number(id), Number(canon)));
   }
@@ -78,6 +80,8 @@ export function indexer(overrides) {
     idCanonique: (id) => alias.get(Number(id)) ?? Number(id),
     nom: (id, lang, parDefaut) => series[String(id)]?.noms?.[lang] ?? parDefaut,
     existe: (id) => Boolean(series[String(id)]),
+    // Alias de recherche : une requête (normalisée) → ce qu'il faut réellement chercher chez Hardcover (titres français absents de son index).
+    alias: (requeteNormalisee) => recherches[requeteNormalisee] || null,
     couverture: ({ isbn13, serieId, position }) =>
       (isbn13 && couvertures[`isbn:${isbn13}`]) || (serieId && couvertures[`serie:${serieId}:${position}`]) || null,
   };
