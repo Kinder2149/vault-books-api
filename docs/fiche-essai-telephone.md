@@ -22,6 +22,7 @@ Avant de commencer : Réglages → carte « Catalogue » → l'interrupteur est 
 | 13 | Mode avion : chercher un livre jamais cherché | Message d'erreur clair (pas d'écran blanc) | |
 | 14 | Réseau revenu : refaire la recherche | Résultats frais, plus de mention « ancien » | |
 | 15 | Réglages → couper le catalogue, chercher `dune` | La recherche marche comme avant (Google, Open Library, BnF) | |
+| 16 | Réglages → « Sources des données » → toucher « Hardcover » | La page s'ouvre dans le navigateur du téléphone, pas dans l'application | |
 
 ## Vitesse (au chrono, réseau mobile)
 
