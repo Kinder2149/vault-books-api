@@ -100,6 +100,7 @@ export function construireCartes(hits, requete, { idCanonique = (x) => x, nom = 
       // Pour la suite du traitement : les livres Hardcover derrière la carte (jamais envoyés à l'app).
       _livres: g.membres.map((m) => Number(m.hit.id)),
       _meilleurLivre: Number(hit.id),
+      _technique: Boolean(commeSerie && MOTIF_SERIE_TECHNIQUE.test(g.serie.name)),
     };
   }).sort((a, b) => b.score - a.score);
 }
@@ -110,7 +111,7 @@ export function construireCartes(hits, requete, { idCanonique = (x) => x, nom = 
  * sur « fondation asimov », d'un coffret au score négatif. Même signal que le filtre du hors-sujet de Vault Read : l'auteur de l'œuvre dominante.
  *
  * Deux règles, et elles ne s'appliquent QU'EN PRÉSENCE d'une tête de liste sûre (score ≥ 50) :
- *  1. un score négatif — un titre bien plus long que la recherche, sans rien pour le sauver — disparaît ;
+ *  1. un score négatif — un titre bien plus long que la recherche, sans rien pour le sauver — disparaît ; de même un titre de plus de 20 mots\n *     (« Catalogue des livres de la bibliothèque de feu C. L. L'Héritier de Brutelle… » sur « germinal ») et une série « technique »\n *     (traductions découpées, ordre de parution, coffrets) derrière une vraie œuvre ;
  *  2. si la tête est très lue (≥ 500 lecteurs), disparaît ce qui est CENT FOIS moins lu ET d'un autre auteur.
  * Le seuil de 100 est large exprès : « les fourmis » garde Boris Vian (9 lecteurs) à côté de Werber (≈ 170) — un homonyme réel reste ; un inconnu, non.
  * Le premier résultat reste toujours.
@@ -122,6 +123,8 @@ export function ecarterBruit(cartes) {
   return cartes.filter((c, i) => {
     if (i === 0) return true;
     if (c.score <= 0) return false;
+    if (c._technique && !tete._technique) return false;                  // regroupement d'éditions, pas une œuvre
+    if (mots(normaliser(c.titre)).length > 20) return false;            // un catalogue de bibliothèque, pas un livre
     const memeAuteur = (c.auteurs || []).some((a) => famille.has(nomFamille(a)));
     const quasiInconnu = tete.lecteurs >= 500 && c.lecteurs * 100 < tete.lecteurs;
     return memeAuteur || !quasiInconnu;
@@ -129,3 +132,5 @@ export function ecarterBruit(cartes) {
 }
 
 const MOTIF_SERIE_BRUIT = /split[- ]volume|publication order|omnibus|boxed|box set|graphic novel|sequels?\b/i;
+// Ces séries-là ne sont jamais une œuvre : ce sont des regroupements d'éditions (traductions découpées, ordre de parution, coffrets).
+const MOTIF_SERIE_TECHNIQUE = /split[- ]volume|publication order|omnibus|boxed|box set/i;

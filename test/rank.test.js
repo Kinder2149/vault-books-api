@@ -126,3 +126,21 @@ test('bruit : le premier résultat reste toujours, même seul', () => {
   assert.equal(ecarterBruit([carte('X', 'Y', 0, 80)]).length, 1);
   assert.deepEqual(ecarterBruit([]), []);
 });
+
+test('bruit : une série « technique » (traductions découpées, ordre de parution) disparaît derrière une vraie œuvre, jamais seule', () => {
+  const tech = { ...carte('Dune Split-Volume Translation', 'Frank Herbert', 3, 87.5), _technique: true };
+  assert.deepEqual(ecarterBruit([carte('Dune', 'Frank Herbert', 14234, 154), tech]).map((c) => c.titre), ['Dune']);
+  assert.equal(ecarterBruit([tech]).length, 1);                                       // seule, elle reste : on ne rend jamais rien
+});
+
+test('bruit : un titre de plus de 20 mots (catalogue de bibliothèque) disparaît', () => {
+  const long = carte('Catalogue des livres de la bibliothèque de feu C. L. L\'Héritier de Brutelle par G. Debure l\'aîné avec un extrait de l\'éloge du citoyen l\'Héritier par le citoyen Cuvier la vente se fera dans le courant du mois de germinal', 'Debure', 0, 49.6);
+  assert.deepEqual(ecarterBruit([carte('Germinal', 'Émile Zola', 343, 144), long]).map((c) => c.titre), ['Germinal']);
+});
+
+test('construireCartes : une série « Split-Volume Translation » est marquée technique, une vraie saga non', () => {
+  const h = (id, nom) => ({ id: String(id), title: 'Dune', author_names: ['Frank Herbert'], users_count: 10, image: { url: 'x' }, alternative_titles: [], compilation: false,
+    featured_series: { position: 1, series: { id, name: nom, primary_books_count: 5 } } });
+  const cartes = construireCartes([h(1, 'Dune'), h(2, 'Dune Split-Volume Translation')], 'dune');
+  assert.deepEqual(cartes.map((c) => [c.titre, c._technique]).sort((a, b) => a[0].localeCompare(b[0])), [['Dune', false], ['Dune Split-Volume Translation', true]]);
+});

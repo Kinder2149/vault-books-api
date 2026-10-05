@@ -14,7 +14,7 @@ import { fusionnerEditions } from './editions.js';
 import { indexer } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
 
-const VERSION_CACHE = 'v3';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
+const VERSION_CACHE = 'v4';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
 const NB_RESULTATS = 20;
 const CONCURRENCE_COUVERTURES = 4;
@@ -104,7 +104,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         requete: texte,
         langue: lang,
         langueNonDisponible: dansLaLangue.length === 0 && cartes.length > 0,
-        resultats: retenues.map(({ _livres, _meilleurLivre, ...publique }) => publique),
+        // Les champs de travail (préfixés « _ ») ne quittent jamais le service.
+        resultats: retenues.map((c) => Object.fromEntries(Object.entries(c).filter(([k]) => !k.startsWith('_')))),
       };
     });
   }
