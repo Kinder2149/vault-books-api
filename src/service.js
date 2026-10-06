@@ -15,7 +15,7 @@ import { indexer, urlsMasquees } from './overrides.js';
 import { versIsbn13, versIsbn10 } from './isbn.js';
 import { sansArticleInitial, sansMotsParasites, candidatsAuteur, auteurCorrespond, variantesDeFaute } from './requete.js';
 import { nomFamille } from './text.js';
-import { nettoyerResume, langueResume } from './resume.js';
+import { nettoyerResume, langueResume, resumePourLangue } from './resume.js';
 import { utilisable, petite } from './images.js';
 import { formatNormalise, pagesPlausibles } from './formats.js';
 
@@ -415,6 +415,22 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     return lang === LANGUE_BILINGUE ? bi : projeterSerie(bi, lang);
   }
 
+  /**
+   * Le résumé d'un livre dans UNE langue : celui du livre lui-même s'il est écrit dans cette langue, sinon — un seul appel de plus — celui d'une de
+   * ses traductions (voir `descriptionsLivre`). Absent si aucune ne convient : jamais l'autre langue, jamais un mélange.
+   */
+  async function resumeEn(lang, description, livreId, origineId) {
+    const direct = resumePourLangue(description, lang);
+    if (direct.resume || !hardcover.descriptionsLivre) return direct;
+    try {
+      for (const autre of await hardcover.descriptionsLivre(origineId || livreId)) {
+        const r = resumePourLangue(autre, lang);
+        if (r.resume) return r;
+      }
+    } catch { /* sans ce complément, le résumé reste absent : on ne fait pas échouer le livre */ }
+    return direct;
+  }
+
   // ---------------------------------------------------------------- éditions d'un livre
   const titreCourt = (t) => String(t || '').split(/ : | \(/)[0].trim();
 
@@ -476,8 +492,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         titreLangue,
         auteurs,
         langue: lang,
-        resume: nettoyerResume(l.description),
-        resumeLangue: langueResume(nettoyerResume(l.description)),
+        // Le résumé n'est rendu que dans la langue demandée (sinon absent) ; l'autre langue se lit dans la réponse `lang=both`.
+        ...(await resumeEn(lang, l.description, numero, l.canonical_id)),
         serie: serieLien ? { id: idx.idCanonique(serieLien.series.id), nom: idx.nom(idx.idCanonique(serieLien.series.id), lang, serieLien.series.name), position: serieLien.position } : null,
         editions,
         statut: editions.length ? 'disponible' : 'indisponible_langue',
@@ -532,8 +548,10 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
           formatBrut: ed.edition_format || null,
           couverture: { url: couverture.url, source: couverture.source, approximative: couverture.approximative, basseDefinition: Boolean(couverture.basseDefinition), qualite: couverture.qualite ?? 0 },
           livre: ed.book ? { id: ed.book.id, titre: ed.book.title } : null,
-          resume: nettoyerResume(ed.book?.description),
-          resumeLangue: langueResume(nettoyerResume(ed.book?.description)),
+          // Un scan désigne UNE édition : le résumé doit être dans la langue de cette édition (s'il est dans une autre, il est absent).
+          ...(LANGUES.includes(ed.language?.code2)
+            ? await resumeEn(ed.language.code2, ed.book?.description, ed.book?.id, null)
+            : { resume: nettoyerResume(ed.book?.description), resumeLangue: langueResume(nettoyerResume(ed.book?.description)) }),
           serie: serieLien ? {
             id: canon, nom: idx.nom(canon, langue, serieLien.series.name), position: serieLien.position, total: serieLien.series.primary_books_count ?? null,
           } : null,

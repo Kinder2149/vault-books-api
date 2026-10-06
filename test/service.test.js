@@ -322,9 +322,13 @@ test("isbn : le résumé de Hardcover est nettoyé et sa langue indiquée ; la B
   assert.deepEqual([r2.resume, r2.resumeLangue], [null, null]);
 });
 
-test('livre : le résumé est rendu avec sa langue', async () => {
+test("livre : le résumé n'est rendu que dans la langue demandée (un résumé anglais est absent en français, présent en anglais)", async () => {
   const hc = { ...faux(), async livre() { return { ...livreHc(), description: 'In a kingdom where magic is forbidden, a young girl who does not know her power travels to the capital with her brother.' }; } };
-  const r = await creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couvFaux }).livre(927288, 'fr');
-  assert.equal(r.resumeLangue, 'en');
-  assert.match(r.resume, /kingdom where magic/);
+  const s = creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: couvFaux });
+  const fr = await s.livre(927288, 'fr');
+  assert.equal(fr.resume, null);
+  assert.equal(fr.resumeLangue, null);
+  const en = await s.livre(927288, 'en');
+  assert.equal(en.resumeLangue, 'en');
+  assert.match(en.resume, /kingdom where magic/);
 });

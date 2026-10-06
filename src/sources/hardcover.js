@@ -254,10 +254,22 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       return (data.editions || [])[0] || null;
     },
 
+    /**
+     * Les descriptions du livre d'origine et de ses TRADUCTIONS (livres distincts rattachés à l'original par `canonical_id`), les plus lues d'abord.
+     * Mesuré le 2026-10-06 : Hardcover ne garde qu'une description par livre, mais celle d'une traduction est souvent dans SA langue
+     * (3 livres sur 6 ont ainsi un résumé français : Harry Potter 1, Le Prince Caspian, Le Seigneur du Chaos).
+     * @returns {Promise<string[]>}
+     */
+    async descriptionsLivre(id, limite = 40) {
+      const data = await gql(`query ($id: Int!, $n: Int!) { books(where: {_or: [{id: {_eq: $id}}, {canonical_id: {_eq: $id}}], description: {_is_null: false}},
+        order_by: {users_count: desc}, limit: $n) { description } }`, { id: Number(id), n: limite });
+      return (data.books || []).map((b) => b.description).filter(Boolean);
+    },
+
     /** Un livre : titre, auteurs, séries, et TOUTES ses éditions dans la langue (jusqu'à 100, les plus lues d'abord). */
     async livre(id, lang) {
       const data = await gql(`query ($id: Int!, $lang: String!) { books_by_pk(id: $id) {
-        id title description users_count image { url width }
+        id title description canonical_id users_count image { url width }
         contributions { author { name } }
         book_series { position series { id name primary_books_count } }
         editions(where: {language: {code2: {_eq: $lang}}}, order_by: {users_count: desc}, limit: 100) {
