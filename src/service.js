@@ -12,11 +12,12 @@ import { construireCartes, ecarterBruit } from './rank.js';
 import { construireSerie, fusionnerLangues, projeterSerie, langueDuTitre } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer, urlsMasquees } from './overrides.js';
-import { versIsbn13 } from './isbn.js';
+import { versIsbn13, versIsbn10 } from './isbn.js';
 import { sansArticleInitial, sansMotsParasites, candidatsAuteur, auteurCorrespond } from './requete.js';
 import { nomFamille } from './text.js';
 import { nettoyerResume, langueResume } from './resume.js';
 import { utilisable, petite } from './images.js';
+import { formatNormalise, pagesPlausibles } from './formats.js';
 
 export const VERSION_CACHE = 'v6';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
@@ -192,7 +193,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
    */
   async function finaliser(cartes, lang, { ecarter }) {
     const ids = cartes.slice(0, NB_RESULTATS).flatMap((c) => c._livres).slice(0, MAX_LIVRES_VERIFIES);
-    const editions = await hardcover.editionsEnLangue(ids, lang);
+    const editions = await hardcover.editionsEnLangue(ids, lang, { secoursAudio: false });   // une recherche ne coûte pas un appel de plus pour de l'audio
 
     let finales = cartes.map((c) => {
       const edition = editions.get(c._meilleurLivre) || c._livres.map((id) => editions.get(id)).find(Boolean) || null;
@@ -302,13 +303,13 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         couvertureEdition: t.couvertureSource === 'edition' ? t.couverture : null,
         couvertureVoisine: t._couvertureVoisine,
         couverturePetite: t._couverturePetite,
-        couvertureLivre: t._couvertureLivre,
         correction: idx.couverture({ isbn13, serieId, position: t.position }),
       });
       t.couverture = r.url;
       t.couvertureSource = r.source;
       t.couvertureApproximative = r.approximative;
       t.couvertureBasseDefinition = Boolean(r.basseDefinition);
+      t.couvertureQualite = r.qualite ?? 0;
     });
   }
 
@@ -430,11 +431,10 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
             isbn13: e.isbn13,
             couvertureEdition: e.couverture,
             couverturePetite: e.couverturePetite,
-            couvertureLivre: l.image?.url,
             correction: idx.couverture({ isbn13: e.isbn13, serieId: serieLien?.series?.id, position: serieLien?.position }),
           })
           : { url: e.couverture, source: e.couverture ? 'hardcover' : null, approximative: false };
-        e.couverture = { url: r.url, source: r.source, approximative: r.approximative, basseDefinition: Boolean(r.basseDefinition) };
+        e.couverture = { url: r.url, source: r.source, approximative: r.approximative, basseDefinition: Boolean(r.basseDefinition), qualite: r.qualite ?? 0 };
         delete e.couverturePetite;
       });
 
@@ -494,9 +494,11 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
           editeur: ed.publisher?.name || null,
           date: ed.release_date || null,
           langue: ed.language?.code2 || null,
-          nbPages: ed.pages || null,
-          format: ed.edition_format || null,
-          couverture: { url: couverture.url, source: couverture.source, approximative: couverture.approximative, basseDefinition: Boolean(couverture.basseDefinition) },
+          isbn10: versIsbn10(ed.isbn_10) || versIsbn10(isbn13),
+          nbPages: pagesPlausibles(ed.pages, formatNormalise(ed)),   // un nombre de pages absurde (11 pour un roman) devient null
+          format: formatNormalise(ed),
+          formatBrut: ed.edition_format || null,
+          couverture: { url: couverture.url, source: couverture.source, approximative: couverture.approximative, basseDefinition: Boolean(couverture.basseDefinition), qualite: couverture.qualite ?? 0 },
           livre: ed.book ? { id: ed.book.id, titre: ed.book.title } : null,
           resume: nettoyerResume(ed.book?.description),
           resumeLangue: langueResume(nettoyerResume(ed.book?.description)),
@@ -526,9 +528,10 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         editeur: notice.editeur,
         date: notice.annee,
         langue: LANGUES_BNF[notice.langue] || null,
+        isbn10: versIsbn10(isbn13),
         nbPages: null,
         format: null,
-        couverture: { url: couverture.url, source: couverture.source, approximative: false, basseDefinition: false },
+        couverture: { url: couverture.url, source: couverture.source, approximative: false, basseDefinition: false, qualite: couverture.qualite ?? 0 },
         livre: null,
         resume: null,
         resumeLangue: null,

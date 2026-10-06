@@ -92,7 +92,6 @@ function entree(position, candidats, editions, aujourdhui, { editionsAutre, lang
 
   const couvertureEdition = utilisable(ed?.image) ? ed.image.url : null;
   const couverturePetite = petite(ed?.image) ? ed.image.url : null;
-  const couvertureLivre = choisi.image?.url || null;
   // Une AUTRE édition française du même tome, avec une image assez grande (voir hardcover.editionsEnLangue) : utile quand l'édition retenue n'a qu'une miniature.
   const couvertureVoisine = !couvertureEdition && utilisable(ed?._imageVoisine) ? ed._imageVoisine.url : null;
   // Une édition annoncée (date future) reste « à paraître » : on peut la précommander, mais elle ne se lit pas encore.
@@ -105,11 +104,11 @@ function entree(position, candidats, editions, aujourdhui, { editionsAutre, lang
     statut,
     disponible: Boolean(ed),
     aParaitre: statut === 'a_paraitre',
-    couverture: couvertureEdition || couverturePetite || couvertureLivre,
-    couvertureSource: couvertureEdition ? 'edition' : (couverturePetite ? 'edition-petite' : (couvertureLivre ? 'livre' : null)),
+    // Pas de repli sur l'image du « livre » : elle peut être celle d'une autre langue. Sans image de l'édition, l'application dessine la couverture.
+    couverture: couvertureEdition || couverturePetite,
+    couvertureSource: couvertureEdition ? 'edition' : (couverturePetite ? 'edition-petite' : null),
     _couverturePetite: couverturePetite,
     _couvertureVoisine: couvertureVoisine,
-    _couvertureLivre: couvertureLivre,
     edition: ed && {
       id: ed.id,
       isbn13: ed.isbn_13 || null,

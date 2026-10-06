@@ -11,6 +11,8 @@
 import { normaliser, sansArticle, nomFamille } from './text.js';
 import { versIsbn13 } from './isbn.js';
 import { utilisable, petite } from './images.js';
+import { formatNormalise, pagesPlausibles, rangFormat } from './formats.js';
+import { versIsbn10 } from './isbn.js';
 
 /**
  * « Le feu dans le ciel (Édition collector) » correspond à « Le Feu dans le ciel » ; « Le feu » ne correspond pas.
@@ -34,12 +36,17 @@ export function fusionnerEditions({ editionsHardcover = [], noticesBnf = [], tit
   for (const e of editionsHardcover) {
     const isbn13 = versIsbn13(e.isbn_13);
     if (!isbn13) continue;
+    const format = formatNormalise(e);
     parIsbn.set(isbn13, {
       isbn13,
+      isbn10: versIsbn10(e.isbn_10) || versIsbn10(isbn13),
       titre: e.title || titre,
+      sousTitre: e.subtitle || null,
       editeur: e.publisher?.name || null,
       date: e.release_date || null,
-      format: e.edition_format || null,
+      format,                               // papier | poche | numerique | audio | null
+      formatBrut: e.edition_format || null,
+      pages: pagesPlausibles(e.pages, format),
       couverture: utilisable(e.image) ? e.image.url : null,
       couverturePetite: petite(e.image) ? e.image.url : null,
       collection: null,
@@ -58,13 +65,13 @@ export function fusionnerEditions({ editionsHardcover = [], noticesBnf = [], tit
       if (!existante.sources.includes('bnf')) existante.sources.push('bnf');
     } else {
       parIsbn.set(n.isbn13, {
-        isbn13: n.isbn13, titre: n.titre, editeur: n.editeur, date: n.annee, format: null,
+        isbn13: n.isbn13, isbn10: versIsbn10(n.isbn13), titre: n.titre, sousTitre: null, editeur: n.editeur, date: n.annee, format: null, formatBrut: null, pages: null,
         couverture: null, couverturePetite: null, collection: n.collection, sources: ['bnf'],
       });
     }
   }
 
-  // Les plus récentes d'abord : ce sont celles qu'on trouve en rayon.
-  return [...parIsbn.values()].sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  // Le papier avant le numérique, l'audio en dernier ; à format égal, les plus récentes d'abord (ce sont celles qu'on trouve en rayon).
+  return [...parIsbn.values()].sort((a, b) => (rangFormat(a.format) - rangFormat(b.format)) || String(b.date || '').localeCompare(String(a.date || '')));
 }
 

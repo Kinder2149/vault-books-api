@@ -73,11 +73,12 @@ test('fusion : Hardcover fait foi, la BnF comble et ajoute, sans doublon ni livr
     { isbn13: '9782266046503', titre: 'Le feu dans le ciel', auteurs: ['Boris Vian'], editeur: 'Autre', annee: '1999', collection: null },
   ];
   const e = fusionnerEditions({ editionsHardcover: hc, noticesBnf: bnf, titre: 'Le Feu dans le ciel', auteur: 'Anne Robillard' });
-  assert.deepEqual(e.map((x) => x.isbn13), ['9782749915357', '9782749906256']);   // récentes d'abord ; 3e = autre titre, 4e = autre auteur, 2e HC sans ISBN
-  assert.equal(e[1].editeur, 'M. Lafon');                  // comblé par la BnF
-  assert.equal(e[1].date, '2007');
-  assert.equal(e[1].couverture, 'https://img/1.jpg');      // gardée de Hardcover
-  assert.deepEqual(e[1].sources, ['hardcover', 'bnf']);
+  assert.deepEqual(e.map((x) => x.isbn13), ['9782749906256', '9782749915357']);   // le format connu (papier) d'abord, puis les plus récentes ; 3e = autre titre, 4e = autre auteur, 2e HC sans ISBN
+  assert.equal(e[0].format, 'papier');
+  assert.equal(e[0].editeur, 'M. Lafon');                  // comblé par la BnF
+  assert.equal(e[0].date, '2007');
+  assert.equal(e[0].couverture, 'https://img/1.jpg');      // gardée de Hardcover
+  assert.deepEqual(e[0].sources, ['hardcover', 'bnf']);
 });
 
 

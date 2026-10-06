@@ -4,12 +4,12 @@ import { creerCouvertures } from '../src/covers.js';
 import { cacheMemoire } from '../src/cache.js';
 import { indexer, overridesSupabase } from '../src/overrides.js';
 
-const reponse = (status, taille) => ({ status, ok: status >= 200 && status < 300, headers: { get: () => (taille == null ? null : String(taille)) } });
+const reponse = (status, taille) => ({ status, ok: status >= 200 && status < 300, headers: { get: () => null }, arrayBuffer: async () => new ArrayBuffer(taille || 0) });
 
 test('cascade : la correction manuelle gagne sur tout', async () => {
   const c = creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => { throw new Error('ne doit pas être appelé'); } });
   const r = await c.resoudre({ isbn13: '1', couvertureEdition: 'hc', correction: 'main' });
-  assert.deepEqual(r, { url: 'main', source: 'correction', approximative: false });
+  assert.deepEqual(r, { url: 'main', source: 'correction', approximative: false, qualite: 1 });
 });
 
 test("cascade : l'image de l'édition Hardcover évite tout appel à Open Library", async () => {
@@ -33,7 +33,7 @@ test("cascade : Open Library 404 → image du livre, marquée APPROXIMATIVE ; l'
   const c = creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => { appels += 1; return reponse(404); } });
   const a = await c.resoudre({ isbn13: '9782749906256', couvertureLivre: 'livre' });
   await c.resoudre({ isbn13: '9782749906256', couvertureLivre: 'livre' });
-  assert.deepEqual(a, { url: 'livre', source: 'hardcover-livre', approximative: true });
+  assert.deepEqual(a, { url: 'livre', source: 'hardcover-livre', approximative: true, qualite: 0.2 });
   assert.equal(appels, 1);
 });
 
@@ -48,7 +48,7 @@ test("cascade : Open Library en panne ou limitée (429) → on ne mémorise rien
   const c = creerCouvertures({ cache, fetchImpl: async () => reponse(429) });
   const r = await c.resoudre({ isbn13: '9782749906256', couvertureLivre: 'livre' });
   assert.equal(r.approximative, true);
-  assert.equal(await cache.get('cover:v1:ol:9782749906256'), null);
+  assert.equal(await cache.get('cover:v2:ol:9782749906256'), null);
 });
 
 test('corrections : par ISBN ou par tome de saga', () => {
@@ -82,7 +82,7 @@ test("corrections Supabase : fusionnées avec le fichier, gardées en mémoire, 
 test("cascade : miniature de l'édition APRÈS Open Library, marquée basse définition, avant l'image du livre", async () => {
   const c = creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => reponse(404) });
   const r = await c.resoudre({ isbn13: '9782749906256', couverturePetite: 'petite', couvertureLivre: 'livre' });
-  assert.deepEqual(r, { url: 'petite', source: 'hardcover-petite', approximative: false, basseDefinition: true });
+  assert.deepEqual(r, { url: 'petite', source: 'hardcover-petite', approximative: false, basseDefinition: true, qualite: 0.4 });
 });
 
 test('cascade : Open Library passe devant une miniature Hardcover', async () => {
@@ -94,7 +94,7 @@ test('cascade : Open Library passe devant une miniature Hardcover', async () => 
 test("cascade : l'image d'une édition voisine passe APRÈS Open Library (couverture de cette édition) et AVANT la miniature", async () => {
   const sansOl = creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => reponse(404) });
   const r = await sansOl.resoudre({ isbn13: '9782749906256', couvertureVoisine: 'voisine', couverturePetite: 'petite', couvertureLivre: 'livre' });
-  assert.deepEqual(r, { url: 'voisine', source: 'hardcover-voisine', approximative: false });
+  assert.deepEqual(r, { url: 'voisine', source: 'hardcover-voisine', approximative: false, qualite: 0.7 });
   const avecOl = creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => reponse(200, 30000) });
   assert.equal((await avecOl.resoudre({ isbn13: '9782749906256', couvertureVoisine: 'voisine' })).source, 'openlibrary');
 });

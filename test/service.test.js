@@ -199,7 +199,7 @@ test("isbn : l'édition de Hardcover avec éditeur, date, pages, langue, couvert
   assert.deepEqual(r.auteurs, ['Anne Robillard']);              // sans doublon
   assert.deepEqual(r.serie, { id: 25608, nom: "Les Chevaliers d'Émeraude (cycle 1)", position: 8, total: 12 });
   assert.deepEqual(r.livre, { id: 1099977, titre: 'Les dieux déchus' });
-  assert.deepEqual(r.couverture, { url: 'https://img/e.jpg', source: 'hardcover', approximative: false, basseDefinition: false });
+  assert.deepEqual(r.couverture, { url: 'https://img/e.jpg', source: 'hardcover', approximative: false, basseDefinition: false, qualite: 0 });
   assert.deepEqual(r.sources, ['hardcover']);
 });
 

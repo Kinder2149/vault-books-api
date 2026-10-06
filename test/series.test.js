@@ -73,7 +73,7 @@ test('la couverture vient de l\'édition dans la langue, sinon du livre', () => 
   const entrees = [entree(1, livre(1, 'Un', 5)), entree(2, livre(2, 'Deux', 5))];
   const s = construireSerie({ serie: SERIE, entrees, editions: new Map([[1, edition(9, 'Un', '1')]]), lang: 'fr' });
   assert.equal(s.tomes[0].couverture, 'https://img/e9.jpg');
-  assert.equal(s.tomes[1].couverture, 'https://img/2.jpg');
+  assert.equal(s.tomes[1].couverture, null);   // jamais l'image du « livre » : elle peut être d'une autre langue
 });
 
 test('un tome pas encore paru est signalé et ne compte pas dans « disponibles »', () => {
@@ -89,7 +89,7 @@ test("la source de la couverture est tracée : image d'édition ou, à défaut, 
   const ed = { id: 1, title: 'Un', isbn_13: '1', image: { url: 'https://img/e.jpg' } };
   const s = construireSerie({ serie: SERIE, entrees, editions: new Map([[1, ed], [2, { id: 2, title: 'Deux', isbn_13: '2', image: null }]]), lang: 'fr' });
   assert.equal(s.tomes[0].couvertureSource, 'edition');
-  assert.equal(s.tomes[1].couvertureSource, 'livre');
+  assert.equal(s.tomes[1].couvertureSource, null);
 });
 
 test('sans date de sortie ni édition dans la langue, un tome est « à paraître » (The Winds of Winter) ; avec une édition, non', () => {

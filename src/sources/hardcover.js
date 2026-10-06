@@ -5,6 +5,8 @@
  * Chaque champ de premier niveau d'une requête compte comme un appel : on groupe le moins possible, on n'en met pas plus de 1.
  */
 
+import { FORMATS_AUDIO } from '../formats.js';
+
 const URL_API = 'https://api.hardcover.app/v1/graphql';
 const DELAI_MAX_MS = 10000;
 const PAUSES_REESSAI_MS = [500, 1500];   // 429 et 503 : l'API dit « sans danger de réessayer »
@@ -233,7 +235,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
      */
     async editionParIsbn(isbn13) {
       const data = await gql(`query ($isbn: String!) { editions(where: {isbn_13: {_eq: $isbn}}, order_by: {users_count: desc}, limit: 3) {
-        id title isbn_13 release_date pages edition_format language { code2 } publisher { name } image { url width }
+        id title isbn_13 isbn_10 release_date pages edition_format audio_seconds reading_format { format } language { code2 } publisher { name } image { url width }
         book { id title description image { url width } contributions { author { name } }
           book_series { position featured series { id name primary_books_count } } } } }`, { isbn: isbn13 });
       return (data.editions || [])[0] || null;
@@ -246,7 +248,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
         contributions { author { name } }
         book_series { position series { id name primary_books_count } }
         editions(where: {language: {code2: {_eq: $lang}}}, order_by: {users_count: desc}, limit: 100) {
-          id title isbn_13 release_date edition_format publisher { name } image { url width } users_count } } }`,
+          id title subtitle isbn_13 isbn_10 release_date pages edition_format audio_seconds reading_format { format } publisher { name } image { url width } users_count } } }`,
       { id, lang });
       return data.books_by_pk || null;
     },
@@ -255,25 +257,39 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
      * La meilleure édition de chaque livre dans une langue (code ISO à 2 lettres), en un seul appel.
      * @returns {Promise<Map<number, object>>} bookId → édition
      */
-    async editionsEnLangue(bookIds, lang, { voisines = false } = {}) {
+    async editionsEnLangue(bookIds, lang, { voisines = false, secoursAudio = true } = {}) {
       const ids = [...new Set(bookIds.map(Number))].filter(Boolean);
       if (!ids.length) return new Map();
-      const champs = 'id book_id title isbn_13 release_date edition_format publisher { name } image { url width }';
-      const base = 'book_id: {_in: $ids}, language: {code2: {_eq: $lang}}';
+      const champs = 'id book_id title subtitle isbn_13 isbn_10 release_date pages edition_format audio_seconds reading_format { format } publisher { name } image { url width }';
       const ordre = 'order_by: [{book_id: asc}, {users_count: desc}], distinct_on: book_id, limit: 500';
+      const base = 'book_id: {_in: $ids}, language: {code2: {_eq: $lang}}';
+      /*
+       * L'AUDIO n'est jamais « l'édition » d'un livre qui existe en papier (mesuré le 2026-10-06 : pour Harry Potter 1 la plus lue en français,
+       * 163 lecteurs, est le livre audio de 2018, et sa couverture devenait celle du tome). On l'écarte donc dans la requête ; les livres qui
+       * n'ont QUE de l'audio sont repris dans un second temps (voir plus bas), signalés par leur format.
+       */
+      const sansAudio = `audio_seconds: {_is_null: true}, _and: [{_or: [{reading_format_id: {_is_null: true}}, {reading_format_id: {_neq: 2}}]}, {_or: [{edition_format: {_is_null: true}}, {edition_format: {_nin: ${JSON.stringify(FORMATS_AUDIO)}}}]}]`;
       /*
        * `voisines` : pour chaque livre, en plus de sa meilleure édition, l'image de l'édition la plus lue qui en a une d'AU MOINS 200 px
        * (mesuré le 2026-10-05 : sur « Journal d'un dégonflé », 11 tomes sur 16 n'avaient qu'une miniature de 98 px chez Hardcover). Un second
        * champ de la requête, donc un appel de plus décompté : réservé aux sagas, jamais aux recherches.
        */
       const data = await gql(`query ($ids: [Int!], $lang: String!) {
-        editions(where: {${base}}, ${ordre}) { ${champs} }
-        ${voisines ? `voisines: editions(where: {${base}, image: {width: {_gte: 200}}}, ${ordre}) { book_id image { url width } }` : ''} }`,
+        editions(where: {${base}, ${sansAudio}}, ${ordre}) { ${champs} }
+        ${voisines ? `voisines: editions(where: {${base}, ${sansAudio}, image: {width: {_gte: 200}}}, ${ordre}) { book_id image { url width } }` : ''} }`,
       { ids, lang });
       const parLivre = new Map((data.editions || []).map((e) => [e.book_id, e]));
       for (const v of data.voisines || []) {
         const e = parLivre.get(v.book_id);
         if (e) e._imageVoisine = v.image;
+      }
+      // Les livres sans édition « lisible » dans la langue : y en a-t-il une en audio ? (un appel de plus, seulement s'il en manque)
+      const absents = ids.filter((id) => !parLivre.has(id));
+      if (absents.length && secoursAudio) {
+        try {
+          const audio = await gql(`query ($ids: [Int!], $lang: String!) { editions(where: {${base}}, ${ordre}) { ${champs} } }`, { ids: absents, lang });
+          for (const e of audio.editions || []) parLivre.set(e.book_id, e);
+        } catch { /* sans ce complément, ces livres restent « indisponibles » : on ne fait pas échouer la saga */ }
       }
       return parLivre;
     },

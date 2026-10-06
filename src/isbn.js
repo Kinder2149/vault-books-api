@@ -42,3 +42,10 @@ export function extraireIsbn13(texte) {
   const m = String(texte || '').match(/\d[\d-]{8,16}[\dXx]/);
   return m ? versIsbn13(m[0]) : null;
 }
+
+/** ISBN-10 valide à partir d'un ISBN-10 ou d'un ISBN-13 en 978 (un 979 n'a pas d'équivalent). Sinon null. */
+export function versIsbn10(brut) {
+  const s = String(brut || '').replace(/[^0-9Xx]/g, '').toUpperCase();
+  if (s.length === 10) return cle10(s.slice(0, 9)) === s[9] ? s : null;
+  return s.length === 13 && versIsbn13(s) ? isbn13Vers10(s) : null;
+}
