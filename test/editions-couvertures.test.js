@@ -91,3 +91,47 @@ test('isbn : pages douteuses → null, format normalisé et ISBN-10', async () =
   assert.equal(r.formatBrut, 'Paperback');
   assert.equal(r.isbn10, versIsbn10('9782890746626'));
 });
+
+test('saga : un tome qui n’existe qu’en volumes coupés prend la couverture de son premier volume illustré', async () => {
+  const bk = (id, title, users = 5) => ({ id, title, users_count: users, release_date: '2005-01-01', image: null });
+  const serie = { id: 981, name: 'ASOIAF', primary_books_count: 1, book_series: [{ position: 3, book: bk(30, 'A Storm of Swords') }, { position: 3.1, book: bk(31, 'Intrigues') }, { position: 3.2, book: bk(32, 'Épée') }] };
+  const ed = (id, i) => ({ id, title: `t${id}`, isbn_13: i, image: { url: `https://img/${id}.jpg`, width: 400 }, publisher: { name: 'J’ai lu' } });
+  const hc = {
+    async serie() { return serie; },
+    async editionsEnLangue(ids, lang) { return lang === 'fr' ? new Map([[31, ed(1, '9782290325704')], [32, ed(2, '9782290329535')]]) : new Map(); },
+  };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire(), couvertures: creerCouvertures({ cache: cacheMemoire(), fetchImpl: async () => ({ status: 404, ok: false }) }) });
+  const r = await s.serie(981, 'fr');
+  assert.equal(r.tomes[0].viaParties, true);
+  assert.equal(r.tomes[0].couverture, 'https://img/1.jpg');
+  assert.equal(r.tomes[0].couvertureSource, 'partie');
+});
+
+import { creerHardcover } from '../src/sources/hardcover.js';
+import { construireSerie } from '../src/series.js';
+
+test('édition mal étiquetée (« The Ugly Truth » rangé en français) : remplacée par une vraie édition française, ou écartée', async () => {
+  const reponses = [
+    { data: { editions: [{ id: 1, book_id: 10, title: 'The Ugly Truth' }, { id: 2, book_id: 11, title: 'Le Feu dans le ciel' }, { id: 3, book_id: 12, title: 'The Third Wish' }] } },
+    { data: { editions: [{ id: 4, book_id: 10, title: 'The Ugly Truth' }, { id: 5, book_id: 10, title: 'La Vérité toute nue' }, { id: 6, book_id: 12, title: 'The Third Wish' }] } },
+  ];
+  const requetes = [];
+  const fetchImpl = async (_u, o) => { requetes.push(JSON.parse(o.body)); return { status: 200, ok: true, headers: { get: () => null }, json: async () => reponses.shift() }; };
+  const hc = creerHardcover({ cle: 'k', fetchImpl, limiteur: async () => {} });
+  const m = await hc.editionsEnLangue([10, 11, 12], 'fr', { secoursAudio: false });
+  assert.equal(m.get(10).title, 'La Vérité toute nue');   // remplacée
+  assert.equal(m.get(11).title, 'Le Feu dans le ciel');   // intacte
+  assert.equal(m.has(12), false);                           // aucune vraie édition française : écartée
+  assert.equal(requetes.length, 2);
+  assert.deepEqual(requetes[1].variables.ids, [10, 12]);
+});
+
+test('un livre non paru dont la fiche n’a ni date ni pages (« The Winds of Winter ») est « à paraître », même avec une « édition »', () => {
+  const livre = { id: 1, title: 'The Winds of Winter', users_count: 9000, release_date: null, image: null };
+  const s = construireSerie({
+    serie: { id: 1, name: 'ASOIAF', primary_books_count: 6 }, entrees: [{ position: 6, book: livre }],
+    editions: new Map([[1, { id: 9, title: 'The Winds of Winter', isbn_13: '9780002247412', release_date: null, pages: null }]]), lang: 'en', aujourdhui: '2026-10-06',
+  });
+  assert.equal(s.tomes[0].statut, 'a_paraitre');
+  assert.equal(s.aParaitre, 1);
+});

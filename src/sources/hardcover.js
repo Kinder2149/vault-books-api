@@ -6,6 +6,7 @@
  */
 
 import { FORMATS_AUDIO } from '../formats.js';
+import { langueDuTitre } from '../series.js';
 
 const URL_API = 'https://api.hardcover.app/v1/graphql';
 const DELAI_MAX_MS = 10000;
@@ -283,6 +284,22 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
         const e = parLivre.get(v.book_id);
         if (e) e._imageVoisine = v.image;
       }
+      /*
+       * ÉDITIONS MAL ÉTIQUETÉES. Hardcover range parfois une édition anglaise parmi les françaises (mesuré le 2026-10-06 : « The Ugly Truth »,
+       * tome 5 du Journal d'un dégonflé, avec sa couverture anglaise). Quand le titre de l'édition retenue est dans l'AUTRE langue, on cherche
+       * pour ce livre une autre édition dont le titre ne l'est pas ; sans elle, le livre est considéré sans édition dans cette langue.
+       * Un appel de plus, seulement s'il y a des suspects.
+       */
+      const autre = lang === 'fr' ? 'en' : 'fr';
+      const suspects = [...parLivre.values()].filter((e) => langueDuTitre(e.title) === autre).map((e) => e.book_id);
+      if (suspects.length) {
+        for (const id of suspects) parLivre.delete(id);
+        try {
+          const lot = await gql(`query ($ids: [Int!], $lang: String!) { editions(where: {${base}, ${sansAudio}}, order_by: [{book_id: asc}, {users_count: desc}], limit: 400) { ${champs} } }`, { ids: suspects, lang });
+          for (const e of lot.editions || []) if (!parLivre.has(e.book_id) && langueDuTitre(e.title) !== autre) parLivre.set(e.book_id, e);
+        } catch { /* sans ce complément, ces livres restent sans édition dans la langue */ }
+      }
+
       // Les livres sans édition « lisible » dans la langue : y en a-t-il une en audio ? (un appel de plus, seulement s'il en manque)
       const absents = ids.filter((id) => !parLivre.has(id));
       if (absents.length && secoursAudio) {

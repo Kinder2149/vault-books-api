@@ -95,7 +95,10 @@ function entree(position, candidats, editions, aujourdhui, { editionsAutre, lang
   // Une AUTRE édition française du même tome, avec une image assez grande (voir hardcover.editionsEnLangue) : utile quand l'édition retenue n'a qu'une miniature.
   const couvertureVoisine = !couvertureEdition && utilisable(ed?._imageVoisine) ? ed._imageVoisine.url : null;
   // Une édition annoncée (date future) reste « à paraître » : on peut la précommander, mais elle ne se lit pas encore.
-  const statut = ed ? (choisi.release_date > aujourdhui ? 'a_paraitre' : 'disponible') : statutAbsent(candidats, editionsAutre, aujourdhui);
+  // Une édition annoncée (date future) reste « à paraître » : on peut la précommander, mais elle ne se lit pas encore. Même chose pour une édition
+  // sans date, sans pages et sur un livre sans date (« The Winds of Winter », 2026 : une fiche de référence, pas un livre).
+  const fiche = ed && !ed.release_date && !ed.pages && !choisi.release_date;
+  const statut = ed ? ((choisi.release_date > aujourdhui || fiche) ? 'a_paraitre' : 'disponible') : statutAbsent(candidats, editionsAutre, aujourdhui);
   return {
     position,
     titre,

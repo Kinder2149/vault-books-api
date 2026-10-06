@@ -370,7 +370,12 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         parLangue[l] = construireSerie({ serie: principale, entrees, editions, editionsAutre, lang: l, nom: idx.nom(canon, l, principale.name), exclurePositions });
         const lignes = [...parLangue[l].tomes, ...parLangue[l].tomes.flatMap((t) => t.parties), ...parLangue[l].horsSerie];
         await enrichirCouvertures(lignes, { idx, serieId: canon });
-        lignes.forEach((x) => { delete x._couvertureLivre; delete x._couverturePetite; delete x._couvertureVoisine; });
+        // Un tome qui n'existe qu'en volumes coupés (viaParties) n'a pas de couverture propre : celle de son premier volume illustré, de la même langue.
+        for (const t of parLangue[l].tomes) {
+          const partie = !t.couverture && t.viaParties ? t.parties.find((p) => p.couverture) : null;
+          if (partie) Object.assign(t, { couverture: partie.couverture, couvertureSource: 'partie', couvertureQualite: partie.couvertureQualite ?? 0, couvertureBasseDefinition: partie.couvertureBasseDefinition });
+        }
+        lignes.forEach((x) => { delete x._couverturePetite; delete x._couvertureVoisine; });
       }
       return fusionnerLangues({
         ...parLangue,
