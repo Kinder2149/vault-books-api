@@ -13,6 +13,13 @@
 > **VALIDATION DU CATALOGUE (2026-10-05/06) — correctifs DÉPLOYÉS sur `main` (commit `cc8cbbb`)** : jeu de 117 cas + lanceur rejouable (`npm run validation`) ; score en ligne **103/116 (89 %)**, départ 71/116 (61 %), 0 régression.
 > **Rapport final : `docs/rapport-validation-catalogue.md`** (tableau cas par cas, limites). Reprise / détails : `docs/resultats-validation-1.md`. Reste ouvert : couvertures de 5 sagas (images sources à fournir), 13 cas dus à des limites de Hardcover, relevé d'un ISBN 979 (cas N04), 30 vraies recherches de Kinder à ajouter au jeu, cause des 502 ponctuels.
 
+**MISSION « BILINGUE-CATALOGUE » (2026-10-06) — codée, testée, NON DÉPLOYÉE** : branche locale `bilingue-catalogue` (dernier commit `758851b`, 9 commits au-dessus de `main` `fa7c2ae`, **jamais envoyée en ligne**). Elle répond au rapport de l'essai sur émulateur (`docs/rapport-essai-emulateur.md`) :
+M1 mode `lang=fr|en|both`, statut des tomes (`disponible` / `indisponible_langue` / `a_paraitre`), titre de repli, nom de saga dans les deux langues ·
+M2 couvertures et éditions (audio et pages de titre écartées, pages plausibles, ISBN-10, pas de couverture d'une autre langue) ·
+M3 recherche (fautes multi-mots, plus de score négatif, `typeSaga`, total de tomes) · M4 résumés nettoyés et dans la langue demandée · M5 jeu de validation porté à 134 cas.
+**Mesure locale : 114/134 (85,1 %)**, axes 97,2 % (`sorties/validation-apres-m5.md`, non versionné) ; **221 tests, 0 échec** (`node --test test/*.test.js`). Le service en ligne tourne toujours sur `main` (sans ces correctifs).
+**Prochaine étape : plan détaillé dans `docs/plan-complet.md`, Phase 6.**
+
 ## 1. Pourquoi ce projet
 
 Vault Read interrogeait Google Books, Open Library et la BnF en direct depuis le téléphone. Aucune de ces sources n'est faite pour retrouver un livre :
@@ -61,6 +68,8 @@ Cas de test fondateurs : « game of thrones », « seigneur des anneaux » (saga
 - **Branche concurrente** `claude/search-results-saga-organization-…` dans Vault Read : archiver (recommandé) ou supprimer.
 
 ## 5. Ce qui reste à faire
+
+**Prochaine mission (Claude)** — plan complet : `docs/plan-complet.md`, **Phase 6**. Ordre : (1) accord de Kinder, puis fusion de `bilingue-catalogue` dans `main`, déploiement, vidage du cache, rejeu en ligne ; (2) restes du catalogue (X09, X12, X14, couvertures, grandes sagas) ; (3) côté application (autre conversation) : afficher les tomes indisponibles, mode Auteur, messages hors ligne, jargon, mentions Hardcover.
 
 **Par Kinder** (détail pas à pas : `docs/a-faire-par-kinder.md`)
 1. Secrets GitHub : `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `HARDCOVER_API_KEY` — **ajoutés et vérifiés le 5 octobre** (sauvegarde, fraîcheur et réchauffement BnF : exécutions manuelles au vert). **Fait.**
@@ -120,7 +129,7 @@ Et `https://vault-books-api.vercel.app/v1/health` doit répondre `"ok":true`.
 - Une correction de saga ou de couverture se fait avec `npm run corriger -- …` (`docs/exploitation.md` §6), jamais en modifiant le code.
 
 ### 6.6 Dire à Claude pour reprendre
-**Validation du catalogue en cours** : `git fetch && git checkout validation-catalogue`, copier le `.env` du service, puis dire : *« Lis PROJET_CONTEXTE.md et docs/resultats-validation-1.md, puis continue la validation du catalogue à l'étape 1 des « Ce qui reste à faire ». »*
+**Mission bilingue en cours (branche locale, non poussée : à envoyer en ligne ou copier avant de changer de poste)** : `git checkout bilingue-catalogue`, copier le `.env` du service, puis dire : *« Lis PROJET_CONTEXTE.md et docs/plan-complet.md Phase 6, puis reprends à l'étape 6.1. »* (La validation du catalogue précédente est terminée : `docs/rapport-validation-catalogue.md`.)
 Autre reprise : ouvrir une session dans `vault-books-api` et écrire par exemple : *« Lis PROJET_CONTEXTE.md et docs/a-faire-par-kinder.md. Voici ce que j'ai fait depuis : … »* — puis donner les retours (fiche d'essai remplie, noms de sagas validés, réponse de Hardcover, décisions du §4).
 
 ## 7. Index des documents
@@ -137,6 +146,7 @@ Autre reprise : ouvrir une session dans `vault-books-api` et écrire par exemple
 | `docs/statut-projet.md` | Personnel / public gratuit / payant, comparaison |
 | `docs/fiche-essai-telephone.md` | Les 16 gestes de l'essai sur téléphone |
 | `docs/plan-de-tests.md` | Tests A à E et leurs seuils |
+| `docs/rapport-essai-emulateur.md` | Rapport de l'essai émulateur : défauts service / application (origine de la mission bilingue) |
 | `docs/resultats-validation-1.md` | **Validation du catalogue : critère, mesure de départ, causes, étapes restantes (reprise)** |
 | `docs/resultats-validation-1-brut.md` | Tableau cas par cas de la mesure de départ |
 | `test/fixtures-pertinence/requetes-kinder.json` | Jeu de 117 cas (rejouable : `scripts/validation-catalogue.mjs`) |

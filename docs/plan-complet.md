@@ -1,6 +1,6 @@
 # Plan complet — de « ça marche » à « on peut publier »
 
-> Établi le 2026-10-05 à partir du bilan d'état (service en ligne, 84 tests, branche Vault Read `feature/catalogue-api` non fusionnée).
+> **Phase 6 (état au 2026-10-06) en fin de document.** Établi le 2026-10-05 à partir du bilan d'état (service en ligne, 84 tests, branche Vault Read `feature/catalogue-api` non fusionnée).
 > Chaque point a un **critère de réussite vérifiable** : la règle du projet reste « aucune amélioration n'est acquise sans un chiffre avant/après ».
 > Tailles : **S** < 1 h · **M** 1 à 3 h · **L** une demi-journée ou plus (temps de travail de Claude, hors attentes).
 > Qui : **C** = Claude · **K** = Kinder (compte, clé, essai téléphone, décision). Les clés ne sont jamais saisies par Claude.
@@ -164,3 +164,25 @@ requêtes Hardcover/jour (< 50 % du quota) · taille de la base (< 100 Mo) · no
 3. **Noms français** : êtes-vous d'accord pour valider une liste de ~100 sagas (≈ 20 minutes) ?
 4. **Branche concurrente** `claude/search-results-saga-organization-…` : abandonner ou archiver ?
 5. **Calendrier** : on enchaîne les phases 0 et 1 maintenant ?
+
+---
+
+## Phase 6 — Catalogue bilingue : mise en ligne et restes (état au 2026-10-06)
+
+**Fait (branche `bilingue-catalogue`, non déployée)** : M1 à M5 (voir `PROJET_CONTEXTE.md`, en tête). 221 tests ; mesure locale 114/134. Origine : `docs/rapport-essai-emulateur.md`.
+Légende : **C** = Claude · **K** = Kinder · **A** = conversation de l'application (Vault Read).
+
+| # | Étape | Qui | Critère de fin |
+|---|---|---|---|
+| 6.1 | **Mise en ligne** : Kinder dit « fusionne » → fusion `bilingue-catalogue` → `main` (déploiement automatique), suppression de la branche ; vidage du cache (`VERSION_CACHE`, ou `delete from cache_entries where key like 'serie:%' or key like 'search:%' or key like 'auteur:%'`) | K accord, C exécute | `npm run smoke` 14/14 ; `/v1/series/1150?lang=fr` rend Dune 8 tomes avec `statut` |
+| 6.2 | **Rejeu en ligne** du jeu complet (`npm run validation -- --nom ligne-m5`) | C | score en ligne ≥ 114/134, aucune régression sur les 103 réussis précédents |
+| 6.3 | **Contrat** : mettre à jour `contrat/exemples/` (nouveaux champs `statut`, `langueTitre`, `noms`, `typeSaga`, `langues`) et prévenir A | C | `npm run contrat -- --live` vert ; message à A listant les champs |
+| 6.4 | **Restes du catalogue** (un par un, test avant, correction par donnée si possible) : X12 / X14 (édition stricte en anglais : Narnia, Game of Thrones), X09 (Trône de fer pas « propre »), couvertures S21 / S26 / S27 (image source fiable exigée), grandes sagas S24 / S30 / B03 / B05 / C04 (limite 60 positions / 400 lignes), C02 Sandman (limite Hardcover : accepter ou fusionner par donnée), S11 (attendu 13 à 16 à vérifier auprès de la BnF) | C | cas réussis, ou limite documentée dans `docs/rapport-validation-catalogue.md` |
+| 6.5 | **Éditions d'un livre** : vérifier que `GET /v1/books/:id` répond à la fiche (choix de l'édition, format, couverture : point G10 de l'essai) ; sinon compléter | C | un livre à ≥ 2 éditions montrées avec éditeur, année, format, couverture |
+| 6.6 | **Vitesse** : mesurer saga à froid et à chaud en ligne (attendu ≤ 5 s / ≤ 1 s côté application) ; préchauffer si besoin | C | relevé consigné dans `docs/resultats-validation-1.md` |
+| 6.7 | **Côté application (A, hors de ce dépôt)** : afficher les tomes indisponibles / à paraître marqués (`client/src/sources/vaultapi.js` l.136), mode Auteur en sagas dépliées, messages hors ligne en français (ni « Failed to fetch » ni « Google Books »), retirer le jargon (`ol:…`, `fp:…`), « Sources des données » avec Hardcover, complément Google / Open Library / BnF quand le catalogue ne connaît pas un livre | A + K | nouvel essai émulateur : gestes G05, G12, G13, G16, N01, N11 en OK |
+| 6.8 | **Nouvel essai** émulateur puis **téléphone** (scan caméra, vitesse réelle) avec `docs/fiche-essai-telephone.md` | A + K | fiche remplie ; lignes non-OK renvoyées à C |
+| 6.9 | **Jeu élargi** : intégrer les 30 vraies recherches de Kinder, appliquer les 43 noms de sagas validés (`npm run importer-noms -- --appliquer`), rejouer `npm run pertinence -- kinder` | K puis C | jeu à jour, score consigné |
+
+**Inchangé** : actions de Kinder (`docs/a-faire-par-kinder.md` : message Hardcover, UptimeRobot, clé Google à révoquer, décisions statut / branche concurrente / canal d'alerte) ; rapport de fraîcheur le **19 octobre** ; nettoyage de l'ancien code de Vault Read après 2 à 4 semaines ; relecture de la part du cache après un mois.
+**Ordre conseillé** : 6.1 → 6.2 → 6.3 (mise en ligne sûre), puis 6.4 et 6.7 en parallèle, 6.5 / 6.6 au passage, 6.8, 6.9.
