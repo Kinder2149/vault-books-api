@@ -16,6 +16,29 @@ export function sansArticleInitial(texte) {
   return m.length > 1 && ARTICLES.has(m[0]) ? m.slice(1).join(' ') : null;
 }
 
+const PARASITES = new Set(['integrale', 'integral', 'coffret', 'box', 'boxset', 'set', 'omnibus', 'complet', 'complete', 'saga', 'trilogie', 'tetralogie', 'cycle', 'serie', 'collection', 'edition', 'poche', 'livre', 'roman']);
+const MOT_TOME = new Set(['tome', 'tomes', 'volume', 'vol', 't']);
+const NUMERO = /^(\d{1,3}|[ivx]{1,4})$/;
+
+/**
+ * La requête sans les mots qui décrivent l'objet plutôt que le titre : « intégrale », « coffret », « tome 2 », « saga »… en tête ou en fin.
+ * « le seigneur des anneaux intégrale » → « le seigneur des anneaux » (Hardcover ne rend rien avec le mot de trop). Un mot du milieu n'est jamais
+ * touché (« la saga des gardiens »), on ne vide jamais la requête, et null dit « rien à retirer ».
+ */
+export function sansMotsParasites(texte) {
+  const m = mots(normaliser(texte));
+  const reste = [...m];
+  while (reste.length > 1) {
+    const dernier = reste[reste.length - 1];
+    if (NUMERO.test(dernier) && reste.length > 2 && MOT_TOME.has(reste[reste.length - 2])) reste.splice(-2, 2);
+    else if (PARASITES.has(dernier) || MOT_TOME.has(dernier)) reste.pop();
+    else break;
+  }
+  while (reste.length > 1 && (PARASITES.has(reste[0]) || MOT_TOME.has(reste[0]))) reste.shift();
+  const tousParasites = reste.every((w) => PARASITES.has(w) || MOT_TOME.has(w));
+  return !tousParasites && reste.length < m.length ? reste.join(' ') : null;
+}
+
 /**
  * Les morceaux de la requête qui pourraient être un nom d'auteur : le début et la fin, sur un ou deux mots.
  * « tolkien hobbit » → [« tolkien »], [« hobbit »] ; « stephen king ça » → « stephen », « ça », « stephen king », « king ça ».

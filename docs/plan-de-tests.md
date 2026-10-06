@@ -58,6 +58,10 @@ source, qui décide de la fréquence des imports et du besoin d'un repli en dire
 Taille de la base filtrée (fr + en) mesurée sur un import réel ; temps de réponse des requêtes `/search` sur Supabase gratuit ;
 comportement après 7 jours sans activité (mise en pause).
 
+## F. Validation du catalogue (2026-10-05)
+
+Jeu de 117 cas, critère en 6 axes, lanceur `scripts/validation-catalogue.mjs` : voir `docs/resultats-validation-1.md`.
+
 ## Règle
 
 Aucune amélioration de l'API n'est « réussie » sans un chiffre avant/après sur ces tests.

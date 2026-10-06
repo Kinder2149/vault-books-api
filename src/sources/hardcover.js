@@ -9,6 +9,8 @@ const URL_API = 'https://api.hardcover.app/v1/graphql';
 const DELAI_MAX_MS = 10000;
 const PAUSES_REESSAI_MS = [500, 1500];   // 429 et 503 : l'API dit « sans danger de réessayer »
 const PAUSE_MAX_MS = 5000;
+const MAX_POSITIONS_RETROUVEES = 60;      // tomes manquants cherchés d'un coup (au-delà : saga géante, on garde ce que la 1re requête a rendu)
+const LIMITE_LIGNES_RETROUVEES = 400;   // plusieurs traductions par position : de quoi couvrir ~50 positions sans alourdir la réponse
 
 /**
  * Limiteur de débit (seau à jetons) : au plus `capacite` appels d'un coup, puis `parSeconde` par seconde. Il FAIT ATTENDRE au lieu de laisser
@@ -182,13 +184,36 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
         };
       });
     },
-    /** Une série et ses entrées numérotées (position ≥ 1), sans les compilations. */
+    /**
+     * Une série et ses entrées numérotées (position ≥ 1), sans les compilations.
+     * Première requête : les livres dont CETTE série est la série « mise en avant » (peu de lignes, sans les traductions rattachées ailleurs).
+     * Mesuré le 2026-10-06 : un tome rattaché à plusieurs séries n'y figure que dans sa série mise en avant (Dune 6 sur 8, Narnia 3 sur 7,
+     * Ender 2 sur 6). Si des positions entières manquent par rapport au total annoncé, une 2e requête, limitée à ces positions et sans le
+     * filtre, les retrouve. Une saga complète ne coûte donc aucun appel de plus ; une panne de la 2e requête laisse la saga incomplète, pas en erreur.
+     */
     async serie(id) {
       const data = await gql(`query ($id: Int!) { series_by_pk(id: $id) {
         id name primary_books_count
         book_series(where: {featured: {_eq: true}, position: {_gte: 1}, book: {compilation: {_eq: false}}}, order_by: {position: asc}) {
           position book { id title users_count release_date image { url width } } } } }`, { id });
-      return data.series_by_pk || null;
+      const serie = data.series_by_pk || null;
+      const annonces = serie?.primary_books_count;
+      if (!serie || !Number.isInteger(annonces) || annonces < 1) return serie;
+
+      const presentes = new Set(serie.book_series.map((e) => e.position).filter(Number.isInteger));
+      const manquantes = [];
+      for (let p = 1; p <= annonces && manquantes.length < MAX_POSITIONS_RETROUVEES; p += 1) if (!presentes.has(p)) manquantes.push(p);
+      if (!manquantes.length) return serie;
+
+      try {
+        const retrouvees = await gql(`query ($id: Int!, $positions: [float8!]) { series_by_pk(id: $id) {
+          book_series(where: {featured: {_eq: false}, position: {_in: $positions}, book: {compilation: {_eq: false}}},
+                      order_by: [{position: asc}, {book: {users_count: desc}}], limit: ${LIMITE_LIGNES_RETROUVEES}) {
+            position book { id title users_count release_date image { url width } } } } }`, { id, positions: manquantes });
+        serie.book_series = serie.book_series.concat(retrouvees.series_by_pk?.book_series || [])
+          .sort((a, b) => a.position - b.position);
+      } catch { /* la saga reste telle que la 1re requête l'a rendue */ }
+      return serie;
     },
 
     /**

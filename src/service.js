@@ -13,7 +13,7 @@ import { construireSerie } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer, urlsMasquees } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
-import { sansArticleInitial, candidatsAuteur, auteurCorrespond } from './requete.js';
+import { sansArticleInitial, sansMotsParasites, candidatsAuteur, auteurCorrespond } from './requete.js';
 import { nomFamille } from './text.js';
 import { nettoyerResume, langueResume } from './resume.js';
 import { utilisable, petite } from './images.js';
@@ -107,7 +107,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
    * Les cartes de la meilleure reformulation de la requête. On cherche d'abord comme tapé (ou selon un alias, voir `recherches` dans les corrections) ;
    * seulement si la tête de liste est faible, on essaie — dans l'ordre, en gardant la meilleure :
    *  1. SANS L'ARTICLE DE TÊTE (« le da vinci code » ne rend rien chez Hardcover, « da vinci code » rend Dan Brown) ;
-   *  2. en RECONNAISSANT L'AUTEUR dans la requête (« tolkien hobbit » : on cherche « hobbit » et on favorise Tolkien).
+   *  2. SANS LES MOTS PARASITES (« intégrale », « coffret », « tome 2 »…) ;
+ *  3. en RECONNAISSANT L'AUTEUR dans la requête (« tolkien hobbit » : on cherche « hobbit » et on favorise Tolkien).
    * Chaque variante coûte une requête Hardcover : on ne reformule donc jamais une réponse franche, ni quand le quota du jour est bas.
    */
   async function meilleuresCartes(texte, idx, lang) {
@@ -137,6 +138,19 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     if (sansArticle) {
       const v = await evaluer(sansArticle);
       if (v.tete > meilleur.tete) meilleur = v;
+      if (meilleur.tete >= SEUIL_FRANC) return meilleur.cartes;
+    }
+
+    // « le seigneur des anneaux intégrale » : Hardcover ne rend rien avec le mot qui décrit l'objet. On retente sans « intégrale », « coffret », « tome 2 »…
+    const epure = sansMotsParasites(cible);
+    if (epure) {
+      let v = await evaluer(epure);
+      if (v.tete > meilleur.tete) meilleur = v;
+      const epureSansArticle = meilleur.tete < SEUIL_FRANC ? sansArticleInitial(epure) : null;
+      if (epureSansArticle) {
+        v = await evaluer(epureSansArticle);
+        if (v.tete > meilleur.tete) meilleur = v;
+      }
       if (meilleur.tete >= SEUIL_FRANC) return meilleur.cartes;
     }
 
@@ -217,7 +231,15 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
       const mots = q.split(' ');
       // Parmi les auteurs dont le nom contient TOUS les mots tapés, le plus FOURNI (« dumas » : Alexandre Dumas, pas un homonyme à 2 livres).
       const correspondants = docs.filter((d) => mots.every((m) => [d.name, ...(d.alternate_names || [])].some((nom) => normaliser(nom).split(' ').includes(m))));
-      const retenu = [...correspondants].sort((a, b) => (Number(b.books_count) || 0) - (Number(a.books_count) || 0))[0] || docs[0];
+      const parLivres = (a, b) => (Number(b.books_count) || 0) - (Number(a.books_count) || 0);
+      const livresDe = (d) => Number(d?.books_count) || 0;
+      const meilleurExact = [...correspondants].sort(parLivres)[0];
+      const plusFourni = [...docs].sort(parLivres)[0];
+      // Faute de frappe (« j k rowlin ») : un quasi-inconnu (1 ou 2 livres) peut contenir exactement les mots tapés. Si un autre candidat de Hardcover
+      // est un vrai auteur (50 livres ou plus), c'est lui. Sans correspondance exacte : le 1er résultat s'il est fourni (10 livres), sinon le plus fourni.
+      const exactFaible = meilleurExact && livresDe(meilleurExact) <= 2 && livresDe(plusFourni) >= 50;
+      const premier = livresDe(docs[0]) >= 10 ? docs[0] : plusFourni;
+      const retenu = exactFaible ? plusFourni : (meilleurExact || premier);
       if (!retenu) return { requete: texte, langue: lang, mode: 'auteur', auteur: null, autresAuteurs: [], langueNonDisponible: false, resultats: [] };
 
       const livres = await hardcover.livresDeLAuteur(retenu.id);
