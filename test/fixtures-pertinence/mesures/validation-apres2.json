@@ -1,0 +1,4349 @@
+{
+  "bilan": {
+    "date": "2026-10-06T07:45:03.845Z",
+    "service": "http://localhost:3000",
+    "cas": 117,
+    "jouables": 116,
+    "reussis": 100,
+    "partiels": 3,
+    "echoues": 13,
+    "ignores": 1,
+    "pourcentReussis": 86.2,
+    "pourcentAxes": 96.4,
+    "duree_s": 433
+  },
+  "parCategorie": {
+    "saga longue fantasy": {
+      "reussi": 8,
+      "partiel": 0,
+      "echoue": 3,
+      "ignore": 0
+    },
+    "saga courte fantasy": {
+      "reussi": 4,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "saga SF": {
+      "reussi": 5,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "saga policier": {
+      "reussi": 3,
+      "partiel": 0,
+      "echoue": 3,
+      "ignore": 0
+    },
+    "jeunesse": {
+      "reussi": 3,
+      "partiel": 0,
+      "echoue": 2,
+      "ignore": 0
+    },
+    "livre isolé classique": {
+      "reussi": 10,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "livre isolé étranger": {
+      "reussi": 3,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "livre isolé français contemporain": {
+      "reussi": 5,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "livre isolé étranger contemporain": {
+      "reussi": 2,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "récent ou à paraître": {
+      "reussi": 6,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "manga": {
+      "reussi": 7,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "bande dessinée": {
+      "reussi": 4,
+      "partiel": 0,
+      "echoue": 2,
+      "ignore": 0
+    },
+    "comics": {
+      "reussi": 3,
+      "partiel": 0,
+      "echoue": 2,
+      "ignore": 0
+    },
+    "recherche par auteur": {
+      "reussi": 11,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "ISBN": {
+      "reussi": 5,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 1
+    },
+    "titre accentué": {
+      "reussi": 2,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "article de tête": {
+      "reussi": 2,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "faute de frappe": {
+      "reussi": 0,
+      "partiel": 2,
+      "echoue": 1,
+      "ignore": 0
+    },
+    "titre anglais cherché en français": {
+      "reussi": 3,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "titre français cherché en anglais": {
+      "reussi": 2,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "lang=en": {
+      "reussi": 3,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "coffret ou intégrale": {
+      "reussi": 2,
+      "partiel": 1,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "doublon de titre": {
+      "reussi": 4,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    },
+    "titre très court ou ambigu": {
+      "reussi": 3,
+      "partiel": 0,
+      "echoue": 0,
+      "ignore": 0
+    }
+  },
+  "resultats": [
+    {
+      "id": "S01",
+      "categorie": "saga longue fantasy",
+      "requete": "harry potter",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 961,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Harry Potter (7) — J.K. Rowling, Mary GrandPré"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1185,
+          "titre": "Harry Potter",
+          "type": "serie"
+        },
+        "msSerie": 328,
+        "tomes": 7,
+        "disponibles": 7,
+        "totalPrincipal": 7,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 7
+        }
+      }
+    },
+    {
+      "id": "S02",
+      "categorie": "saga longue fantasy",
+      "requete": "seigneur des anneaux",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 432,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Le Seigneur des anneaux (3) — J.R.R. Tolkien",
+          "[livre] Le Seigneur des Anneaux, Tome 2 : Les deux Tours — J.R.R. Tolkien"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1130,
+          "titre": "Le Seigneur des anneaux",
+          "type": "serie"
+        },
+        "msSerie": 1172,
+        "tomes": 3,
+        "disponibles": 3,
+        "totalPrincipal": 3,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 3
+        }
+      }
+    },
+    {
+      "id": "S03",
+      "categorie": "saga longue fantasy",
+      "requete": "game of thrones",
+      "lang": "fr",
+      "source": "a_verifier: BnF (découpage J'ai lu)",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": false
+      },
+      "detail": {
+        "ms": 1591,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Le Trône de fer (5) — George R.R. Martin"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 981,
+          "titre": "Le Trône de fer",
+          "type": "serie"
+        },
+        "msSerie": 3279,
+        "tomes": 6,
+        "disponibles": 5,
+        "totalPrincipal": 6,
+        "indisponibles": 1,
+        "aParaitre": 1,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 1,
+          "partagees": 0,
+          "sur": 5
+        }
+      }
+    },
+    {
+      "id": "S04",
+      "categorie": "saga longue fantasy",
+      "requete": "les chevaliers d'émeraude",
+      "lang": "fr",
+      "source": "connaissance (1er cycle)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1087,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Les Chevaliers d'Émeraude (12) — Anne Robillard",
+          "[serie] Les Chevaliers d'Émeraude (Graphic Novel) (7) — Tiburce Oger, Anne Robillard"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 25608,
+          "titre": "Les Chevaliers d'Émeraude",
+          "type": "serie"
+        },
+        "msSerie": 3165,
+        "tomes": 12,
+        "disponibles": 12,
+        "totalPrincipal": 12,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 12
+        }
+      }
+    },
+    {
+      "id": "S05",
+      "categorie": "saga longue fantasy",
+      "requete": "dune",
+      "lang": "fr",
+      "source": "a_verifier: Wikipédia + BnF",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 458,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Dune (6) — Frank Herbert",
+          "[serie] Dune Sequels (2) — Brian Herbert, Kevin J. Anderson"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1150,
+          "titre": "Dune",
+          "type": "serie"
+        },
+        "msSerie": 3952,
+        "tomes": 8,
+        "disponibles": 6,
+        "totalPrincipal": 8,
+        "indisponibles": 2,
+        "aParaitre": 2,
+        "tomesMarquesIndisponibles": 2,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 6
+        }
+      }
+    },
+    {
+      "id": "S06",
+      "categorie": "saga longue fantasy",
+      "requete": "la roue du temps",
+      "lang": "fr",
+      "source": "a_verifier: BnF (Bragelonne 14 ou 28 volumes)",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": false,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1105,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Wheel of Time (14) — Robert Jordan"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1097,
+          "titre": "The Wheel of Time",
+          "type": "serie"
+        },
+        "msSerie": 2167,
+        "tomes": 16,
+        "disponibles": 14,
+        "totalPrincipal": 14,
+        "indisponibles": 2,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 1,
+          "approximatives": 2,
+          "partagees": 0,
+          "sur": 14
+        }
+      }
+    },
+    {
+      "id": "S07",
+      "categorie": "saga longue fantasy",
+      "requete": "les annales du disque-monde",
+      "lang": "fr",
+      "source": "a_verifier: BnF + Wikipédia",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1046,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Discworld (41) — Terry Pratchett"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1018,
+          "titre": "Discworld",
+          "type": "serie"
+        },
+        "msSerie": 4863,
+        "tomes": 41,
+        "disponibles": 41,
+        "totalPrincipal": 41,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 41
+        }
+      }
+    },
+    {
+      "id": "S08",
+      "categorie": "saga longue fantasy",
+      "requete": "fils des brumes",
+      "lang": "fr",
+      "source": "a_verifier: Wikipédia (ère 1 = 3 tomes, ère 2 = 4)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 705,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] The Mistborn Saga: The Original Trilogy (3) — Brandon Sanderson",
+          "[serie] The Mistborn Saga : Wax & Wayne (4) — Brandon Sanderson"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 10001,
+          "titre": "The Mistborn Saga: The Original Trilogy",
+          "type": "serie"
+        },
+        "msSerie": 3009,
+        "tomes": 3,
+        "disponibles": 3,
+        "totalPrincipal": 3,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 3
+        }
+      }
+    },
+    {
+      "id": "S09",
+      "categorie": "saga longue fantasy",
+      "requete": "eragon",
+      "lang": "fr",
+      "source": "mesure du 2026-10-05 : 5 tomes depuis Murtagh (2023)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 399,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Inheritance Cycle (5) — Christopher Paolini"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5464,
+          "titre": "The Inheritance Cycle",
+          "type": "serie"
+        },
+        "msSerie": 2956,
+        "tomes": 5,
+        "disponibles": 5,
+        "totalPrincipal": 5,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 5
+        }
+      }
+    },
+    {
+      "id": "S10",
+      "categorie": "saga longue fantasy",
+      "requete": "le sorceleur",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : 5 romans de la saga + Le Dernier Væu et L'Épée de la providence + La Saison des orages (recherche web, listes de lecture The Witcher)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1080,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Witcher (5) — Andrzej Sapkowski, Danusia Stok"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1808,
+          "titre": "The Witcher",
+          "type": "serie"
+        },
+        "msSerie": 3208,
+        "tomes": 5,
+        "disponibles": 4,
+        "totalPrincipal": 5,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 4
+        }
+      }
+    },
+    {
+      "id": "S11",
+      "categorie": "saga longue fantasy",
+      "requete": "l'assassin royal",
+      "lang": "fr",
+      "source": "a_verifier: BnF + Wikipédia",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": false,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": false
+      },
+      "detail": {
+        "ms": 1135,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] L'Assassin royal (17) — Robin Hobb, Arnaud Mousnier-Lompré"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 10896,
+          "titre": "L'Assassin royal",
+          "type": "serie"
+        },
+        "msSerie": 6319,
+        "tomes": 17,
+        "disponibles": 16,
+        "totalPrincipal": 17,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "completRaison": "17 tomes rendus, 17 annoncés par le service, 13 à 16 attendus",
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 16
+        },
+        "parasites": [
+          "Le Fou et l'Assassin, Intégrale 1"
+        ]
+      }
+    },
+    {
+      "id": "S12",
+      "categorie": "saga courte fantasy",
+      "requete": "le monde de narnia",
+      "lang": "fr",
+      "source": "connaissance (ordre de publication)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 656,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Chronicles of Narnia (Publication Order) (7) — C. S. Lewis, Pauline Baynes"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5485,
+          "titre": "The Chronicles of Narnia (Publication Order)",
+          "type": "serie"
+        },
+        "msSerie": 408,
+        "tomes": 7,
+        "disponibles": 6,
+        "totalPrincipal": 7,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 6
+        }
+      }
+    },
+    {
+      "id": "S13",
+      "categorie": "saga courte fantasy",
+      "requete": "a la croisée des mondes",
+      "lang": "fr",
+      "source": "connaissance (La Croisée des mondes, 3 tomes)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1312,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] His Dark Materials (3) — Philip Pullman",
+          "[serie] His Dark Materials: The Graphic Novels (2) — Stéphane Melchior-Durand, Philip Pullman"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1025,
+          "titre": "His Dark Materials",
+          "type": "serie"
+        },
+        "msSerie": 1625,
+        "tomes": 3,
+        "disponibles": 3,
+        "totalPrincipal": 3,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 3
+        }
+      }
+    },
+    {
+      "id": "S14",
+      "categorie": "saga courte fantasy",
+      "requete": "la passe-miroir",
+      "lang": "fr",
+      "source": "a_verifier: Gallimard (4 tomes + 1 hors série possible)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1573,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] La Passe-Miroir (4) — Christelle Dabos, Hildegarde Serle"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5588,
+          "titre": "La Passe-Miroir",
+          "type": "serie"
+        },
+        "msSerie": 2758,
+        "tomes": 4,
+        "disponibles": 4,
+        "totalPrincipal": 4,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 4
+        }
+      }
+    },
+    {
+      "id": "S15",
+      "categorie": "saga courte fantasy",
+      "requete": "la quête d'ewilan",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1584,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] La Quête d'Ewilan (3) — Pierre Bottero"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 12539,
+          "titre": "La Quête d'Ewilan",
+          "type": "serie"
+        },
+        "msSerie": 3280,
+        "tomes": 3,
+        "disponibles": 3,
+        "totalPrincipal": 3,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 3
+        }
+      }
+    },
+    {
+      "id": "S16",
+      "categorie": "saga SF",
+      "requete": "fondation",
+      "lang": "fr",
+      "source": "a_verifier: Wikipédia (cycle de Fondation = 7 romans)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 471,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Foundation (7) — Isaac Asimov"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5450,
+          "titre": "Foundation",
+          "type": "serie"
+        },
+        "msSerie": 2226,
+        "tomes": 7,
+        "disponibles": 7,
+        "totalPrincipal": 7,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 7
+        }
+      }
+    },
+    {
+      "id": "S17",
+      "categorie": "saga SF",
+      "requete": "hunger games",
+      "lang": "fr",
+      "source": "connaissance (3 + préquelles récentes)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1597,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Hunger Games (5) — Suzanne Collins"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1015,
+          "titre": "The Hunger Games",
+          "type": "serie"
+        },
+        "msSerie": 1625,
+        "tomes": 5,
+        "disponibles": 5,
+        "totalPrincipal": 5,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 5
+        }
+      }
+    },
+    {
+      "id": "S18",
+      "categorie": "saga SF",
+      "requete": "hypérion",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : 4 romans (Hypérion, La Chute d'Hypérion, Endymion, L'Éveil d'Endymion) ; Hardcover ajoute la novella Orphan of the Helix",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1593,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Hyperion Cantos (4) — Dan Simmons"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1049,
+          "titre": "Hyperion Cantos",
+          "type": "serie"
+        },
+        "msSerie": 3877,
+        "tomes": 5,
+        "disponibles": 4,
+        "totalPrincipal": 5,
+        "indisponibles": 1,
+        "aParaitre": 1,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 4
+        }
+      }
+    },
+    {
+      "id": "S19",
+      "categorie": "saga SF",
+      "requete": "le problème à trois corps",
+      "lang": "fr",
+      "source": "connaissance (trilogie)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1589,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Remembrance of Earth's Past (4) — Cixin Liu, Ken Liu",
+          "[livre] Les Frontières de la science — Cixin Liu, XuDong Cai"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1584,
+          "titre": "Remembrance of Earth's Past",
+          "type": "serie"
+        },
+        "msSerie": 2139,
+        "tomes": 4,
+        "disponibles": 4,
+        "totalPrincipal": 4,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 4
+        }
+      }
+    },
+    {
+      "id": "S20",
+      "categorie": "saga SF",
+      "requete": "ender",
+      "lang": "fr",
+      "source": "a_verifier: BnF (cycle d'Ender, nombreuses déclinaisons)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1086,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Ender's Saga (6) — Orson Scott Card",
+          "[serie] Robot (4) — Isaac Asimov"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1059,
+          "titre": "Ender's Saga",
+          "type": "serie"
+        },
+        "msSerie": 3927,
+        "tomes": 6,
+        "disponibles": 5,
+        "totalPrincipal": 6,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 5
+        }
+      }
+    },
+    {
+      "id": "S21",
+      "categorie": "saga policier",
+      "requete": "millenium",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : 6 romans (3 Larsson + 3 Lagercrantz, Actes Sud) ; Hardcover compte aussi les 2 romans de Karin Smirnoff",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": false,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1528,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Millennium (8) — Stieg Larsson"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 2115,
+          "titre": "Millennium",
+          "type": "serie"
+        },
+        "msSerie": 3209,
+        "tomes": 8,
+        "disponibles": 7,
+        "totalPrincipal": 8,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 1,
+          "partagees": 0,
+          "sur": 7
+        }
+      }
+    },
+    {
+      "id": "S22",
+      "categorie": "saga policier",
+      "requete": "sherlock holmes",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : canon = 4 romans + 5 recueils = 9 ; un 10e titre recueil/compilation toléré",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 452,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Sherlock Holmes (10) — Arthur Conan Doyle, Sidney Paget"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1098,
+          "titre": "Sherlock Holmes",
+          "type": "serie"
+        },
+        "msSerie": 3983,
+        "tomes": 10,
+        "disponibles": 6,
+        "totalPrincipal": 10,
+        "indisponibles": 4,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 6
+        }
+      }
+    },
+    {
+      "id": "S23",
+      "categorie": "saga policier",
+      "requete": "hercule poirot",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : 33 romans + recueils de nouvelles (Hardcover réunit les deux dans la série)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 442,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Hercule Poirot (48) — Agatha Christie"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1157,
+          "titre": "Hercule Poirot",
+          "type": "serie"
+        },
+        "msSerie": 2708,
+        "tomes": 47,
+        "disponibles": 34,
+        "totalPrincipal": 47,
+        "indisponibles": 13,
+        "aParaitre": 1,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 34
+        }
+      }
+    },
+    {
+      "id": "S24",
+      "categorie": "saga policier",
+      "requete": "maigret",
+      "lang": "fr",
+      "source": "a_verifier: Wikipédia (75 romans, 28 nouvelles)",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": false,
+        "edition": true,
+        "couverture": true,
+        "propre": false
+      },
+      "detail": {
+        "ms": 1101,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Inspector Maigret (75) — Georges Simenon"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 11737,
+          "titre": "Inspector Maigret",
+          "type": "serie"
+        },
+        "msSerie": 4403,
+        "tomes": 74,
+        "disponibles": 42,
+        "totalPrincipal": 75,
+        "indisponibles": 32,
+        "aParaitre": 1,
+        "completRaison": "74 tomes rendus, 75 annoncés par le service, 75 à 103 attendus",
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 42
+        },
+        "parasites": [
+          "Maigret : A Fifth Omnibus"
+        ]
+      }
+    },
+    {
+      "id": "S25",
+      "categorie": "saga policier",
+      "requete": "jack reacher",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : 30 romans parus (Exit Strategy, nov. 2025), le 31e (Chain Reaction) annoncé pour oct. 2026",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1061,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Jack Reacher (30) — Lee Child"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1527,
+          "titre": "Jack Reacher",
+          "type": "serie"
+        },
+        "msSerie": 3249,
+        "tomes": 31,
+        "disponibles": 7,
+        "totalPrincipal": 31,
+        "indisponibles": 24,
+        "aParaitre": 1,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 7
+        }
+      }
+    },
+    {
+      "id": "S26",
+      "categorie": "saga policier",
+      "requete": "arsène lupin",
+      "lang": "fr",
+      "source": "a_verifier: Wikipédia + BnF (nombreuses éditions)",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": false,
+        "edition": false,
+        "couverture": "partiel",
+        "propre": true
+      },
+      "detail": {
+        "ms": 1075,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Arsène Lupin (21) — Maurice Leblanc, Michael Sims"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 27827,
+          "titre": "Arsène Lupin",
+          "type": "serie"
+        },
+        "msSerie": 4744,
+        "tomes": 20,
+        "disponibles": 16,
+        "totalPrincipal": 21,
+        "indisponibles": 4,
+        "aParaitre": 0,
+        "completRaison": "20 tomes rendus, 21 annoncés par le service, 15 à 25 attendus",
+        "editionsAutreLangue": 1,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 1,
+          "partagees": 0,
+          "sur": 16
+        }
+      }
+    },
+    {
+      "id": "S27",
+      "categorie": "jeunesse",
+      "requete": "journal d'un dégonflé",
+      "lang": "fr",
+      "source": "a_verifier: Seuil/Wikipédia",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": false,
+        "couverture": false,
+        "propre": true
+      },
+      "detail": {
+        "ms": 404,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Diary of a Wimpy Kid (20) — Jeff Kinney"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 6224,
+          "titre": "Diary of a Wimpy Kid",
+          "type": "serie"
+        },
+        "msSerie": 3432,
+        "tomes": 20,
+        "disponibles": 16,
+        "totalPrincipal": 20,
+        "indisponibles": 4,
+        "aParaitre": 0,
+        "editionsAutreLangue": 1,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 4,
+          "partagees": 0,
+          "sur": 16
+        }
+      }
+    },
+    {
+      "id": "S28",
+      "categorie": "jeunesse",
+      "requete": "percy jackson",
+      "lang": "fr",
+      "source": "connaissance (1er cycle ; suites = autre saga)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": "Hardcover annonce 8 tomes dont un espace réservé « Untitled #8 » (exclu par correction)",
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 421,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Percy Jackson and the Olympians (7) — Rick Riordan"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5193,
+          "titre": "Percy Jackson and the Olympians",
+          "type": "serie"
+        },
+        "msSerie": 1331,
+        "tomes": 7,
+        "disponibles": 7,
+        "totalPrincipal": 8,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 7
+        }
+      }
+    },
+    {
+      "id": "S29",
+      "categorie": "jeunesse",
+      "requete": "les royaumes de feu",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : au moins 14 tomes parus chez Gallimard Jeunesse (tome 14 en 2022) ; Hardcover en compte 16",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1600,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Wings of Fire (16) — Tui T. Sutherland"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 6958,
+          "titre": "Wings of Fire",
+          "type": "serie"
+        },
+        "msSerie": 3696,
+        "tomes": 16,
+        "disponibles": 9,
+        "totalPrincipal": 16,
+        "indisponibles": 7,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 9
+        }
+      }
+    },
+    {
+      "id": "S30",
+      "categorie": "jeunesse",
+      "requete": "geronimo stilton",
+      "lang": "fr",
+      "source": "a_verifier: BnF",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": false,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 607,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Geronimo Stilton (85) — Geronimo Stilton"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 15436,
+          "titre": "Geronimo Stilton",
+          "type": "serie"
+        },
+        "msSerie": 2835,
+        "tomes": 81,
+        "disponibles": 5,
+        "totalPrincipal": 82,
+        "indisponibles": 76,
+        "aParaitre": 1,
+        "completRaison": "81 tomes rendus, 82 annoncés par le service, 50 à 500 attendus",
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 5
+        }
+      }
+    },
+    {
+      "id": "S31",
+      "categorie": "jeunesse",
+      "requete": "le club des cinq",
+      "lang": "fr",
+      "source": "a_verifier: Hachette (21 originaux, 45 FR)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1532,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[serie] The Famous Five (21) — Enid Blyton",
+          "[livre] Le Club des Cinq se distingue — Enid Blyton",
+          "[livre] Le Club des Cinq 13 - Le Club des Cinq joue et gagne — Enid Blyton"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 11185,
+          "titre": "The Famous Five",
+          "type": "serie"
+        },
+        "msSerie": 2777,
+        "tomes": 21,
+        "disponibles": 14,
+        "totalPrincipal": 21,
+        "indisponibles": 7,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 14
+        }
+      }
+    },
+    {
+      "id": "I01",
+      "categorie": "livre isolé classique",
+      "requete": "germinal",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1554,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[livre] Germinal — Émile Zola, Stanley Hochman",
+          "[serie] Germinal (2) — Philippe Chanoinat, Émile Zola",
+          "[livre] Émile Zola: \"Germinal\" — Colette Becker"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 341667,
+          "titre": "Germinal",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I02",
+      "categorie": "livre isolé classique",
+      "requete": "1984",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1608,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[livre] 1984 — George Orwell, Peter Hobley Davison",
+          "[livre] 1984 — Fido Nesti, George Orwell",
+          "[livre] 1984 — George Orwell, Jacques Mailhos"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 379760,
+          "titre": "1984",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I03",
+      "categorie": "livre isolé classique",
+      "requete": "l'étranger",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1632,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] L'étranger — Albert Camus, Matthew Ward",
+          "[livre] L'absurde: L'Etranger, Le Mythe de Sisyphe, Caligula, Le malentendu — Albert Camus"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 266084,
+          "titre": "L'étranger",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I04",
+      "categorie": "livre isolé classique",
+      "requete": "le petit prince",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1585,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[livre] Le Petit Prince — Antoine de Saint-Exupéry",
+          "[livre] Le Petit Prince raconté aux enfants — Antoine de Saint-Exupéry, Gallimard",
+          "[livre] Une journée avec le Petit Prince — Antoine de Saint-Exupéry"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 115005,
+          "titre": "Le Petit Prince",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I05",
+      "categorie": "livre isolé classique",
+      "requete": "madame bovary",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1623,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Madame Bovary — Gustave Flaubert, Sérgio Duarte"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 379529,
+          "titre": "Madame Bovary",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I06",
+      "categorie": "livre isolé classique",
+      "requete": "les misérables",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1611,
+        "statut": 200,
+        "nbCartes": 6,
+        "top": [
+          "[livre] Les Misérables — Victor Hugo, Christine Donougher",
+          "[serie] Manga Classics (17) — Crystal S. Chan, Victor Hugo",
+          "[serie] Les misérables (2) — Bernard Capo, Daniel Bardet"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 370972,
+          "titre": "Les Misérables",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I07",
+      "categorie": "livre isolé classique",
+      "requete": "le comte de monte-cristo",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1598,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Le Comte de Monte-Cristo (12) — Alexandre Dumas",
+          "[serie] Le comte de Monte-Cristo (13) — Alexandre Dumas"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 7859,
+          "titre": "Le Comte de Monte-Cristo",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "I08",
+      "categorie": "livre isolé classique",
+      "requete": "fahrenheit 451",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1633,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Fahrenheit 451 (5) — Ray Bradbury"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 195714,
+          "titre": "Fahrenheit 451",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "I09",
+      "categorie": "livre isolé classique",
+      "requete": "le nom de la rose",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1618,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] Le Nom de la rose — Umberto Eco, William Weaver",
+          "[livre] Le Nom de la rose - Livre premier — Milo Manara, Umberto Eco"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 365331,
+          "titre": "Le Nom de la rose",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I10",
+      "categorie": "livre isolé classique",
+      "requete": "crime et châtiment",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1613,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] Crime et Châtiment — Fyodor Dostoevsky, Leonard Stanton",
+          "[serie] Crime and Punishment (2 Volumes) (2) — Fyodor Dostoevsky"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 469783,
+          "titre": "Crime et Châtiment",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I11",
+      "categorie": "livre isolé étranger",
+      "requete": "cent ans de solitude",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1601,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Cent ans de solitude — Gabriel García Márquez"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 762271,
+          "titre": "Cent ans de solitude",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I12",
+      "categorie": "livre isolé étranger",
+      "requete": "l'alchimiste",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1633,
+        "statut": 200,
+        "nbCartes": 5,
+        "top": [
+          "[livre] L'Alchimiste — Paulo Coelho",
+          "[serie] The Secrets of the Immortal Nicholas Flamel (6) — Michael Scott",
+          "[serie] The Scarlet Alchemist (2) — Kylie Lee Baker"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 337236,
+          "titre": "L'Alchimiste",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I13",
+      "categorie": "livre isolé étranger",
+      "requete": "la ligne verte",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1600,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Green Mile (6) — Stephen King"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5737,
+          "titre": "The Green Mile",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "I14",
+      "categorie": "livre isolé français contemporain",
+      "requete": "la vérité sur l'affaire harry quebert",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1628,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Marcus Goldman (3) — Joël Dicker, Sam Taylor"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 11416,
+          "titre": "Marcus Goldman",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "I15",
+      "categorie": "livre isolé français contemporain",
+      "requete": "la fille de papier",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1607,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] La fille de papier — Guillaume Musso"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1070798,
+          "titre": "La fille de papier",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I16",
+      "categorie": "livre isolé français contemporain",
+      "requete": "stupeurs et tremblements",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1615,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Stupeur et tremblements — Amélie Nothomb"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 765866,
+          "titre": "Stupeur et tremblements",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I17",
+      "categorie": "livre isolé français contemporain",
+      "requete": "soumission",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1613,
+        "statut": 200,
+        "nbCartes": 5,
+        "top": [
+          "[livre] Soumission — Michel Houellebecq, Lorin Stein",
+          "[livre] Et j'ai cessé de t'appeler papa — Caroline Darian",
+          "[livre] La soumission librement consentie: Comment amener les gens à faire librement ce qu'ils doivent faire? — joule/beauvois robert-vincent/jean-leon, Jean-Léon Beauvois"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 447280,
+          "titre": "Soumission",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I18",
+      "categorie": "livre isolé français contemporain",
+      "requete": "veiller sur elle",
+      "lang": "fr",
+      "source": "a_verifier: BnF (Goncourt 2023)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1626,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Veiller sur elle — Jean-Baptiste Andrea"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1122831,
+          "titre": "Veiller sur elle",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "I19",
+      "categorie": "livre isolé étranger contemporain",
+      "requete": "l'amie prodigieuse",
+      "lang": "fr",
+      "source": "connaissance (tétralogie)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1607,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] L'amica geniale (4) — Elena Ferrante, Ann Goldstein"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5850,
+          "titre": "L'amica geniale",
+          "type": "serie"
+        },
+        "msSerie": 1639,
+        "tomes": 4,
+        "disponibles": 4,
+        "totalPrincipal": 4,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 4
+        }
+      }
+    },
+    {
+      "id": "I20",
+      "categorie": "livre isolé étranger contemporain",
+      "requete": "kafka sur le rivage",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1592,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Kafka sur le rivage — Haruki Murakami, Philip Gabriel"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 207877,
+          "titre": "Kafka sur le rivage",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "R01",
+      "categorie": "récent ou à paraître",
+      "requete": "onyx storm",
+      "lang": "fr",
+      "source": "a_verifier: Hardcover/éditeur (3e tome de la saga Empyrée)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1625,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Onyx Storm — Rebecca Yarros"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1197328,
+          "titre": "Onyx Storm",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "R02",
+      "categorie": "récent ou à paraître",
+      "requete": "fourth wing",
+      "lang": "fr",
+      "source": "a_verifier: éditeur (Empyrée, tomes à paraître attendus)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1604,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] The Empyrean (3) — Rebecca Yarros",
+          "[serie] The Crucible (2) — Abigail Owen"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 41764,
+          "titre": "The Empyrean",
+          "type": "serie"
+        },
+        "msSerie": 1620,
+        "tomes": 5,
+        "disponibles": 3,
+        "totalPrincipal": 4,
+        "indisponibles": 2,
+        "aParaitre": 2,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 3
+        }
+      }
+    },
+    {
+      "id": "R03",
+      "categorie": "récent ou à paraître",
+      "requete": "wind and truth",
+      "lang": "en",
+      "source": "a_verifier: éditeur (Stormlight 5, décembre 2024)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1594,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] Wind and Truth — Brandon Sanderson",
+          "[serie] Agents of the Crown (5) — Lindsay Buroker"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 665261,
+          "titre": "Wind and Truth",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "R04",
+      "categorie": "récent ou à paraître",
+      "requete": "the winds of winter",
+      "lang": "en",
+      "source": "connaissance (non paru à ce jour)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1622,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] The Winds of Winter — George R.R. Martin",
+          "[livre] The Winds of War — Mosha Winter"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 427817,
+          "titre": "The Winds of Winter",
+          "type": "livre"
+        },
+        "noteAParaitre": "à contrôler à la main (carte livre sans date dans la recherche)"
+      }
+    },
+    {
+      "id": "R05",
+      "categorie": "récent ou à paraître",
+      "requete": "houris",
+      "lang": "fr",
+      "source": "a_verifier: BnF (Goncourt 2024)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1653,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Houris — Kamel Daoud"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1711526,
+          "titre": "Houris",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "R06",
+      "categorie": "récent ou à paraître",
+      "requete": "intermezzo",
+      "lang": "fr",
+      "source": "a_verifier: Hardcover + BnF",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1567,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[livre] Intermezzo — Sally Rooney",
+          "[livre] Intermezzo — Sally Rooney",
+          "[serie] Artemis Fowl (8) — Eoin Colfer"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1214974,
+          "titre": "Intermezzo",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "M01",
+      "categorie": "manga",
+      "requete": "one piece",
+      "lang": "fr",
+      "source": "a_verifier: Glénat (tomes publiés à la date du test)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1632,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] One Piece (116) — Eiichiro Oda, Andy Nakatani"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 4624,
+          "titre": "One Piece",
+          "type": "serie"
+        },
+        "msSerie": 4265,
+        "tomes": 116,
+        "disponibles": 95,
+        "totalPrincipal": 116,
+        "indisponibles": 21,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 95
+        }
+      }
+    },
+    {
+      "id": "M02",
+      "categorie": "manga",
+      "requete": "naruto",
+      "lang": "fr",
+      "source": "connaissance (72 tomes)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 311,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Naruto [ナルト] (72) — Masashi Kishimoto",
+          "[livre] Naruto — Cyril Castaing"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 6102,
+          "titre": "Naruto [ナルト]",
+          "type": "serie"
+        },
+        "msSerie": 2527,
+        "tomes": 72,
+        "disponibles": 5,
+        "totalPrincipal": 72,
+        "indisponibles": 67,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 5
+        }
+      }
+    },
+    {
+      "id": "M03",
+      "categorie": "manga",
+      "requete": "death note",
+      "lang": "fr",
+      "source": "connaissance (12 + tome 13 guide)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1598,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Death Note (13) — Tsugumi Ohba, Takeshi Obata"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 7310,
+          "titre": "Death Note",
+          "type": "serie"
+        },
+        "msSerie": 1637,
+        "tomes": 13,
+        "disponibles": 12,
+        "totalPrincipal": 13,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 12
+        }
+      }
+    },
+    {
+      "id": "M04",
+      "categorie": "manga",
+      "requete": "l'attaque des titans",
+      "lang": "fr",
+      "source": "connaissance (34 tomes)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1584,
+        "statut": 200,
+        "nbCartes": 5,
+        "top": [
+          "[serie] Attack on Titan (34) — Hajime Isayama, Hajime Isayama",
+          "[livre] L'Attaque des Titans Edition Colossale T10 — Hajime Isayama",
+          "[livre] L'attaque des titans édition colossale tome 4 — Hajime Isayama"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 6370,
+          "titre": "Attack on Titan",
+          "type": "serie"
+        },
+        "msSerie": 2166,
+        "tomes": 34,
+        "disponibles": 25,
+        "totalPrincipal": 34,
+        "indisponibles": 9,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 25
+        }
+      }
+    },
+    {
+      "id": "M05",
+      "categorie": "manga",
+      "requete": "fullmetal alchemist",
+      "lang": "fr",
+      "source": "connaissance (27 tomes ; éditions perfect à part)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1071,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Fullmetal Alchemist (27) — Hiromu Arakawa, Akira Watanabe"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1574,
+          "titre": "Fullmetal Alchemist",
+          "type": "serie"
+        },
+        "msSerie": 2138,
+        "tomes": 27,
+        "disponibles": 27,
+        "totalPrincipal": 27,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 27
+        }
+      }
+    },
+    {
+      "id": "M06",
+      "categorie": "manga",
+      "requete": "dragon ball",
+      "lang": "fr",
+      "source": "a_verifier: Glénat",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1093,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Dragon Ball (42 Books) (42) — Akira Toriyama",
+          "[serie] Dragon Ball Z (26) — Akira Toriyama"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 3472,
+          "titre": "Dragon Ball (42 Books)",
+          "type": "serie"
+        },
+        "msSerie": 2802,
+        "tomes": 42,
+        "disponibles": 37,
+        "totalPrincipal": 42,
+        "indisponibles": 5,
+        "aParaitre": 3,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 37
+        }
+      }
+    },
+    {
+      "id": "M07",
+      "categorie": "manga",
+      "requete": "berserk",
+      "lang": "fr",
+      "source": "a_verifier: Glénat (parution continuée après la mort de l'auteur)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1532,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Berserk (43) — Kentaro Miura"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 3408,
+          "titre": "Berserk",
+          "type": "serie"
+        },
+        "msSerie": 1667,
+        "tomes": 43,
+        "disponibles": 42,
+        "totalPrincipal": 43,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 42
+        }
+      }
+    },
+    {
+      "id": "B01",
+      "categorie": "bande dessinée",
+      "requete": "astérix",
+      "lang": "fr",
+      "source": "a_verifier: Wikipédia (album 40 en 2019, 41 en 2023)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1580,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Astérix (41) — René Goscinny, Albert Uderzo"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 6571,
+          "titre": "Astérix",
+          "type": "serie"
+        },
+        "msSerie": 4253,
+        "tomes": 41,
+        "disponibles": 37,
+        "totalPrincipal": 41,
+        "indisponibles": 4,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 37
+        }
+      }
+    },
+    {
+      "id": "B02",
+      "categorie": "bande dessinée",
+      "requete": "tintin",
+      "lang": "fr",
+      "source": "verifie 2026-10-06 : 23 albums + L'Alph-Art + Tintin et le lac aux requins (roman-film, 1973) comptés par Hardcover",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 450,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Tintin (25) — Hergé, Leslie Lonsdale-Cooper"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 4794,
+          "titre": "Tintin",
+          "type": "serie"
+        },
+        "msSerie": 2360,
+        "tomes": 25,
+        "disponibles": 23,
+        "totalPrincipal": 25,
+        "indisponibles": 2,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 23
+        }
+      }
+    },
+    {
+      "id": "B03",
+      "categorie": "bande dessinée",
+      "requete": "lucky luke",
+      "lang": "fr",
+      "source": "a_verifier: Wikipédia",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": false,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1593,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Lucky Luke (82) — Bob de Groot, Morris",
+          "[serie] Les Aventures de Lucky Luke d'après Morris (3) — Tonino Benacquista, Achdé"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 12463,
+          "titre": "Lucky Luke",
+          "type": "serie"
+        },
+        "msSerie": 5865,
+        "tomes": 70,
+        "disponibles": 39,
+        "totalPrincipal": 82,
+        "indisponibles": 31,
+        "aParaitre": 0,
+        "completRaison": "70 tomes rendus, 82 annoncés par le service, 70 à 110 attendus",
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 39
+        }
+      }
+    },
+    {
+      "id": "B04",
+      "categorie": "bande dessinée",
+      "requete": "blacksad",
+      "lang": "fr",
+      "source": "a_verifier: Dargaud",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 322,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Blacksad (7) — Juan Díaz Canales, Juanjo Guarnido"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 12453,
+          "titre": "Blacksad",
+          "type": "serie"
+        },
+        "msSerie": 306,
+        "tomes": 7,
+        "disponibles": 6,
+        "totalPrincipal": 7,
+        "indisponibles": 1,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 6
+        }
+      }
+    },
+    {
+      "id": "B05",
+      "categorie": "bande dessinée",
+      "requete": "gaston lagaffe",
+      "lang": "fr",
+      "source": "a_verifier: Dupuis",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": "partiel",
+        "trouve": true,
+        "complet": false,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 4423,
+        "statut": 200,
+        "nbCartes": 4,
+        "top": [
+          "[serie] Gaston Classique (14) — André Franquin, Stellan Nehlmark",
+          "[serie] Gaston [Nouvelle Edition] (22) — Delaf",
+          "[livre] Gaston, Tome 08 : Lagaffe nous gâte — Jidéhem, André Franquin"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 118771,
+          "titre": "Gaston Classique",
+          "type": "serie"
+        },
+        "msSerie": 3181,
+        "tomes": 7,
+        "disponibles": 7,
+        "totalPrincipal": 14,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "completRaison": "7 tomes rendus, 14 annoncés par le service, 19 à 20 attendus",
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 7
+        }
+      }
+    },
+    {
+      "id": "B06",
+      "categorie": "bande dessinée",
+      "requete": "persepolis",
+      "lang": "fr",
+      "source": "a_verifier: L'Association",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1129,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Persepolis (4) — Marjane Satrapi",
+          "[serie] The Expanse (9) — James S. A. Corey"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5523,
+          "titre": "Persepolis",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "C01",
+      "categorie": "comics",
+      "requete": "watchmen",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1635,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Watchmen (12) — Alan Moore, Dave Gibbons"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5453,
+          "titre": "Watchmen",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "C02",
+      "categorie": "comics",
+      "requete": "sandman",
+      "lang": "fr",
+      "source": "a_verifier: Urban Comics (10 volumes + hors série)",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": false,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1604,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[serie] The Sandman (75) — Neil Gaiman, Colleen Doran",
+          "[serie] Sandman Edición Absolute (2) — Neil Gaiman",
+          "[serie] Sandman Slim (12) — Richard Kadrey, MacLeod Andrews"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1057,
+          "titre": "The Sandman",
+          "type": "serie"
+        },
+        "msSerie": 1639,
+        "tomes": 75,
+        "disponibles": 1,
+        "totalPrincipal": 75,
+        "indisponibles": 74,
+        "aParaitre": 0,
+        "completRaison": "75 tomes rendus, 75 annoncés par le service, 10 à 12 attendus",
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 1
+        }
+      }
+    },
+    {
+      "id": "C03",
+      "categorie": "comics",
+      "requete": "maus",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1571,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Maus (2) — Art Spiegelman, Judith Ertel"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5565,
+          "titre": "Maus",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "C04",
+      "categorie": "comics",
+      "requete": "the walking dead",
+      "lang": "en",
+      "source": "a_verifier: Image Comics (32 volumes)",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": false,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1619,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Walking Dead (33) — Robert Kirkman, Tony Moore"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5845,
+          "titre": "The Walking Dead",
+          "type": "serie"
+        },
+        "msSerie": 3149,
+        "tomes": 31,
+        "disponibles": 31,
+        "totalPrincipal": 32,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "completRaison": "31 tomes rendus, 32 annoncés par le service, 32 à 33 attendus",
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 31
+        }
+      }
+    },
+    {
+      "id": "C05",
+      "categorie": "comics",
+      "requete": "saga",
+      "lang": "en",
+      "source": "2026-10-06 : 12 volumes parus ; Hardcover liste déjà les volumes 13 et 14 à paraître",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1190,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Saga (12) — Fiona Staples, Brian K. Vaughan",
+          "[livre] Saga — Conor Kostick"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5476,
+          "titre": "Saga",
+          "type": "serie"
+        },
+        "msSerie": 2736,
+        "tomes": 14,
+        "disponibles": 12,
+        "totalPrincipal": 14,
+        "indisponibles": 2,
+        "aParaitre": 2,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 12
+        }
+      }
+    },
+    {
+      "id": "A01",
+      "categorie": "recherche par auteur",
+      "requete": "tolkien",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "trouveSaga": true
+      },
+      "detail": {
+        "ms": 2738,
+        "statut": 200,
+        "auteurRetenu": "J.R.R. Tolkien",
+        "nbCartes": 6,
+        "top": [
+          "[serie] Middle Earth (4)",
+          "[serie] Le Seigneur des anneaux (3)",
+          "[serie] Tales of Middle Earth (4)",
+          "[serie] The History of Middle-Earth (13)",
+          "[livre] Lettres du Père Noël",
+          "[livre] La Chute d'Arthur"
+        ]
+      }
+    },
+    {
+      "id": "A02",
+      "categorie": "recherche par auteur",
+      "requete": "stephen king",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true
+      },
+      "detail": {
+        "ms": 2700,
+        "statut": 200,
+        "auteurRetenu": "Stephen King",
+        "nbCartes": 20,
+        "top": [
+          "[serie] The Shining (2)",
+          "[serie] The Dark Tower (7)",
+          "[livre] Le Fléau",
+          "[livre] Ca - tome 2",
+          "[livre] Misery",
+          "[livre] Simetierre"
+        ]
+      }
+    },
+    {
+      "id": "A03",
+      "categorie": "recherche par auteur",
+      "requete": "amélie nothomb",
+      "lang": "fr",
+      "source": "connaissance (accent)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true
+      },
+      "detail": {
+        "ms": 2729,
+        "statut": 200,
+        "auteurRetenu": "Amélie Nothomb",
+        "nbCartes": 20,
+        "top": [
+          "[livre] Stupeur et tremblements",
+          "[livre] Acide sulfurique",
+          "[livre] Ni d'Ève ni d'Adam",
+          "[livre] Le Sabotage amoureux",
+          "[livre] Soif",
+          "[livre] Antéchrista"
+        ]
+      }
+    },
+    {
+      "id": "A04",
+      "categorie": "recherche par auteur",
+      "requete": "guillaume musso",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true
+      },
+      "detail": {
+        "ms": 2732,
+        "statut": 200,
+        "auteurRetenu": "Guillaume Musso",
+        "nbCartes": 11,
+        "top": [
+          "[livre] Central Park",
+          "[serie] La Trilogie des Ecrivains (3)",
+          "[serie] Madeline (5)",
+          "[livre] Demain",
+          "[livre] Et après ...",
+          "[livre] Sauve-moi"
+        ]
+      }
+    },
+    {
+      "id": "A05",
+      "categorie": "recherche par auteur",
+      "requete": "haruki murakami",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true
+      },
+      "detail": {
+        "ms": 2722,
+        "statut": 200,
+        "auteurRetenu": "Haruki Murakami",
+        "nbCartes": 16,
+        "top": [
+          "[serie] Haruki Murakami Short Stories (38)",
+          "[serie] Haruki Murakami Manga Stories (3)",
+          "[livre] La Ballade de l'impossible",
+          "[livre] Le passage de la nuit",
+          "[livre] Les Amants du Spoutnik",
+          "[serie] The Rat (4)"
+        ]
+      }
+    },
+    {
+      "id": "A06",
+      "categorie": "recherche par auteur",
+      "requete": "eiichiro oda",
+      "lang": "fr",
+      "source": "connaissance (auteur de manga)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "trouveSaga": true
+      },
+      "detail": {
+        "ms": 2717,
+        "statut": 200,
+        "auteurRetenu": "Eiichiro Oda",
+        "nbCartes": 1,
+        "top": [
+          "[serie] One Piece (116)"
+        ]
+      }
+    },
+    {
+      "id": "A07",
+      "categorie": "recherche par auteur",
+      "requete": "hergé",
+      "lang": "fr",
+      "source": "connaissance (auteur de BD, accent)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "trouveSaga": true
+      },
+      "detail": {
+        "ms": 2730,
+        "statut": 200,
+        "auteurRetenu": "Hergé",
+        "nbCartes": 3,
+        "top": [
+          "[serie] Tintin (25)",
+          "[serie] The Adventures of Jo, Zette and Jocko (5)",
+          "[serie] Quick & Flupke (12)"
+        ]
+      }
+    },
+    {
+      "id": "A08",
+      "categorie": "recherche par auteur",
+      "requete": "frank herbert",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "trouveSaga": true
+      },
+      "detail": {
+        "ms": 2705,
+        "statut": 200,
+        "auteurRetenu": "Frank Herbert",
+        "nbCartes": 4,
+        "top": [
+          "[serie] Dune (8)",
+          "[serie] The Pandora Sequence (3)",
+          "[livre] Et l'homme créa un dieu : Prélude à Dune",
+          "[livre] La Ruche d'Hellstrom"
+        ]
+      }
+    },
+    {
+      "id": "A09",
+      "categorie": "recherche par auteur",
+      "requete": "nothomb",
+      "lang": "fr",
+      "source": "connaissance (nom seul)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true
+      },
+      "detail": {
+        "ms": 2720,
+        "statut": 200,
+        "auteurRetenu": "Amélie Nothomb",
+        "nbCartes": 20,
+        "top": [
+          "[livre] Stupeur et tremblements",
+          "[livre] Soif",
+          "[livre] Antéchrista",
+          "[livre] Acide sulfurique",
+          "[livre] Pétronille",
+          "[livre] Mercure"
+        ]
+      }
+    },
+    {
+      "id": "A10",
+      "categorie": "recherche par auteur",
+      "requete": "j k rowlin",
+      "lang": "fr",
+      "source": "connaissance (faute de frappe)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "trouveSaga": true
+      },
+      "detail": {
+        "ms": 2742,
+        "statut": 200,
+        "auteurRetenu": "J.K. Rowling",
+        "nbCartes": 9,
+        "top": [
+          "[serie] Harry Potter (7)",
+          "[serie] Hogwarts Library (3)",
+          "[serie] Cormoran Strike (9)",
+          "[livre] Une place à prendre",
+          "[serie] Fantastic Beasts: The Original Screenplay (3)",
+          "[serie] Pottermore Presents (3)"
+        ]
+      }
+    },
+    {
+      "id": "A11",
+      "categorie": "recherche par auteur",
+      "requete": "joël dicker",
+      "lang": "fr",
+      "source": "connaissance (accent)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true
+      },
+      "detail": {
+        "ms": 2735,
+        "statut": 200,
+        "auteurRetenu": "Joël Dicker",
+        "nbCartes": 4,
+        "top": [
+          "[serie] Marcus Goldman (3)",
+          "[livre] La Disparition de Stephanie Mailer: Roman",
+          "[livre] Un animal sauvage",
+          "[livre] La Très Catastrophique Visite du Zoo"
+        ]
+      }
+    },
+    {
+      "id": "N01",
+      "categorie": "ISBN",
+      "requete": "9782070541270",
+      "lang": "fr",
+      "source": "mesure du 2026-10-05 : le premier ISBN noté (…612758) était Le Petit Prince ; …541270 vérifié en ligne = Harry Potter à l'école des sorciers, Gallimard Jeunesse",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "edition": true,
+        "couverture": true,
+        "pages": true
+      },
+      "detail": {
+        "ms": 491,
+        "statut": 200,
+        "titre": "Harry Potter à l'école des sorciers",
+        "langue": "fr",
+        "editeur": "Gallimard Jeunesse"
+      }
+    },
+    {
+      "id": "N02",
+      "categorie": "ISBN",
+      "requete": "0441172717",
+      "lang": "fr",
+      "source": "connaissance (ISBN-10, clé vérifiée)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "edition": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 492,
+        "statut": 200,
+        "titre": "Dune",
+        "langue": "en",
+        "editeur": "Ace"
+      }
+    },
+    {
+      "id": "N03",
+      "categorie": "ISBN",
+      "requete": "9780547928227",
+      "lang": "fr",
+      "source": "connaissance (clé vérifiée)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "edition": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 513,
+        "statut": 200,
+        "titre": "The Hobbit",
+        "langue": "en",
+        "editeur": "Houghton Mifflin Harcourt"
+      }
+    },
+    {
+      "id": "N04",
+      "categorie": "ISBN",
+      "requete": "A_RELEVER_979",
+      "lang": "fr",
+      "source": "a_verifier: un ISBN 979-10 réel relevé à la BnF avant la mesure",
+      "verdict": "ignore",
+      "axes": {
+        "ignore": true
+      },
+      "detail": {
+        "ignore": "ISBN à relever auprès de la BnF avant la mesure"
+      }
+    },
+    {
+      "id": "N05",
+      "categorie": "ISBN",
+      "requete": "9789999999991",
+      "lang": "fr",
+      "source": "connaissance (ISBN-13 à clé valide mais inexistant : 404 propre attendu)",
+      "verdict": "reussi",
+      "axes": {
+        "reponse": true,
+        "rapide": true
+      },
+      "detail": {
+        "ms": 618,
+        "statut": 404
+      }
+    },
+    {
+      "id": "N06",
+      "categorie": "ISBN",
+      "requete": "123",
+      "lang": "fr",
+      "source": "connaissance (forme invalide : rejet propre, pas d'erreur 500)",
+      "verdict": "reussi",
+      "axes": {
+        "reponse": true,
+        "rapide": true
+      },
+      "detail": {
+        "ms": 1,
+        "statut": 400
+      }
+    },
+    {
+      "id": "V01",
+      "categorie": "titre accentué",
+      "requete": "ça",
+      "lang": "fr",
+      "source": "connaissance (titre très court)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 889,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Ca - tome 2 — Stephen King"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 373525,
+          "titre": "Ca - tome 2",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "V02",
+      "categorie": "titre accentué",
+      "requete": "éragon",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "edition": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Inheritance Cycle (5) — Christopher Paolini"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 5464,
+          "titre": "The Inheritance Cycle",
+          "type": "serie"
+        },
+        "msSerie": 2,
+        "tomes": 5,
+        "disponibles": 5,
+        "totalPrincipal": 5,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0
+      }
+    },
+    {
+      "id": "V03",
+      "categorie": "article de tête",
+      "requete": "hobbit",
+      "lang": "fr",
+      "source": "connaissance (sans article)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 428,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Middle Earth (4) — J.R.R. Tolkien",
+          "[serie] Bilbo Le Hobbit Bande Dessinée (2) — Wenzel, J.R.R. Tolkien"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 127396,
+          "titre": "Middle Earth",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "V04",
+      "categorie": "article de tête",
+      "requete": "le hobbit",
+      "lang": "fr",
+      "source": "connaissance (avec article ; doit donner le même premier résultat que V03)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1636,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[serie] Middle Earth (4) — J.R.R. Tolkien",
+          "[serie] Le Seigneur des anneaux (3) — J.R.R. Tolkien, Tove Jansson",
+          "[serie] Bilbo Le Hobbit Bande Dessinée (2) — Wenzel, J.R.R. Tolkien"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 127396,
+          "titre": "Middle Earth",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "F01",
+      "categorie": "faute de frappe",
+      "requete": "harri poter",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "echoue",
+      "axes": {
+        "sante": true,
+        "rapide": "partiel",
+        "trouve": false
+      },
+      "detail": {
+        "ms": 3782,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Chronicles of the Overworld (4) — Licia Troisi"
+        ],
+        "rang": 0,
+        "trouveRaison": "auteur ou type attendu absent"
+      }
+    },
+    {
+      "id": "F02",
+      "categorie": "faute de frappe",
+      "requete": "le seigneur des aneaux",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "partiel",
+      "axes": {
+        "sante": true,
+        "rapide": "partiel",
+        "trouve": true,
+        "complet": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 7240,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Le Seigneur des anneaux (3) — J.R.R. Tolkien",
+          "[livre] Le Seigneur des Anneaux, Tome 2 : Les deux Tours — J.R.R. Tolkien"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1130,
+          "titre": "Le Seigneur des anneaux",
+          "type": "serie"
+        },
+        "msSerie": 1,
+        "tomes": 3,
+        "disponibles": 3,
+        "totalPrincipal": 3,
+        "indisponibles": 0,
+        "aParaitre": 0
+      }
+    },
+    {
+      "id": "F03",
+      "categorie": "faute de frappe",
+      "requete": "hunger gamez",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "partiel",
+      "axes": {
+        "sante": true,
+        "rapide": "partiel",
+        "trouve": true,
+        "complet": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 3204,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Hunger Games (5) — Suzanne Collins"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1015,
+          "titre": "The Hunger Games",
+          "type": "serie"
+        },
+        "msSerie": 1,
+        "tomes": 5,
+        "disponibles": 5,
+        "totalPrincipal": 5,
+        "indisponibles": 0,
+        "aParaitre": 0
+      }
+    },
+    {
+      "id": "L01",
+      "categorie": "titre anglais cherché en français",
+      "requete": "lord of the rings",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 977,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Le Seigneur des anneaux (3) — J.R.R. Tolkien",
+          "[livre] Le Seigneur des Anneaux, Tome 2 : Les deux Tours — J.R.R. Tolkien"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1130,
+          "titre": "Le Seigneur des anneaux",
+          "type": "serie"
+        },
+        "msSerie": 1,
+        "tomes": 3,
+        "disponibles": 3,
+        "totalPrincipal": 3,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 3
+        }
+      }
+    },
+    {
+      "id": "L02",
+      "categorie": "titre anglais cherché en français",
+      "requete": "the little prince",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1028,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[livre] Le Petit Prince — Antoine de Saint-Exupéry"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 115005,
+          "titre": "Le Petit Prince",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "L03",
+      "categorie": "titre anglais cherché en français",
+      "requete": "a song of ice and fire",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "edition": true
+      },
+      "detail": {
+        "ms": 1646,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Le Trône de fer (5) — George R.R. Martin"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 981,
+          "titre": "Le Trône de fer",
+          "type": "serie"
+        },
+        "msSerie": 2,
+        "tomes": 6,
+        "disponibles": 5,
+        "totalPrincipal": 6,
+        "indisponibles": 1,
+        "aParaitre": 1,
+        "editionsAutreLangue": 0
+      }
+    },
+    {
+      "id": "L04",
+      "categorie": "titre français cherché en anglais",
+      "requete": "le petit prince",
+      "lang": "en",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 957,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] The Little Prince — Antoine de Saint-Exupéry",
+          "[livre] I Am the Little Prince / Je suis le Petit Prince — Antoine de Saint-Exupéry"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 115005,
+          "titre": "The Little Prince",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "L05",
+      "categorie": "titre français cherché en anglais",
+      "requete": "le seigneur des anneaux",
+      "lang": "en",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "edition": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1649,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] The Lord of the Rings (3) — J.R.R. Tolkien"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1130,
+          "titre": "The Lord of the Rings",
+          "type": "serie"
+        },
+        "msSerie": 6023,
+        "tomes": 3,
+        "disponibles": 3,
+        "totalPrincipal": 3,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0
+      }
+    },
+    {
+      "id": "L06",
+      "categorie": "lang=en",
+      "requete": "game of thrones",
+      "lang": "en",
+      "source": "a_verifier: Wikipédia (5 parus + 2 à paraître)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1602,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[serie] A Song of Ice and Fire (5) — George R.R. Martin",
+          "[serie] A Game of Thrones: The Graphic Novel (14) — Daniel Abraham, George R.R. Martin",
+          "[serie] A Song of Ice and Fire: The Graphic Novels (7) — Daniel Abraham, George R.R. Martin"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 981,
+          "titre": "A Song of Ice and Fire",
+          "type": "serie"
+        },
+        "msSerie": 2571,
+        "tomes": 6,
+        "disponibles": 6,
+        "totalPrincipal": 6,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 6
+        }
+      }
+    },
+    {
+      "id": "L07",
+      "categorie": "lang=en",
+      "requete": "dune",
+      "lang": "en",
+      "source": "a_verifier: Wikipédia",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 649,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Dune (6) — Frank Herbert",
+          "[serie] Dune Sequels (2) — Brian Herbert, Kevin J. Anderson"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1150,
+          "titre": "Dune",
+          "type": "serie"
+        },
+        "msSerie": 3236,
+        "tomes": 8,
+        "disponibles": 6,
+        "totalPrincipal": 8,
+        "indisponibles": 2,
+        "aParaitre": 2,
+        "editionsAutreLangue": 0
+      }
+    },
+    {
+      "id": "L08",
+      "categorie": "lang=en",
+      "requete": "harry potter",
+      "lang": "en",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "complet": true,
+        "ordre": true,
+        "edition": true,
+        "couverture": true,
+        "propre": true
+      },
+      "detail": {
+        "ms": 1121,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Harry Potter (7) — J.K. Rowling, Mary GrandPré"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1185,
+          "titre": "Harry Potter",
+          "type": "serie"
+        },
+        "msSerie": 2016,
+        "tomes": 7,
+        "disponibles": 7,
+        "totalPrincipal": 7,
+        "indisponibles": 0,
+        "aParaitre": 0,
+        "editionsAutreLangue": 0,
+        "couverture": {
+          "sans": 0,
+          "approximatives": 0,
+          "partagees": 0,
+          "sur": 7
+        }
+      }
+    },
+    {
+      "id": "K01",
+      "categorie": "coffret ou intégrale",
+      "requete": "harry potter coffret",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1194,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Harry Potter (7) — J.K. Rowling, Mary GrandPré"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1185,
+          "titre": "Harry Potter",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "K02",
+      "categorie": "coffret ou intégrale",
+      "requete": "le seigneur des anneaux intégrale",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "partiel",
+      "axes": {
+        "sante": true,
+        "rapide": "partiel",
+        "trouve": true
+      },
+      "detail": {
+        "ms": 3846,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[serie] Le Seigneur des anneaux (3) — J.R.R. Tolkien",
+          "[livre] Le Seigneur des Anneaux, Tome 2 : Les deux Tours — J.R.R. Tolkien"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1130,
+          "titre": "Le Seigneur des anneaux",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "K03",
+      "categorie": "coffret ou intégrale",
+      "requete": "sherlock holmes intégrale",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 2721,
+        "statut": 200,
+        "nbCartes": 1,
+        "top": [
+          "[serie] Sherlock Holmes (10) — Arthur Conan Doyle, Sidney Paget"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1098,
+          "titre": "Sherlock Holmes",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "D01",
+      "categorie": "doublon de titre",
+      "requete": "les fourmis",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1623,
+        "statut": 200,
+        "nbCartes": 7,
+        "top": [
+          "[serie] La Saga des Fourmis (3) — Bernard Werber",
+          "[livre] Les Fourmis — Boris Vian",
+          "[livre] Les Fourmis — Hadley Dyer"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 11905,
+          "titre": "La Saga des Fourmis",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "D02",
+      "categorie": "doublon de titre",
+      "requete": "origine",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1614,
+        "statut": 200,
+        "nbCartes": 4,
+        "top": [
+          "[serie] Robert Langdon (6) — Dan Brown",
+          "[serie] Lux (5) — Jennifer L. Armentrout",
+          "[livre] L' origine des espèces au moyen de la sélection naturelle — Charles Darwin"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 1084,
+          "titre": "Robert Langdon",
+          "type": "serie"
+        }
+      }
+    },
+    {
+      "id": "D03",
+      "categorie": "doublon de titre",
+      "requete": "inferno",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1606,
+        "statut": 200,
+        "nbCartes": 3,
+        "top": [
+          "[livre] Inferno — Dan Brown",
+          "[serie] The Divine Comedy (3) — Dante Alighieri, Mark Musa",
+          "[livre] Inferno — August Strindberg, Carlo Picchio"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 99335,
+          "titre": "Inferno",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "D04",
+      "categorie": "doublon de titre",
+      "requete": "la chute",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1644,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] La chute — Albert Camus, Justin O'Brien",
+          "[serie] Hyperion Cantos (4) — Dan Simmons, Guy Abadia"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 216850,
+          "titre": "La chute",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "T01",
+      "categorie": "titre très court ou ambigu",
+      "requete": "it",
+      "lang": "fr",
+      "source": "connaissance (cas limite : on mesure surtout l'absence d'erreur)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1606,
+        "statut": 200,
+        "nbCartes": 4,
+        "top": [
+          "[livre] Ca - tome 2 — Stephen King",
+          "[serie] It Ends with Us (2) — Colleen Hoover",
+          "[serie] Losing It (3) — Cora Carmack"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 373525,
+          "titre": "Ca - tome 2",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "T02",
+      "categorie": "titre très court ou ambigu",
+      "requete": "nous",
+      "lang": "fr",
+      "source": "a_verifier: BnF (cas limite)",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true
+      },
+      "detail": {
+        "ms": 1616,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] Nous — Yevgeny Zamyatin, Clarence Brown",
+          "[serie] Cycle des Dieux (3) — Bernard Werber"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 445735,
+          "titre": "Nous",
+          "type": "livre"
+        }
+      }
+    },
+    {
+      "id": "T03",
+      "categorie": "titre très court ou ambigu",
+      "requete": "la peste",
+      "lang": "fr",
+      "source": "connaissance",
+      "verdict": "reussi",
+      "axes": {
+        "sante": true,
+        "rapide": true,
+        "trouve": true,
+        "couverture": true
+      },
+      "detail": {
+        "ms": 1624,
+        "statut": 200,
+        "nbCartes": 2,
+        "top": [
+          "[livre] La peste — Albert Camus, Stuart Gilbert",
+          "[livre] La peste, Tome 1 — Ryota Kurumado, Albert Camus"
+        ],
+        "rang": 1,
+        "carte": {
+          "id": 149844,
+          "titre": "La peste",
+          "type": "livre"
+        }
+      }
+    }
+  ]
+}

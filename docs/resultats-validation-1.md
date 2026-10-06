@@ -65,6 +65,38 @@ Sorties : `sorties/validation-<nom>.md` et `.json` (dossier non versionné). La 
 - **Attendus à vérifier avant d'y voir un défaut** (rendu = annoncé par Hardcover) : Sorceleur, Hypérion, Millenium, Sherlock Holmes, Poirot, Jack Reacher, Royaumes de feu, Tintin, Sandman (75 rendus !), Saga (comics), Walking Dead.
 - **Recherche (code)** : L01 « lord of the rings » (alias), K02 « … intégrale » (0 résultat), A10 « j k rowlin », F01 « harri poter » ; F02, F03, K03 sont seulement « lents » (> 3 s) parce que la copie locale démarre à froid : à remesurer en ligne.
 
+## 3 ter. Mesure 3 — après corrections de données et correctifs de recherche (2026-10-06, copie locale du code + corrections de la base)
+
+**100 réussis sur 116 (86,2 %)**, 3 partiels, 13 échoués ; axes 96,4 %. Détail : `docs/resultats-validation-1-apres2-brut.md`, `test/fixtures-pertinence/mesures/validation-apres2.json`. Suite de tests : **182/182**.
+
+**Corrections de DONNÉES appliquées en production le 2026-10-06** (`npm run corriger`, réversibles ; sauvegardées dans `data/overrides.json`) :
+| Quoi | Pourquoi |
+|---|---|
+| Série 1185 (Harry Potter) : exclure la position 8 | pièce de théâtre en lituanien, hors des 7 tomes annoncés |
+| Série 5193 (Percy Jackson) : exclure la position 8 | espace réservé « Untitled #8 » sans édition |
+| Alias « lord of the rings » → « le seigneur des anneaux » | en `lang=fr`, la saga arrivait 5e derrière des livres anglais |
+Vérifiés en ligne : S01, L08, L01, L03, S28 passent.
+**Non corrigés volontairement** : « L'Intégrale 1…5 » du Trône de fer = vrais titres d'éditions (mon test les prenait à tort pour des coffrets, corrigé dans le lanceur) ; Maigret tome 19 (omnibus) et Assassin royal tome 14 : seul candidat à cette position, l'exclure ferait un trou.
+
+**Correctifs de CODE (branche seulement, non déployés)** — chacun avec test écrit avant :
+1. `e91fc2e` tomes rattachés à une autre saga (voir mesure 2).
+2. `2a0181d` **mots parasites** : « … intégrale », « coffret », « tome 2 », « saga » en tête/fin de requête sont retirés pour un essai supplémentaire quand la réponse est faible (« le seigneur des anneaux intégrale » ne rendait rien).
+3. dernier commit : **auteur avec faute** (« j k rowlin ») : un auteur quasi inconnu (≤ 2 livres) qui contient exactement les mots tapés ne l'emporte plus sur un vrai auteur (≥ 50 livres) parmi les candidats.
+
+### Attendus vérifiés auprès de sources externes (2026-10-06)
+Sorceleur (5 romans + recueils, jusqu'à 8), Hypérion (4 romans, +1 novella), Millenium (6 romans + 2 de Smirnoff), Sherlock Holmes (4 romans + 5 recueils = 9), Poirot (33 romans + nouvelles), Jack Reacher (30 parus, 31e en oct. 2026), Royaumes de feu (≥ 14), Tintin (23 albums + Alph-Art + Lac aux requins), Saga comics (12 parus + 13, 14 annoncés). Ajustés dans le jeu avec leur source.
+
+### Les 13 échecs qui restent
+| Cas | Cause | Détail |
+|---|---|---|
+| C02 Sandman | **Hardcover** | 75 numéros isolés au lieu de 10 volumes (titres mêlés) : pas réparable par exclusion |
+| B03 Lucky Luke 70/82, B05 Gaston 7/14, S30 Geronimo 81/82, C04 Walking Dead 31/32 | **limite du correctif** (60 positions / 400 lignes) ou Hardcover incomplet | à examiner ; Gaston est aussi lent (> 3 s) |
+| S24 Maigret, S11 Assassin royal | intrus (omnibus) à une position unique | choix : laisser (pas de trou) ; attendu de S11 (13 à 16) à vérifier (BnF) |
+| S03, S06, S21, S26, S27 | **couverture** approximative ou absente (Hardcover/Open Library n'ont pas l'image de l'édition) | `corriger couverture` exige une image source fiable et libre ; non fait |
+| S26 (édition « autre langue ») | **proxy du lanceur** : un ISBN 978-1 (Createspace) peut être du français | à affiner |
+| F01 « harri poter » | **limite Hardcover** (2 fautes) | acceptée |
+| F02, F03, K02 « partiels » | lenteur > 3 s sur la copie locale à froid | à remesurer en ligne après déploiement |
+
 ## 4. Ce qui reste à faire (dans l'ordre)
 
 1. ~~Récupérer le `.env` du service~~ **Fait le 2026-10-06** (clés Hardcover et Supabase copiées depuis leurs tableaux de bord, testées ; `.env` ignoré par git ; à copier sur la clé USB en fin de journée). Sur un autre poste : recopier ce `.env` dans `vault-books-api/` (`HARDCOVER_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `APP_KEY`).
