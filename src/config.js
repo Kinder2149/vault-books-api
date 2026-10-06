@@ -4,6 +4,7 @@ const JOUR = 24 * 60 * 60 * 1000;
 
 export const TTL = {
   recherche: 7 * JOUR,
+  rechercheVide: 60 * 60 * 1000, // une recherche sans résultat n'est pas figée 7 jours : une panne passagère ou un livre catalogué entre-temps se rattrapent en 1 h
   serie: 1 * JOUR,   // une saga en cours peut recevoir un tome : on la relit chaque jour
   isbn: 30 * JOUR,   // une édition ne change presque jamais
   isbnAbsent: 1 * JOUR,         // un ISBN inconnu aujourd'hui peut être catalogué demain

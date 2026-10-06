@@ -20,6 +20,7 @@ import { utilisable, petite } from './images.js';
 import { formatNormalise, pagesPlausibles } from './formats.js';
 
 export const VERSION_CACHE = 'v7';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
+const ttlRecherche = (v) => (v?.resultats?.length ? TTL.recherche : TTL.rechercheVide);   // une réponse vide se retente après 1 h
 const MAX_LIVRES_VERIFIES = 60;
 const NB_RESULTATS = 20;
 const CONCURRENCE_COUVERTURES = 4;
@@ -265,7 +266,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     const q = normaliser(texte);
     if (q.length < 2) throw new ErreurRequete('Recherche trop courte (2 caractères minimum).');
 
-    return avecCache(`search:${VERSION_CACHE}:${lang}:${q}`, TTL.recherche, async () => {
+    return avecCache(`search:${VERSION_CACHE}:${lang}:${q}`, ttlRecherche, async () => {
       const idx = indexer(await lireOverrides());
       const cartes = await meilleuresCartes(texte, idx, lang, src);
       return { requete: texte, langue: lang, ...(await finaliser(cartes, lang, { ecarter: true })) };
@@ -290,7 +291,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     const q = normaliser(texte);
     if (q.length < 2) throw new ErreurRequete('Recherche trop courte (2 caractères minimum).');
 
-    return avecCache(`auteur:${VERSION_CACHE}:${lang}:${q}`, TTL.recherche, async () => {
+    return avecCache(`auteur:${VERSION_CACHE}:${lang}:${q}`, ttlRecherche, async () => {
       const idx = indexer(await lireOverrides());
       const docs = await src.rechercherAuteurs(texte, 5);
       const mots = q.split(' ');

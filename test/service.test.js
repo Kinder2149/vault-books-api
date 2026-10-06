@@ -332,3 +332,14 @@ test("livre : le résumé n'est rendu que dans la langue demandée (un résumé 
   assert.equal(en.resumeLangue, 'en');
   assert.match(en.resume, /kingdom where magic/);
 });
+
+test('une recherche sans résultat est relue après 1 h, une recherche avec résultats reste 7 jours', async () => {
+  const lecture = (resultats, ageMs) => ({ async get() { return { valeur: { requete: 'x', langue: 'fr', resultats }, ageMs }; }, async set() {} });
+  const hc = faux({ hits: [] });
+  const vide = creerService({ hardcover: hc, cache: lecture([], 2 * 3600 * 1000) });
+  const r1 = await vide.rechercher('zzzz introuvable', 'fr');
+  assert.equal(r1.cache, 'absent');                 // l'entrée vide de 2 h est recalculée
+  const pleine = creerService({ hardcover: hc, cache: lecture([{ titre: 'Dune' }], 2 * 3600 * 1000) });
+  const r2 = await pleine.rechercher('dune', 'fr');
+  assert.equal(r2.cache, 'frais');                  // une entrée avec résultats de 2 h reste servie
+});
