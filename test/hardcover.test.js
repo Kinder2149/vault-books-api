@@ -102,3 +102,45 @@ test("Hardcover : editionsEnLangue avec voisines — un second champ, et l'image
   await hc.editionsEnLangue([10], 'fr');
   assert.doesNotMatch(corps.query, /voisines/);
 });
+
+// ---- saga : les tomes rattachés à une autre saga « mise en avant » ne doivent pas disparaître (validation du catalogue, 2026-10-06)
+function hardcoverFauxPourSerie(reponses) {
+  const requetes = [];
+  const fetchImpl = async (_url, init) => {
+    const corps = JSON.parse(init.body);
+    requetes.push(corps);
+    return reponse(200, { data: reponses.shift() });
+  };
+  const h = creerHardcover({ cle: 'x', fetchImpl, limiteur: async () => {}, pausesReessaiMs: [] });
+  return { h, requetes };
+}
+const ligne = (position, id, titre, users = 10) => ({ position, book: { id, title: titre, users_count: users, release_date: null, image: null } });
+
+test('saga : un tome absent de la requête « mise en avant » est retrouvé par une 2e requête ciblée sur les positions manquantes', async () => {
+  const { h, requetes } = hardcoverFauxPourSerie([
+    { series_by_pk: { id: 1150, name: 'Dune', primary_books_count: 4, book_series: [ligne(1, 1, 'Dune'), ligne(2, 2, 'Dune Messiah'), ligne(2, 22, 'Le Messie de Dune')] } },
+    { series_by_pk: { book_series: [ligne(3, 3, 'Children of Dune', 500), ligne(4, 4, 'God Emperor of Dune', 400)] } },
+  ]);
+  const s = await h.serie(1150);
+  assert.equal(requetes.length, 2);
+  assert.deepEqual(requetes[1].variables.positions, [3, 4]);
+  assert.deepEqual([...new Set(s.book_series.map((e) => e.position))].sort(), [1, 2, 3, 4]);
+  assert.equal(s.book_series.length, 5);   // les 3 lignes de départ (dont la traduction du tome 2) + les 2 retrouvées
+});
+
+test('saga : si tous les tomes annoncés sont là, aucun appel de plus (le quota Hardcover est compté)', async () => {
+  const { h, requetes } = hardcoverFauxPourSerie([
+    { series_by_pk: { id: 5, name: 'Complète', primary_books_count: 2, book_series: [ligne(1, 1, 'A'), ligne(2, 2, 'B')] } },
+  ]);
+  await h.serie(5);
+  assert.equal(requetes.length, 1);
+});
+
+test("saga : un total annoncé inconnu (null) ou une 2e requête qui échoue ne casse pas la saga", async () => {
+  const { h } = hardcoverFauxPourSerie([{ series_by_pk: { id: 6, name: 'Sans total', primary_books_count: null, book_series: [ligne(1, 1, 'A')] } }]);
+  assert.equal((await h.serie(6)).book_series.length, 1);
+  let n = 0;
+  const fetchImpl = async () => { n += 1; return n === 1 ? reponse(200, { data: { series_by_pk: { id: 7, name: 'X', primary_books_count: 3, book_series: [ligne(1, 1, 'A')] } } }) : reponse(500, {}); };
+  const h2 = creerHardcover({ cle: 'x', fetchImpl, limiteur: async () => {}, pausesReessaiMs: [] });
+  assert.equal((await h2.serie(7)).book_series.length, 1);
+});
