@@ -66,7 +66,7 @@ function noterSerie(c, serie, lang) {
   detail.indisponibles = tomes.filter((t) => t.disponible === false).length;
   detail.aParaitre = serie.aParaitre;
   const annonces = serie.totalPrincipal || 0;
-  axes.complet = tomes.length >= min && tomes.length <= max && tomes.length >= annonces;
+  axes.complet = tomes.length >= min && tomes.length <= max && (c.attendu.annoncesIgnore || tomes.length >= annonces);
   if (!axes.complet) detail.completRaison = `${tomes.length} tomes rendus, ${annonces} annoncés par le service, ${min === max ? min : `${min} à ${max}`} attendus`;
   if (c.attendu.aucunTomeCache) { detail.tomesMarquesIndisponibles = detail.indisponibles; }
   if (c.attendu.ordre) {
@@ -93,7 +93,7 @@ function noterSerie(c, serie, lang) {
     axes.couverture = pb === 0 ? true : (dispos.length && pb / dispos.length <= 0.1 ? 'partiel' : false);
   }
   const parasites = tomes.filter((t) => PARASITE.test(t.titre || '')).map((t) => t.titre);
-  if (!/coffret|int[eé]grale/.test(c.categorie)) {
+  if (!/coffret|int[eé]grale/.test(c.categorie) && !c.attendu.titresTolere) {
     axes.propre = parasites.length === 0;
     if (parasites.length) detail.parasites = parasites.slice(0, 5);
   }
