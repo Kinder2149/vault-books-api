@@ -305,7 +305,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       if (absents.length && secoursAudio) {
         try {
           const audio = await gql(`query ($ids: [Int!], $lang: String!) { editions(where: {${base}}, ${ordre}) { ${champs} } }`, { ids: absents, lang });
-          for (const e of audio.editions || []) parLivre.set(e.book_id, e);
+          for (const e of audio.editions || []) if (!parLivre.has(e.book_id) && langueDuTitre(e.title) !== autre) parLivre.set(e.book_id, e);
         } catch { /* sans ce complément, ces livres restent « indisponibles » : on ne fait pas échouer la saga */ }
       }
       return parLivre;

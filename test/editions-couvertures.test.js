@@ -135,3 +135,11 @@ test('un livre non paru dont la fiche n’a ni date ni pages (« The Winds of Wi
   assert.equal(s.tomes[0].statut, 'a_paraitre');
   assert.equal(s.aParaitre, 1);
 });
+
+test('édition mal étiquetée sans remplaçante : le secours « audio » ne la remet pas', async () => {
+  const mal = { id: 1, book_id: 10, title: 'The Ugly Truth' };
+  const reponses = [{ data: { editions: [mal] } }, { data: { editions: [mal] } }, { data: { editions: [mal] } }];
+  const fetchImpl = async () => ({ status: 200, ok: true, headers: { get: () => null }, json: async () => reponses.shift() });
+  const hc = creerHardcover({ cle: 'k', fetchImpl, limiteur: async () => {} });
+  assert.equal((await hc.editionsEnLangue([10], 'fr')).has(10), false);
+});
