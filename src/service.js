@@ -8,12 +8,12 @@
  */
 import { TTL, LANGUES, LANGUE_PAR_DEFAUT, LANGUE_BILINGUE } from './config.js';
 import { normaliser } from './text.js';
-import { construireCartes, ecarterBruit } from './rank.js';
+import { construireCartes, ecarterBruit, correspondance } from './rank.js';
 import { construireSerie, fusionnerLangues, projeterSerie, langueDuTitre } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer, urlsMasquees } from './overrides.js';
 import { versIsbn13, versIsbn10 } from './isbn.js';
-import { sansArticleInitial, sansMotsParasites, candidatsAuteur, auteurCorrespond } from './requete.js';
+import { sansArticleInitial, sansMotsParasites, candidatsAuteur, auteurCorrespond, variantesDeFaute } from './requete.js';
 import { nomFamille } from './text.js';
 import { nettoyerResume, langueResume } from './resume.js';
 import { utilisable, petite } from './images.js';
@@ -37,6 +37,9 @@ export const SEUIL_QUOTA_JOUR = 1000;
 const SEUIL_FRANC = 70;
 // Bonus donné aux résultats de l'auteur reconnu dans la requête (« tolkien hobbit » : les livres de Tolkien passent devant les guides sur le Hobbit).
 const BONUS_AUTEUR = 40;
+// Sous ce score de tête (ou sous 70 quand la tête n'a aucun mot en commun avec la requête), la requête est « perdue » : on tente de corriger une faute de frappe (≤ 2 tours de ≤ 6 variantes ; le 2e seulement si le 1er a amélioré le résultat).
+const SEUIL_PERDU = 45;
+const GAIN_MIN_CORRECTION = 15;
 
 const DELAI_BNF_MS = 5000;
 
@@ -143,7 +146,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         cartes = cartes.map((c) => ((c.auteurs || []).some((a) => nomFamille(a) === famille) ? { ...c, score: c.score + BONUS_AUTEUR } : c))
           .sort((a, b) => b.score - a.score);
       }
-      return { cartes, tete: cartes.length ? cartes[0].score : -Infinity };
+      // `sansMot` : la tête de liste ne partage AUCUN mot avec ce qui a été cherché (« harri poter » → « Chronicles of the Overworld ») : signe d'une faute.
+      return { cartes, tete: cartes.length ? cartes[0].score : -Infinity, sansMot: cartes.length > 0 && correspondance(cartes[0].titre, requeteHc) === 0 };
     };
     const quotaBas = () => {
       const restant = hardcover.quota ? hardcover.quota().restantJour : null;
@@ -183,6 +187,22 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
       if (v.tete > meilleur.tete) meilleur = v;
       break;
     }
+
+    /*
+     * FAUTES DE FRAPPE. Hardcover ne tolère qu'une faute par requête : « hary poter » (deux mots mal écrits) ne rend qu'un livre sans rapport.
+     * Si la tête de liste est perdue, on corrige UN mot à la fois (consonne doublée oubliée, i/y…), on garde la meilleure variante si elle
+     * améliore nettement le résultat, puis on recommence une fois (le second mot). Jamais pour une requête qui a déjà une réponse correcte.
+     */
+    let courante = normaliser(cible);
+    for (let tour = 0; tour < 2 && (meilleur.tete < SEUIL_PERDU || (meilleur.tete < SEUIL_FRANC && meilleur.sansMot)) && !quotaBas(); tour += 1) {
+      const variantes = variantesDeFaute(courante, 6);
+      if (!variantes.length) break;
+      const essais = await Promise.all(variantes.map(async (c) => ({ c, v: await evaluer(c.requete).catch(() => null) })));
+      const gagnant = essais.filter((e) => e.v).sort((a, b) => b.v.tete - a.v.tete)[0];
+      if (!gagnant || gagnant.v.tete < meilleur.tete + GAIN_MIN_CORRECTION) break;
+      meilleur = gagnant.v;
+      courante = gagnant.c.requete;
+    }
     return meilleur.cartes;
   }
 
@@ -193,12 +213,17 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
    */
   async function finaliser(cartes, lang, { ecarter }) {
     const ids = cartes.slice(0, NB_RESULTATS).flatMap((c) => c._livres).slice(0, MAX_LIVRES_VERIFIES);
-    const editions = await hardcover.editionsEnLangue(ids, lang, { secoursAudio: false });   // une recherche ne coûte pas un appel de plus pour de l'audio
+    const sagas = cartes.slice(0, NB_RESULTATS).filter((c) => c.type === 'serie').map((c) => c.id);
+    const [editions, totaux] = await Promise.all([
+      hardcover.editionsEnLangue(ids, lang, { secoursAudio: false }),   // une recherche ne coûte pas un appel de plus pour de l'audio
+      sagas.length && hardcover.totauxSeries ? hardcover.totauxSeries(sagas).catch(() => new Map()) : new Map(),
+    ]);
 
     let finales = cartes.map((c) => {
       const edition = editions.get(c._meilleurLivre) || c._livres.map((id) => editions.get(id)).find(Boolean) || null;
       const dispo = Boolean(edition);
       const carte = { ...c, langueDisponible: dispo, score: c.score + (dispo ? 10 : 0) };
+      if (c.type === 'serie' && totaux.has(c.id)) carte.tomes = totaux.get(c.id);   // le nombre de la série elle-même, pas celui de l'index de recherche
       // `statut` : le même vocabulaire que les tomes d'une saga ; `langueTitre` : la langue du titre affiché (null si on ne peut pas trancher).
       carte.statut = dispo ? 'disponible' : 'indisponible_langue';
       carte.langueTitre = c.type === 'serie' ? c.langueNom : (dispo ? lang : langueDuTitre(c.titre));
@@ -216,6 +241,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
 
     // Le bruit s'écarte APRÈS le bonus de langue : c'est le classement final qui désigne la tête de liste.
     if (ecarter) finales = ecarterBruit(finales);
+    // Un score NÉGATIF — un titre bien plus long que la recherche, sans rien pour le sauver — n'est jamais une réponse, même seul (« hary poter » rendait un recueil allemand à −8).
+    finales = finales.filter((c) => c.score >= 0);
     const dansLaLangue = finales.filter((c) => c.langueDisponible);
     const retenues = (dansLaLangue.length ? dansLaLangue : finales).slice(0, NB_RESULTATS);
     return {

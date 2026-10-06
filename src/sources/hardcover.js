@@ -141,6 +141,18 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       }));
     },
 
+    /**
+     * Le nombre de tomes ANNONCÉ de chaque série, lu à la source : l'index de recherche est en retard (« Dune » : 6 dans l'index, 8 dans la série).
+     * Un seul champ, donc un appel, pour toutes les sagas d'une recherche.
+     * @returns {Promise<Map<number, number>>} id de série → nombre de tomes
+     */
+    async totauxSeries(ids) {
+      const liste = [...new Set(ids.map(Number))].filter(Boolean);
+      if (!liste.length) return new Map();
+      const data = await gql('query ($ids: [Int!]) { series(where: {id: {_in: $ids}}) { id primary_books_count } }', { ids: liste });
+      return new Map((data.series || []).filter((s) => Number.isInteger(s.primary_books_count)).map((s) => [s.id, s.primary_books_count]));
+    },
+
     /** L'état d'un livre chez Hardcover : combien d'éditions, d'ISBN, d'images, et ce qu'on sait de lui (pour suivre son enrichissement). */
     async etatLivre(id) {
       const data = await gql(`query ($id: Int!) { books_by_pk(id: $id) { id release_date description image { url }

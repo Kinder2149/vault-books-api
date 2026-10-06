@@ -183,3 +183,36 @@ test("tome sans aucune édition : le titre d'origine du livre (canonical) rempla
   assert.equal(s.tomes[0].langueTitre, 'en');
   assert.equal(s.tomes[0].statut, 'indisponible_langue');
 });
+
+test('recherche : « hary poter » (deux fautes) retrouve Harry Potter par correction d’un mot à la fois ; aucun score négatif n’est renvoyé', async () => {
+  const hp = { id: '1', title: "Harry Potter and the Philosopher's Stone", author_names: ['J.K. Rowling'], users_count: 15000, image: { url: 'https://img/a.jpg' }, alternative_titles: [], compilation: false, featured_series: { position: 1, series: { id: 1185, name: 'Harry Potter', primary_books_count: 7 } } };
+  const bruit = { id: '9', title: 'Ländliches Mörder-Idyll: Vier Krimis', author_names: ['A. Bekker'], users_count: 0, image: null, alternative_titles: [], compilation: false, featured_series: null };
+  const demandees = [];
+  const hc = { ...fauxHc(), async rechercher(q) { demandees.push(q); return q === 'harry potter' ? [hp] : (q === 'hary poter' ? [bruit] : (q === 'harry poter' ? [hp] : [bruit])); }, async editionsEnLangue() { return new Map(); } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire() });
+  const r = await s.rechercher('hary poter', 'fr');
+  assert.equal(r.resultats[0].titre, 'Harry Potter');
+  assert.ok(r.resultats.every((c) => c.score >= 0));
+  assert.ok(demandees.includes('harry poter'));
+});
+
+test('recherche : un livre sans rapport à score négatif n’est jamais rendu, même seul', async () => {
+  const bruit = { id: '9', title: 'Ländliches Mörder-Idyll: Vier Krimis', author_names: ['A. Bekker'], users_count: 0, image: null, alternative_titles: [], compilation: false, featured_series: null };
+  const hc = { ...fauxHc(), async rechercher() { return [bruit]; }, async editionsEnLangue() { return new Map(); } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire(), overrides: { series: {}, couvertures: {}, recherches: {} } });
+  const r = await s.rechercher('zzzz qqqq', 'fr');
+  assert.deepEqual(r.resultats, []);
+});
+
+test('carte de saga : type de saga et nombre de tomes lu à la série (l’index de recherche est en retard)', async () => {
+  const hit = (id, nom, n) => ({ id: String(id), title: nom, author_names: ['Frank Herbert'], users_count: 5000, image: null, alternative_titles: [], compilation: false, featured_series: { position: 1, series: { id, name: nom, primary_books_count: n } } });
+  const hc = { ...fauxHc(), async rechercher() { return [hit(1150, 'Dune', 6), hit(202993, 'Dune Sequels', 2)]; }, async totauxSeries() { return new Map([[1150, 8]]); } };
+  const s = creerService({ hardcover: hc, cache: cacheMemoire() });
+  const r = await s.rechercher('dune', 'fr');
+  const dune = r.resultats.find((c) => c.id === 1150);
+  const suites = r.resultats.find((c) => c.id === 202993);
+  assert.equal(dune.tomes, 8);
+  assert.equal(dune.typeSaga, 'cycle_principal');
+  assert.equal(suites.typeSaga, 'suites');
+  assert.equal(suites.tomes, 2);
+});

@@ -4,6 +4,7 @@
  * pénalité de longueur), complétée par la popularité Hardcover (nombre de lecteurs), qui y manquait.
  */
 import { normaliser, sansArticle, mots, nomFamille } from './text.js';
+import { typeDeSaga } from './series.js';
 
 /** Correspondance titre/requête de 0 à 100 : exact > début > contient > mots présents. */
 export function correspondance(titre, requete) {
@@ -100,6 +101,8 @@ export function construireCartes(hits, requete, { idCanonique = (x) => x, nom = 
       auteurs: hit.author_names || [],
       couverture: (commeSerie ? premier.hit : hit).image?.url || hit.image?.url || null,
       tomes: commeSerie ? g.serie.primary_books_count : null,
+      // cycle_principal | suites | prequelles | spin_off : de quoi présenter « Dune » et « Dune Sequels » ensemble.
+      typeSaga: commeSerie ? typeDeSaga(g.serie.name) : undefined,
       serie: !commeSerie && g.serie ? { id: g.serieId, nom: nomSerie, position } : undefined,
       lecteurs: Math.max(...g.membres.map((m) => m.hit.users_count || 0)),
       annee: hit.release_year || null,

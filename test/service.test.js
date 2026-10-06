@@ -16,7 +16,7 @@ function faux({ hits = [], editions = new Map(), serie = null, panne = false } =
 }
 
 test('une 2e recherche identique est servie par le cache, sans appeler la source', async () => {
-  const hc = faux({ hits: [doc(1, 'Le Feu dans le ciel')], editions: new Map([[1, { title: 'Le Feu dans le ciel', image: { url: 'https://img/e.jpg' } }]]) });
+  const hc = faux({ hits: [doc(1, "Les Chevaliers d'Émeraude")], editions: new Map([[1, { title: 'Le Feu dans le ciel', image: { url: 'https://img/e.jpg' } }]]) });
   const s = creerService({ hardcover: hc, cache: cacheMemoire() });
   const a = await s.rechercher("Chevaliers d'Émeraude", 'fr');
   const b = await s.rechercher("chevaliers d'emeraude", 'fr');   // même requête une fois normalisée

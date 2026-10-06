@@ -79,3 +79,43 @@ export function auteurCorrespond(doc, candidat) {
     return candidat.mots.every((m) => dedans.has(m));
   });
 }
+
+const VOYELLES = new Set(['a', 'e', 'i', 'o', 'u', 'y']);
+
+/** Les graphies voisines d'un mot, de la plus probable à la moins probable (sans doublon, sans le mot lui-même). */
+export function variantesDeMot(mot) {
+  const v = [];
+  const ajouter = (m) => { if (m !== mot && !v.includes(m)) v.push(m); };
+  const lettres = [...mot];
+  // 1. La consonne DOUBLÉE oubliée, entre deux voyelles (« hary » → « harry », « poter » → « potter », « aneau » → « anneau »).
+  for (let i = 1; i < lettres.length - 1; i += 1) {
+    if (!VOYELLES.has(lettres[i]) && VOYELLES.has(lettres[i - 1]) && VOYELLES.has(lettres[i + 1]) && /[a-z]/.test(lettres[i])) {
+      ajouter(lettres.slice(0, i + 1).join('') + lettres.slice(i).join(''));
+    }
+  }
+  // 2. Une consonne doublée à tort (« harrry » → « harry »).
+  for (let i = 1; i < lettres.length; i += 1) if (lettres[i] === lettres[i - 1] && !VOYELLES.has(lettres[i])) ajouter(lettres.slice(0, i).join('') + lettres.slice(i + 1).join(''));
+  // 3. i/y confondus (« harri » → « harry »), en fin de mot ou entre consonnes.
+  for (let i = 0; i < lettres.length; i += 1) {
+    if (lettres[i] === 'i' || lettres[i] === 'y') ajouter(lettres.slice(0, i).join('') + (lettres[i] === 'i' ? 'y' : 'i') + lettres.slice(i + 1).join(''));
+  }
+  // 4. Deux lettres inversées à l'intérieur du mot (« hrary »).
+  for (let i = 1; i < lettres.length - 2; i += 1) if (lettres[i] !== lettres[i + 1]) ajouter(lettres.slice(0, i).join('') + lettres[i + 1] + lettres[i] + lettres.slice(i + 2).join(''));
+  return v;
+}
+
+/**
+ * Les requêtes à essayer quand Hardcover ne reconnaît rien : la requête avec UN mot corrigé à la fois (il ne tolère qu'une faute par requête, mesuré
+ * le 2026-10-06 : « harry poter » passe, « hary poter » et « hary potter » non). Les mots courts (≤ 2 lettres) ne sont pas touchés.
+ * @returns {{requete: string, mot: number, variante: string}[]} au plus `max`, les corrections les plus probables d'abord
+ */
+export function variantesDeFaute(texte, max = 8) {
+  const m = mots(normaliser(texte));
+  const rangs = [];
+  m.forEach((mot, i) => {
+    if (mot.length <= 2 || NUMERO.test(mot)) return;
+    variantesDeMot(mot).forEach((variante, r) => rangs.push({ r, i, variante }));
+  });
+  return rangs.sort((a, b) => a.r - b.r || a.i - b.i).slice(0, max)
+    .map(({ i, variante }) => ({ requete: m.map((x, j) => (j === i ? variante : x)).join(' '), mot: i, variante }));
+}
