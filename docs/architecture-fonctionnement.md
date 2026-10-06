@@ -54,6 +54,8 @@ Toutes sont en `GET`, protégées par la clé d'application (sauf `/v1/health`),
 - **Regroupement** (`src/rank.js`) : une saga devient UNE carte, quel que soit le nombre de tomes ou d'éditions trouvés. Un roman cherché par son titre au milieu d'un grand cycle reste un livre (« germinal »). Coffrets et compilations ne sont jamais « le » livre.
 - **Note** = correspondance du titre (exact > début > contient > mots) + popularité (nombre de lecteurs Hardcover, échelle logarithmique) + bonus de langue ; titres alternatifs pris en compte.
 - **Bruit écarté** quand une réponse franche existe : scores négatifs, titres de plus de 20 mots, séries « techniques » (traductions découpées, ordre de parution, coffrets) et homonymes quasi inconnus d'un autre auteur derrière une œuvre très lue.
+- **Fautes de frappe** : Hardcover ne tolère qu'UNE faute par requête (« harry poter » passe, « hary poter » non). Si la tête de liste est perdue (score < 45, ou < 70 sans aucun mot en commun avec la requête), le service corrige UN mot à la fois (consonne doublée oubliée, i/y, lettres inversées ; ≤ 6 variantes par tour, 2 tours), garde la variante qui améliore d'au moins 15 points, et s'arrête sinon (`src/requete.js` : `variantesDeFaute`). Coût : jusqu'à 6 à 12 appels, seulement sur une requête perdue, jamais en mode économie.
+- **Aucun score négatif** n'est rendu, même seul. Chaque carte de saga porte `typeSaga` et `noms` ; son nombre de tomes est lu à la série elle-même (un appel pour toutes les sagas : l'index de recherche est en retard).
 - **Langue** : seules les œuvres qui ont une édition dans la langue demandée restent ; sinon tout est rendu, avec `langueNonDisponible: true`.
 
 ## 5. Sagas et couvertures
