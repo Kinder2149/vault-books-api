@@ -51,9 +51,24 @@ Sorties : `sorties/validation-<nom>.md` et `.json` (dossier non versionné). La 
 6. **502 ponctuels (2)** au premier passage, absents au rejeu (S06 saga, S08) ; correspond aux 4 % d'erreurs serveur de `/v1/status`. Journaux Vercel : la requête MCP a dépassé le délai ; à relire depuis le tableau de bord Vercel (Logs, filtre 5xx) ou la table `request_log` de Supabase (`select at, route, statut, erreur from request_log where statut >= 500 order by at desc`).
 7. **Attendus à vérifier avant d'en faire des défauts** : Poirot, Maigret, Sherlock Holmes (10 dont 4 indisponibles), Sandman (75 rendus !), One Piece, Astérix, Tintin, Disque-monde, Jack Reacher, Royaumes de feu, Millenium (8 rendus pour 3 à 6 attendus), Hypérion (5 annoncés).
 
+## 3 bis. Mesure 2 — après le correctif « tomes manquants » (2026-10-06, copie locale du service, correctif non déployé)
+
+**85 réussis sur 116 (73,3 %)**, 3 partiels, 28 échoués ; axes 93,5 %. (Départ : 71 réussis, 61,2 %. La hausse mêle le correctif de code et 7 attendus erronés rectifiés dans le jeu.) Détail : `docs/resultats-validation-1-apres1-brut.md`, `test/fixtures-pertinence/mesures/validation-apres1.json`.
+
+**Cause n°2 CONFIRMÉE** (clé Hardcover rebâtie, requête réelle comparée) : `serie()` ne gardait que les livres dont la saga est la saga « mise en avant » (`featured`). Sans ce filtre : Dune 8/8 (6 avant), Narnia 7/7 (3), Ender 6/6 (2), Naruto 72/72 (71), Sorceleur 6 (4).
+**Correctif (commit `e91fc2e`, branche seulement)** : dans `src/sources/hardcover.js`, si des positions entières manquent par rapport au total annoncé, 2e requête limitée à ces positions, sans le filtre ; 0 appel de plus pour une saga complète ; panne de la 2e requête = saga inchangée. 3 tests ajoutés (`test/hardcover.test.js`) : le principal échouait avant, passe après ; suite complète **178/178**. Constaté : Dune rend maintenant 8 tomes, les tomes 7 et 8 (suites) marqués indisponibles faute d'édition française trouvée, **visibles** comme le demande le critère.
+**Limites du correctif** : jusqu'à 60 positions manquantes / 400 lignes par saga ; restent incomplètes les très grandes séries : Lucky Luke 70/82, Gaston 7/14, Geronimo Stilton 81/82, Maigret 74/75, Walking Dead 31/32. Les tomes 0 et 0,5 (préquelles) restent écartés (`position ≥ 1`). Le titre d'un tome sans édition française est parfois en italien/anglais (ex. Dune 7).
+
+### Ce qui échoue encore (28 cas)
+- **Intrus à exclure par donnée** (`exclurePositions`) : Trône de fer (S03, L03 : intégrales), Assassin royal (S11), Maigret (S24, omnibus), Harry Potter tome 8 lituanien (S01, L08), Percy Jackson tome 8 vide (S28).
+- **Couvertures** (donnée) : S03, S06, S21, S26, S27.
+- **Attendus à vérifier avant d'y voir un défaut** (rendu = annoncé par Hardcover) : Sorceleur, Hypérion, Millenium, Sherlock Holmes, Poirot, Jack Reacher, Royaumes de feu, Tintin, Sandman (75 rendus !), Saga (comics), Walking Dead.
+- **Recherche (code)** : L01 « lord of the rings » (alias), K02 « … intégrale » (0 résultat), A10 « j k rowlin », F01 « harri poter » ; F02, F03, K03 sont seulement « lents » (> 3 s) parce que la copie locale démarre à froid : à remesurer en ligne.
+
 ## 4. Ce qui reste à faire (dans l'ordre)
 
-1. **Récupérer le `.env` du service** (voir `PROJET_CONTEXTE.md` §6.2) dans `vault-books-api/` : `HARDCOVER_API_KEY` (confirmer l'hypothèse n°2 et tester un correctif en local), `SUPABASE_URL` + `SUPABASE_SERVICE_KEY` (appliquer les corrections de données). Sans lui, la mission est bloquée à ce point.
+1. ~~Récupérer le `.env` du service~~ **Fait le 2026-10-06** (clés Hardcover et Supabase copiées depuis leurs tableaux de bord, testées ; `.env` ignoré par git ; à copier sur la clé USB en fin de journée). Sur un autre poste : recopier ce `.env` dans `vault-books-api/` (`HARDCOVER_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `APP_KEY`).
+1 bis. ~~Confirmer la cause des tomes manquants et la corriger par le code~~ **Fait** (voir mesure 2), non déployé.
 2. Relever un ISBN 979-10 réel (BnF) pour le cas N04 ; rejouer N01 et N05.
 3. Vérifier les attendus `a_verifier` auprès d'une source externe (BnF, Wikipédia, éditeur), corriger le jeu, ne compter comme défaut que ce qui l'est.
 4. **Corriger par les données** (`npm run corriger -- …`, voir `docs/exploitation.md` §6) : fusion Dune + Dune Sequels, exclusion des intrus (n°3), couvertures (n°4), alias de recherche (`lord of the rings` → `le seigneur des anneaux`).

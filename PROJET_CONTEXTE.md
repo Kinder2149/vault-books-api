@@ -10,8 +10,8 @@
 > 175 tests automatiques (`node --test test/`) ; côté Vault Read 384 tests (`npx vitest run` dans `client/`) ; contrôle en ligne `npm run smoke` 14/14 ; contrat `npm run contrat -- --live` conforme.
 > **Ce qui reste dépend de Kinder** : voir §5 et `docs/a-faire-par-kinder.md`.
 >
-> **MISSION EN COURS (2026-10-05) — validation du catalogue, branche `validation-catalogue`** : jeu de 117 cas + lanceur rejouable ; mesure de départ **71/116 (61 %)**.
-> **Point de reprise : `docs/resultats-validation-1.md`** (critère validé, causes des échecs, étapes restantes). Premier geste : récupérer le `.env` du service (§6.2) — sans lui, pas de corrections.
+> **MISSION EN COURS (2026-10-05) — validation du catalogue, branche `validation-catalogue`** : jeu de 117 cas + lanceur rejouable ; mesure de départ **71/116 (61 %)**, après correctif des tomes manquants **85/116 (73 %)** (correctif sur la branche, **non déployé**, en attente de l'accord de Kinder).
+> **Point de reprise : `docs/resultats-validation-1.md`** (critère validé, causes des échecs, étapes restantes). Le `.env` du service est reconstitué (2026-10-06) ; prochaine étape : corrections par les données (`npm run corriger`), vérification des attendus, rapport final.
 
 ## 1. Pourquoi ce projet
 
