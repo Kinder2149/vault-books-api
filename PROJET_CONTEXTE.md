@@ -10,8 +10,8 @@
 > 175 tests automatiques (`node --test test/`) ; côté Vault Read 384 tests (`npx vitest run` dans `client/`) ; contrôle en ligne `npm run smoke` 14/14 ; contrat `npm run contrat -- --live` conforme.
 > **Ce qui reste dépend de Kinder** : voir §5 et `docs/a-faire-par-kinder.md`.
 >
-> **MISSION EN COURS (2026-10-05) — validation du catalogue, branche `validation-catalogue`** : jeu de 117 cas + lanceur rejouable ; mesure de départ **71/116 (61 %)**, après correctifs de code et corrections de données **100/116 (86 %)**. Corrections de données **déjà en production** ; correctifs de code sur la branche, **non déployés**, en attente de l'accord de Kinder pour fusionner dans `main`.
-> **Point de reprise : `docs/resultats-validation-1.md`** (critère validé, causes des échecs, étapes restantes). Le `.env` du service est reconstitué (2026-10-06) ; prochaine étape : corrections par les données (`npm run corriger`), vérification des attendus, rapport final.
+> **VALIDATION DU CATALOGUE (2026-10-05/06) — correctifs DÉPLOYÉS sur `main` (commit `cc8cbbb`)** : jeu de 117 cas + lanceur rejouable (`npm run validation`) ; score en ligne **103/116 (89 %)**, départ 71/116 (61 %), 0 régression.
+> **Rapport final : `docs/rapport-validation-catalogue.md`** (tableau cas par cas, limites). Reprise / détails : `docs/resultats-validation-1.md`. Reste ouvert : couvertures de 5 sagas (images sources à fournir), 13 cas dus à des limites de Hardcover, relevé d'un ISBN 979 (cas N04), 30 vraies recherches de Kinder à ajouter au jeu, cause des 502 ponctuels.
 
 ## 1. Pourquoi ce projet
 

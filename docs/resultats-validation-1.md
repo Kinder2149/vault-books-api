@@ -1,4 +1,6 @@
-# Validation du catalogue — mesure 1 (état de départ) et reprise
+# Validation du catalogue — mesures et reprise
+
+> **État final : correctifs déployés ; score en ligne 103/116 (88,8 %). Voir `docs/rapport-validation-catalogue.md`.** Après un déploiement qui change le contenu des réponses, vider le cache des sagas/recherches (`delete from cache_entries where key like 'serie:%' or key like 'search:%' or key like 'auteur:%'`, ou incrémenter `VERSION_CACHE`) : sinon l'ancienne réponse est resservie jusqu'à 1 jour (sagas) ou 7 jours (recherches).
 
 > Mission lancée le 2026-10-05, à la suite de l'essai sur téléphone (« Dune » rend 6 tomes sur 8, suites rangées dans « Dune Sequels », « Hunters of Dune » caché ; aucun livre isolé ni préquelle).
 > Branche de travail : **`validation-catalogue`** (jamais `main` avant l'accord explicite de Kinder).
@@ -78,7 +80,7 @@ Sorties : `sorties/validation-<nom>.md` et `.json` (dossier non versionné). La 
 Vérifiés en ligne : S01, L08, L01, L03, S28 passent.
 **Non corrigés volontairement** : « L'Intégrale 1…5 » du Trône de fer = vrais titres d'éditions (mon test les prenait à tort pour des coffrets, corrigé dans le lanceur) ; Maigret tome 19 (omnibus) et Assassin royal tome 14 : seul candidat à cette position, l'exclure ferait un trou.
 
-**Correctifs de CODE (branche seulement, non déployés)** — chacun avec test écrit avant :
+**Correctifs de CODE (déployés sur `main` le 2026-10-06, commit `cc8cbbb`)** — chacun avec test écrit avant :
 1. `e91fc2e` tomes rattachés à une autre saga (voir mesure 2).
 2. `2a0181d` **mots parasites** : « … intégrale », « coffret », « tome 2 », « saga » en tête/fin de requête sont retirés pour un essai supplémentaire quand la réponse est faible (« le seigneur des anneaux intégrale » ne rendait rien).
 3. dernier commit : **auteur avec faute** (« j k rowlin ») : un auteur quasi inconnu (≤ 2 livres) qui contient exactement les mots tapés ne l'emporte plus sur un vrai auteur (≥ 50 livres) parmi les candidats.
