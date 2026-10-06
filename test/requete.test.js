@@ -225,3 +225,15 @@ test("mots parasites : une réponse franche n'est jamais reformulée, et le quot
   assert.deepEqual(r.resultats, []);
   assert.deepEqual(bas.requetes, ['livre:dune intégrale']);
 });
+
+test("auteur avec faute : si le 1er résultat de Hardcover est un quasi-inconnu (« J. K. Rowlin », 1 livre), l'auteur le plus fourni parmi les candidats est retenu", async () => {
+  const hc = fauxAuteurs({ auteurs: [
+    { id: '1', name: 'J. K. Rowlin', alternate_names: [], books_count: 1 },
+    { id: '2', name: 'J.K. Rowling', alternate_names: [], books_count: 480 },
+    { id: '3', name: 'Joanne Rowland', alternate_names: [], books_count: 4 },
+  ], livres: [] });
+  assert.equal((await creerService({ hardcover: hc, cache: cacheMemoire() }).rechercherAuteur('j k rowlin', 'fr')).auteur.id, 2);
+  // un 1er résultat déjà bien fourni reste prioritaire : on ne remplace pas le choix de Hardcover par un autre auteur plus gros
+  const hc2 = fauxAuteurs({ auteurs: [{ id: '5', name: 'Tolkein Fan', books_count: 30 }, { id: '6', name: 'Stephen King', books_count: 500 }], livres: [] });
+  assert.equal((await creerService({ hardcover: hc2, cache: cacheMemoire() }).rechercherAuteur('tolkein', 'fr')).auteur.id, 5);
+});
