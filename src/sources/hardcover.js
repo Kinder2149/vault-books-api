@@ -93,9 +93,23 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
     }
   }
 
+  /**
+   * Les livres d'une série qui n'y sont PAS « mis en avant », aux positions données : les traductions et autres éditions d'un tome.
+   * Marqués `retrouvee` : ces positions ont déjà été élargies, inutile d'y revenir. Une panne remonte à l'appelant.
+   */
+  async function candidatsPositions(id, positions) {
+    const r = await gql(`query ($id: Int!, $positions: [float8!]) { series_by_pk(id: $id) {
+      book_series(where: {featured: {_eq: false}, position: {_in: $positions}, book: {compilation: {_eq: false}}},
+                  order_by: [{position: asc}, {book: {users_count: desc}}], limit: ${LIMITE_LIGNES_RETROUVEES}) {
+        position book { id title users_count release_date image { url width } canonical { id title } } } } }`, { id, positions });
+    return (r.series_by_pk?.book_series || []).map((e) => ({ ...e, retrouvee: true }));
+  }
+
   return {
     /** Le quota, tel que vu dans la dernière réponse (valeurs nulles tant qu'aucun appel n'a eu lieu dans ce processus). */
     quota: () => ({ ...quota }),
+
+    candidatsPositions,
 
     /** Hardcover répond-il ? `__typename` est une requête d'introspection : elle ne compte pas dans le quota (doc officielle). */
     async ping() {
@@ -195,7 +209,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       const data = await gql(`query ($id: Int!) { series_by_pk(id: $id) {
         id name primary_books_count
         book_series(where: {featured: {_eq: true}, position: {_gte: 1}, book: {compilation: {_eq: false}}}, order_by: {position: asc}) {
-          position book { id title users_count release_date image { url width } } } } }`, { id });
+          position book { id title users_count release_date image { url width } canonical { id title } } } } }`, { id });
       const serie = data.series_by_pk || null;
       const annonces = serie?.primary_books_count;
       if (!serie || !Number.isInteger(annonces) || annonces < 1) return serie;
@@ -206,11 +220,7 @@ export function creerHardcover({ cle, fetchImpl = fetch, limiteur = creerLimiteu
       if (!manquantes.length) return serie;
 
       try {
-        const retrouvees = await gql(`query ($id: Int!, $positions: [float8!]) { series_by_pk(id: $id) {
-          book_series(where: {featured: {_eq: false}, position: {_in: $positions}, book: {compilation: {_eq: false}}},
-                      order_by: [{position: asc}, {book: {users_count: desc}}], limit: ${LIMITE_LIGNES_RETROUVEES}) {
-            position book { id title users_count release_date image { url width } } } } }`, { id, positions: manquantes });
-        serie.book_series = serie.book_series.concat(retrouvees.series_by_pk?.book_series || [])
+        serie.book_series = serie.book_series.concat(await candidatsPositions(id, manquantes))
           .sort((a, b) => a.position - b.position);
       } catch { /* la saga reste telle que la 1re requête l'a rendue */ }
       return serie;

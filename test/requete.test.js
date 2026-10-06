@@ -146,7 +146,7 @@ test('auteur : les sagas de l\'auteur en une carte chacune, les livres isolÃ©s Ã
   const r = await creerService({ hardcover: hc, cache: cacheMemoire() }).rechercherAuteur('tolkien', 'fr');
   assert.deepEqual(hc.appels, ['auteurs:tolkien', 'livres:132049']);
   assert.equal(r.mode, 'auteur');
-  assert.deepEqual(r.auteur, { id: 132049, nom: 'J.R.R. Tolkien', livres: 321 });
+  assert.deepEqual(r.auteur, { id: 132049, nom: 'J.R.R. Tolkien', variantes: [], livres: 321 });
   assert.deepEqual(r.autresAuteurs, [{ id: 5, nom: 'Christopher Tolkien', livres: 9 }]);
   assert.deepEqual(r.resultats.map((c) => [c.type, c.titre]), [['serie', 'Middle Earth'], ['serie', 'The Lord of the Rings'], ['livre', 'Letters From Father Christmas']]);
   assert.equal(r.resultats.some((c) => Object.keys(c).some((k) => k.startsWith('_'))), false);   // aucun champ de travail ne fuit

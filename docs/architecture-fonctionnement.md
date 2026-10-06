@@ -30,9 +30,9 @@ Chaque source a **un seul adaptateur** (`src/sources/*.js`) ; remplacer une sour
 
 | Route | Rend | Cache |
 |---|---|---|
-| `GET /v1/search?q=&lang=fr\|en` | Cartes triées : une par œuvre (`livre`) ou par saga (`serie`). Un livre isolé porte ISBN, éditeur, date. | 7 jours |
-| `GET /v1/series/:id?lang=` | La saga : tomes dans l'ordre (volumes coupés en `parties`), édition (ISBN, éditeur) et couverture par tome, `disponibles`/`aParaitre` | 1 jour |
-| `GET /v1/books/:id?lang=` | Toutes les éditions d'un livre (Hardcover + BnF), une par ISBN, couverture par édition | 7 jours (1 h si la BnF n'a pas répondu) |
+| `GET /v1/search?q=&lang=fr\|en\|both` | Cartes triées : une par œuvre (`livre`) ou par saga (`serie`). Un livre isolé porte ISBN, éditeur, date. | 7 jours |
+| `GET /v1/series/:id?lang=fr\|en\|both` | La saga : tomes dans l'ordre (volumes coupés en `parties`), édition (ISBN, éditeur) et couverture par tome, `statut`, `langueTitre`, `noms` {fr, en}, `typeSaga`, compteurs `disponibles`/`indisponibles`/`aParaitre`. Calculée UNE fois pour les deux langues (clé de cache `serie:v6:both:<id>`) | 1 jour |
+| `GET /v1/books/:id?lang=fr\|en\|both` | Toutes les éditions d'un livre (Hardcover + BnF), une par ISBN, couverture par édition | 7 jours (1 h si la BnF n'a pas répondu) |
 | `GET /v1/isbn/:isbn` | L'édition d'un code-barres : éditeur, date, **pages**, langue, couverture, livre, saga. ISBN-10 accepté. **Aucun filtre de langue.** 404 si inconnu | 30 jours (1 j si absent, 5 min si incertain) |
 | `GET /v1/status` | État détaillé (Supabase, Hardcover, quota du jour, statistiques 24 h) ; `?profond=1` teste la BnF | aucun |
 | `GET /v1/health` | « Vivant ? » sans clé, sans appel de source | aucun |
@@ -58,7 +58,7 @@ Toutes sont en `GET`, protégées par la clé d'application (sauf `/v1/health`),
 
 ## 5. Sagas et couvertures
 
-- **Sagas** (`src/series.js`) : par position, on garde le livre qui a une édition dans la langue, puis le plus lu. Les positions décimales (1.1, 1.2…) sont des **volumes coupés** rangés en `parties` sous leur tome ; un tome existant seulement en volumes coupés reste disponible (`viaParties`) ; un tome sans édition dans la langue reste listé (`disponible: false`) ; `aParaitre` = date future, ou ni date ni édition.
+- **Sagas** (`src/series.js`) : par position, on garde le livre qui a une édition dans la langue, puis le plus lu. Les positions décimales (1.1, 1.2…) sont des **volumes coupés** rangés en `parties` sous leur tome ; un tome existant seulement en volumes coupés reste disponible (`viaParties`) ; un tome sans édition dans la langue reste listé avec un `statut` : `indisponible_langue` (l'œuvre est parue, mais pas dans cette langue) ou `a_paraitre` (date future, ou ni date ni édition dans aucune langue) ; son titre est alors celui de l'AUTRE langue, ou le titre d'origine de Hardcover (`canonical`), avec `langueTitre` pour le dire. `lang=both` rend `{ langues: { fr, en } }` (recherche, auteur, livre) ou, pour une saga, des tomes portant `langues: { fr, en }` ; les positions entières sans édition dans une langue sont élargies à tous les livres de la position (Narnia : « Prince Caspian » à la place du volume double).
 - **Couvertures, toujours PAR ISBN** (`src/covers.js`) : correction manuelle > image de l'édition chez Hardcover (≥ 200 px) > Open Library par ISBN (vérifiée par `HEAD`, mise en cache 30 j / 3 j) > miniature > image du livre canonique (marquée `approximative`). Chaque couverture indique sa `source`.
 - **Corrections manuelles** (`src/overrides.js`, tables `series_overrides` et `cover_overrides`) : nom français/anglais d'une saga, séries doublons à fusionner, positions à exclure, couverture d'une édition ou d'un tome. Elles **gagnent toujours** sur Hardcover. Outil : `npm run corriger`. Copie de secours : `data/overrides.json`, réécrit chaque nuit.
 

@@ -41,9 +41,9 @@ Sans `SUPABASE_URL` et `SUPABASE_SERVICE_KEY`, le cache est en mémoire (perdu �
 
 | Route | Rôle |
 |---|---|
-| `GET /v1/search?q=…&lang=fr\|en` | Cartes triées : `serie` (saga) ou `livre` |
-| `GET /v1/series/:id?lang=` | La saga : tomes dans l'ordre, volumes coupés en `parties`, édition et couverture par tome |
-| `GET /v1/books/:id?lang=` | Les éditions d'un livre (Hardcover + BnF) : ISBN, éditeur, année, couverture et sa source |
+| `GET /v1/search?q=…&lang=fr\|en\|both` | Cartes triées : `serie` (saga) ou `livre` |
+| `GET /v1/series/:id?lang=fr\|en\|both` | La saga : tomes dans l'ordre, volumes coupés en `parties`, édition et couverture par tome, `statut` par tome (`disponible` / `indisponible_langue` / `a_paraitre`), nom de saga dans les deux langues. `both` rend les deux langues d'un coup |
+| `GET /v1/books/:id?lang=fr\|en\|both` | Les éditions d'un livre (Hardcover + BnF) : ISBN, éditeur, année, couverture et sa source |
 | `GET /v1/isbn/:isbn` | L'édition d'un code-barres : éditeur, date, pages, langue, couverture, livre, saga |
 | `GET /v1/status` | État détaillé : sources, quota du jour, statistiques des 24 dernières heures |
 | `GET /v1/health` | Vivant ? (sans clé) |

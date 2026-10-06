@@ -16,9 +16,9 @@ export const BUDGET_MS = 40_000;
 export const CLE_NOUVEAUTES = 'controle:nouveautes';
 const MAX_EVENEMENTS = 50;
 
-/** « serie:v5:fr:25608 » → { lang: 'fr', id: 25608 } ; null si la clé n'est pas une clé de saga de cette version. */
+/** « serie:v6:both:25608 » → { lang: 'both', id: 25608 } ; null si la clé n'est pas une clé de saga de cette version (une saga est mise en cache une fois pour les deux langues). */
 export function lireCleSerie(cle, version) {
-  const m = String(cle).match(new RegExp(`^serie:${version}:(fr|en):(\\d+)$`));
+  const m = String(cle).match(new RegExp(`^serie:${version}:(fr|en|both):(\\d+)$`));
   return m ? { lang: m[1], id: Number(m[2]) } : null;
 }
 
@@ -43,7 +43,7 @@ export function creerRafraichissement({ url, cle, service, cache, version, maint
   const base = `${url}/rest/v1`;
 
   async function lignes() {
-    const select = 'key,fetched_at,aparaitre:value->aParaitre,disp:value->disponibles,total:value->totalPrincipal';
+    const select = 'key,fetched_at,aparaitre:value->comptes->fr->aParaitre,disp:value->comptes->fr->disponibles,total:value->totalPrincipal';
     const r = await fetchImpl(`${base}/cache_entries?key=like.${encodeURIComponent(`serie:${version}:*`)}&select=${select}&order=fetched_at.asc&limit=300`, { headers: entetesSupabase(cle) });
     if (!r.ok) throw new Error(`Supabase (lecture des sagas) a répondu ${r.status}`);
     return r.json();
@@ -60,10 +60,11 @@ export function creerRafraichissement({ url, cle, service, cache, version, maint
       for (const s of choisies) {
         if (maintenant() - debut > budgetMs) { arret = 'budget de temps'; break; }
         try {
-          const apres = await service.serie(s.id, s.lang, { rafraichir: true });
+          const apres = await service.serie(s.id, 'both', { rafraichir: true });
           relues += 1;
-          const n = nouveauxTomes(s.disp, apres?.disponibles);
-          if (n > 0) nouveautes.push({ id: s.id, nom: apres.nom, langue: s.lang, nouveaux: n, disponibles: apres.disponibles, le: new Date(maintenant()).toISOString() });
+          const dispo = apres?.comptes?.fr?.disponibles;   // les nouveautés se suivent sur la bibliothèque française
+          const n = nouveauxTomes(s.disp, dispo);
+          if (n > 0) nouveautes.push({ id: s.id, nom: apres.noms.fr, langue: 'fr', nouveaux: n, disponibles: dispo, le: new Date(maintenant()).toISOString() });
         } catch (e) {
           if (e instanceof ErreurQuota) { arret = 'quota du jour'; break; }
           // Une saga qui échoue ne retient pas les autres.
@@ -95,7 +96,8 @@ export function livresARechauffer(sagas, max = 60) {
   const vus = new Set();
   const ids = [];
   for (const s of sagas) {
-    for (const t of s.value?.tomes || []) {
+    for (const t0 of s.value?.tomes || []) {
+      const t = t0.langues?.fr || t0;   // forme bilingue (v6) ou à plat
       if (!t.disponible || !t.livreId || vus.has(t.livreId)) continue;
       vus.add(t.livreId);
       ids.push(t.livreId);

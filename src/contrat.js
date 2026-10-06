@@ -6,6 +6,8 @@ const carte = {
   type: 'string', id: 'number', titre: 'string', auteurs: ['string'], couverture: 'string?', score: 'number',
   'annee?': 'number?', 'date?': 'string?', 'isbn13?': 'string?', 'editeur?': 'string?',
   'serie?': { id: 'number', nom: 'string', 'position?': 'number?' },
+  // Ajoutés par la v6 (bibliothèque bilingue) : « disponible » | « indisponible_langue », langue du titre affiché (null si inconnue), nom d'une saga dans les deux langues.
+  'statut?': 'string', 'langueTitre?': 'string?', 'langueNom?': 'string', 'noms?': { fr: 'string', en: 'string' },
 };
 const couverture = { url: 'string?', 'source?': 'string?', 'approximative?': 'boolean', 'basseDefinition?': 'boolean' };
 
@@ -14,8 +16,10 @@ export const contrat = {
   'search-auteur': { auteur: { id: 'number', nom: 'string', livres: 'number?' }, langueNonDisponible: 'boolean', resultats: [carte] },
   serie: {
     id: 'number', nom: 'string', langue: 'string', totalPrincipal: 'number?',
+    'langueNom?': 'string', 'noms?': { fr: 'string', en: 'string' }, 'typeSaga?': 'string', 'nbTomes?': 'number?', 'indisponibles?': 'number',
     tomes: [{
       position: 'number', titre: 'string', livreId: 'number', disponible: 'boolean', aParaitre: 'boolean',
+      'statut?': 'string', 'langueTitre?': 'string?',
       couverture: 'string?', 'couvertureApproximative?': 'boolean',
       'edition?': { 'id?': 'number?', isbn13: 'string?', 'editeur?': 'string?', 'date?': 'string?' },
       parties: [{ titre: 'string', 'couverture?': 'string?', 'couvertureApproximative?': 'boolean', 'edition?': { isbn13: 'string?', 'editeur?': 'string?', 'date?': 'string?' } }],

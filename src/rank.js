@@ -94,6 +94,9 @@ export function construireCartes(hits, requete, { idCanonique = (x) => x, nom = 
       type: commeSerie ? 'serie' : 'livre',
       id: commeSerie ? g.serieId : Number(hit.id),
       titre: commeSerie ? nomSerie : hit.title,
+      // Une saga porte son nom dans les DEUX langues ; `langueNom` dit dans quelle langue est le `titre` affiché (« en » = repli sur le nom canonique).
+      noms: commeSerie ? { fr: nom(g.serieId, 'fr', g.serie.name), en: nom(g.serieId, 'en', g.serie.name) } : undefined,
+      langueNom: commeSerie ? (nom(g.serieId, lang, null) ? lang : 'en') : undefined,
       auteurs: hit.author_names || [],
       couverture: (commeSerie ? premier.hit : hit).image?.url || hit.image?.url || null,
       tomes: commeSerie ? g.serie.primary_books_count : null,

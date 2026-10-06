@@ -27,7 +27,7 @@ test('une 2e recherche identique est servie par le cache, sans appeler la source
 
 test('source en panne : on rend le résultat périmé plutôt qu\'une erreur', async () => {
   const cache = cacheMemoire();
-  await cache.set('search:v5:fr:dune', { requete: 'dune', langue: 'fr', resultats: [{ titre: 'Dune' }] });
+  await cache.set('search:v6:fr:dune', { requete: 'dune', langue: 'fr', resultats: [{ titre: 'Dune' }] });
   // Le cache est « jeune » ici : on force le périmé en le remplaçant par une entrée ancienne.
   const vieux = { async get() { return { valeur: { requete: 'dune', langue: 'fr', resultats: [{ titre: 'Dune' }] }, ageMs: 99 * 24 * 3600 * 1000 }; }, async set() {} };
   const s = creerService({ hardcover: faux({ panne: true }), cache: vieux });
@@ -86,7 +86,7 @@ test('série inconnue : null, et rien n\'est mis en cache', async () => {
   const cache = cacheMemoire();
   const s = creerService({ hardcover: faux({ serie: null }), cache });
   assert.equal(await s.serie(999999, 'fr'), null);
-  assert.equal(await cache.get('serie:v5:fr:999999'), null);
+  assert.equal(await cache.get('serie:v6:both:999999'), null);
 });
 
 
@@ -246,7 +246,7 @@ test("isbn : une BnF muette ne prouve pas l'absence → réponse null mais « in
   const bnf = { async parIsbn() { throw new Error('BnF injoignable (ECONNRESET)'); } };
   const s = creerService({ hardcover: hc, bnf, cache });
   assert.equal(await s.isbn('9780000000002'), null);
-  const gardee = await cache.get('isbn:v5:9780000000002');
+  const gardee = await cache.get('isbn:v6:9780000000002');
   assert.equal(gardee.valeur.incertain, true);
 });
 

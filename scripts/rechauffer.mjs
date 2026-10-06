@@ -10,7 +10,7 @@ const max = i > 0 ? Number(process.argv[i + 1]) : 60;
 const app = obtenirApp();
 if (!app.cfg.supabaseUrl) { console.error('SUPABASE_URL / SUPABASE_SERVICE_KEY manquants.'); process.exit(2); }
 
-const r = await fetch(`${app.cfg.supabaseUrl}/rest/v1/cache_entries?key=like.${encodeURIComponent(`serie:${VERSION_CACHE}:fr:*`)}&select=key,value&order=fetched_at.desc&limit=40`, { headers: entetesSupabase(app.cfg.supabaseKey) });
+const r = await fetch(`${app.cfg.supabaseUrl}/rest/v1/cache_entries?key=like.${encodeURIComponent(`serie:${VERSION_CACHE}:both:*`)}&select=key,value&order=fetched_at.desc&limit=40`, { headers: entetesSupabase(app.cfg.supabaseKey) });
 if (!r.ok) { console.error(`Supabase a répondu ${r.status}`); process.exit(1); }
 const ids = livresARechauffer(await r.json(), max);
 console.log(`${ids.length} livre(s) à relire.`);

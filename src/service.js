@@ -6,10 +6,10 @@
  * Trajet d'une requête : cache frais → réponse ; sinon source → tri → cache → réponse ;
  * source en panne mais cache périmé disponible → on rend le périmé (mieux que rien, comme dans Vault Read).
  */
-import { TTL, LANGUES, LANGUE_PAR_DEFAUT } from './config.js';
+import { TTL, LANGUES, LANGUE_PAR_DEFAUT, LANGUE_BILINGUE } from './config.js';
 import { normaliser } from './text.js';
 import { construireCartes, ecarterBruit } from './rank.js';
-import { construireSerie } from './series.js';
+import { construireSerie, fusionnerLangues, projeterSerie, langueDuTitre } from './series.js';
 import { fusionnerEditions } from './editions.js';
 import { indexer, urlsMasquees } from './overrides.js';
 import { versIsbn13 } from './isbn.js';
@@ -18,10 +18,11 @@ import { nomFamille } from './text.js';
 import { nettoyerResume, langueResume } from './resume.js';
 import { utilisable, petite } from './images.js';
 
-export const VERSION_CACHE = 'v5';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
+export const VERSION_CACHE = 'v6';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
 const NB_RESULTATS = 20;
 const CONCURRENCE_COUVERTURES = 4;
+const MAX_POSITIONS_ELARGIES = 60;   // tomes dont on cherche les autres éditions d'un coup (au-delà : saga géante, on garde ce que la 1re requête a rendu)
 
 export class ErreurRequete extends Error {}
 
@@ -96,6 +97,23 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     return l;
   }
 
+  /** `fr`, `en` ou `both` (les deux langues d'un coup). */
+  function verifierLangueOuDeux(lang) {
+    return String(lang || '').toLowerCase() === LANGUE_BILINGUE ? LANGUE_BILINGUE : verifierLangue(lang);
+  }
+
+  /**
+   * Une réponse dans les DEUX langues : `{ …commun, langues: { fr, en } }`. Chaque langue passe par son propre cache, et une source
+   * (recherche Hardcover) n'est interrogée qu'une fois pour les deux langues (voir `memoiser`).
+   */
+  async function enDeuxLangues(calculer) {
+    const src = memoiser(hardcover);
+    const [fr, en] = await Promise.all(LANGUES.map((l) => calculer(l, src)));
+    const sansCache = ({ cache, ...reste }) => reste;
+    const frais = [fr, en].every((r) => r?.cache === 'frais');
+    return { langues: { fr: fr && sansCache(fr), en: en && sansCache(en) }, cache: frais ? 'frais' : 'absent' };
+  }
+
   function verifierId(id, nom) {
     const n = Number(id);
     if (!Number.isInteger(n) || n <= 0) throw new ErreurRequete(`Identifiant de ${nom} invalide.`);
@@ -111,13 +129,13 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
  *  3. en RECONNAISSANT L'AUTEUR dans la requête (« tolkien hobbit » : on cherche « hobbit » et on favorise Tolkien).
    * Chaque variante coûte une requête Hardcover : on ne reformule donc jamais une réponse franche, ni quand le quota du jour est bas.
    */
-  async function meilleuresCartes(texte, idx, lang) {
+  async function meilleuresCartes(texte, idx, lang, src) {
     // Un alias s'écrit sans article (« journal d'un dégonflé ») : on essaie la requête telle quelle, puis sans son article de tête (« le journal d'un dégonflé »).
     const sansArt = sansArticleInitial(texte);
     const alias = idx.alias(normaliser(texte)) || (sansArt ? idx.alias(sansArt) : null);
     const cible = alias || texte;
     const evaluer = async (requeteHc, auteur = null) => {
-      const hits = await hardcover.rechercher(requeteHc);
+      const hits = await src.rechercher(requeteHc);
       let cartes = construireCartes(hits, requeteHc, { idCanonique: idx.idCanonique, nom: idx.nom, lang });
       if (auteur) {
         const famille = nomFamille(auteur.name);
@@ -157,7 +175,7 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     // Une seule hypothèse d'auteur est retenue : la première qui correspond à un auteur connu de Hardcover.
     for (const candidat of candidatsAuteur(cible)) {
       let docs = [];
-      try { docs = await hardcover.rechercherAuteurs(candidat.texte, 3); } catch { continue; }
+      try { docs = await src.rechercherAuteurs(candidat.texte, 3); } catch { continue; }
       const auteur = docs.find((d) => auteurCorrespond(d, candidat));
       if (!auteur) continue;
       const v = await evaluer(candidat.reste, auteur);
@@ -180,6 +198,9 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
       const edition = editions.get(c._meilleurLivre) || c._livres.map((id) => editions.get(id)).find(Boolean) || null;
       const dispo = Boolean(edition);
       const carte = { ...c, langueDisponible: dispo, score: c.score + (dispo ? 10 : 0) };
+      // `statut` : le même vocabulaire que les tomes d'une saga ; `langueTitre` : la langue du titre affiché (null si on ne peut pas trancher).
+      carte.statut = dispo ? 'disponible' : 'indisponible_langue';
+      carte.langueTitre = c.type === 'serie' ? c.langueNom : (dispo ? lang : langueDuTitre(c.titre));
       // Pour un livre isolé, titre et couverture de l'ÉDITION dans la langue : c'est celle que l'utilisateur possède.
       if (c.type === 'livre' && edition) {
         carte.titre = edition.title || c.titre;
@@ -204,13 +225,21 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
   }
 
   async function rechercher(texte, langue) {
+    if (verifierLangueOuDeux(langue) === LANGUE_BILINGUE) {
+      const r = await enDeuxLangues((l, src) => rechercherUne(texte, l, src));
+      return { requete: texte, ...r };
+    }
+    return rechercherUne(texte, langue, hardcover);
+  }
+
+  async function rechercherUne(texte, langue, src) {
     const lang = verifierLangue(langue);
     const q = normaliser(texte);
     if (q.length < 2) throw new ErreurRequete('Recherche trop courte (2 caractères minimum).');
 
     return avecCache(`search:${VERSION_CACHE}:${lang}:${q}`, TTL.recherche, async () => {
       const idx = indexer(await lireOverrides());
-      const cartes = await meilleuresCartes(texte, idx, lang);
+      const cartes = await meilleuresCartes(texte, idx, lang, src);
       return { requete: texte, langue: lang, ...(await finaliser(cartes, lang, { ecarter: true })) };
     });
   }
@@ -221,13 +250,21 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
    * suivants sont rendus dans `autresAuteurs` pour qu'on puisse proposer « vous cherchiez peut-être… ».
    */
   async function rechercherAuteur(texte, langue) {
+    if (verifierLangueOuDeux(langue) === LANGUE_BILINGUE) {
+      const r = await enDeuxLangues((l, src) => rechercherAuteurUne(texte, l, src));
+      return { requete: texte, mode: 'auteur', ...r };
+    }
+    return rechercherAuteurUne(texte, langue, hardcover);
+  }
+
+  async function rechercherAuteurUne(texte, langue, src) {
     const lang = verifierLangue(langue);
     const q = normaliser(texte);
     if (q.length < 2) throw new ErreurRequete('Recherche trop courte (2 caractères minimum).');
 
     return avecCache(`auteur:${VERSION_CACHE}:${lang}:${q}`, TTL.recherche, async () => {
       const idx = indexer(await lireOverrides());
-      const docs = await hardcover.rechercherAuteurs(texte, 5);
+      const docs = await src.rechercherAuteurs(texte, 5);
       const mots = q.split(' ');
       // Parmi les auteurs dont le nom contient TOUS les mots tapés, le plus FOURNI (« dumas » : Alexandre Dumas, pas un homonyme à 2 livres).
       const correspondants = docs.filter((d) => mots.every((m) => [d.name, ...(d.alternate_names || [])].some((nom) => normaliser(nom).split(' ').includes(m))));
@@ -242,14 +279,14 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
       const retenu = exactFaible ? plusFourni : (meilleurExact || premier);
       if (!retenu) return { requete: texte, langue: lang, mode: 'auteur', auteur: null, autresAuteurs: [], langueNonDisponible: false, resultats: [] };
 
-      const livres = await hardcover.livresDeLAuteur(retenu.id);
+      const livres = await src.livresDeLAuteur(retenu.id);
       // Pas de titre à comparer à la requête (c'est un nom d'auteur) : le classement vient de la popularité.
       const cartes = construireCartes(livres, texte, { idCanonique: idx.idCanonique, nom: idx.nom, lang });
       return {
         requete: texte,
         langue: lang,
         mode: 'auteur',
-        auteur: { id: Number(retenu.id), nom: retenu.name, livres: Number(retenu.books_count) || null },
+        auteur: { id: Number(retenu.id), nom: retenu.name, variantes: (retenu.alternate_names || []).filter((v) => v && v !== retenu.name).slice(0, 10), livres: Number(retenu.books_count) || null },
         autresAuteurs: docs.filter((d) => d !== retenu).slice(0, 3).map((d) => ({ id: Number(d.id), nom: d.name, livres: Number(d.books_count) || null })),
         ...(await finaliser(cartes, lang, { ecarter: false })),
       };
@@ -275,15 +312,19 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
     });
   }
 
+  /**
+   * La saga dans les DEUX langues, calculée UNE fois (une seule lecture de la série chez Hardcover) puis mise en cache sous la clé `both`.
+   * `lang=fr|en` en tire la réponse à plat de cette langue, `lang=both` rend tout : changer de langue ne rappelle jamais la source.
+   */
   async function serie(id, langue, { rafraichir = false } = {}) {
-    const lang = verifierLangue(langue);
+    const lang = verifierLangueOuDeux(langue);
     const numero = verifierId(id, 'série');
     const ov = await lireOverrides();
     const idx = indexer(ov);
     const canon = idx.idCanonique(numero);
 
     // `rafraichir` : recalculer même si le cache est frais (rafraîchissement nocturne des sagas en cours, voir rafraichissement.js).
-    return avecCache(`serie:${VERSION_CACHE}:${lang}:${canon}`, rafraichir ? 0 : TTL.serie, async () => {
+    const bi = await avecCache(`serie:${VERSION_CACHE}:${LANGUE_BILINGUE}:${canon}`, rafraichir ? 0 : TTL.serie, async () => {
       const principale = await hardcover.serie(canon);
       if (!principale) return null;
 
@@ -294,24 +335,66 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         if (autre) entrees = entrees.concat(autre.book_series);
       }
 
-      const editions = await hardcover.editionsEnLangue(entrees.map((e) => e.book.id), lang, { voisines: true });
-      const resultat = construireSerie({
-        serie: principale, entrees, editions, lang,
-        nom: idx.nom(canon, lang, principale.name),
-        exclurePositions: ov.series?.[String(canon)]?.exclurePositions || [],
-      });
+      const editionsDe = (ids) => Promise.all(LANGUES.map((l) => hardcover.editionsEnLangue(ids, l, { voisines: true })));
+      let [edFr, edEn] = await editionsDe(entrees.map((e) => e.book.id));
 
-      const lignes = [...resultat.tomes, ...resultat.tomes.flatMap((t) => t.parties), ...resultat.horsSerie];
-      await enrichirCouvertures(lignes, { idx, serieId: canon });
-      lignes.forEach((l) => { delete l._couvertureLivre; delete l._couverturePetite; delete l._couvertureVoisine; });
-      return resultat;
+      /*
+       * ÉLARGIR LES CANDIDATS. Hardcover ne rend d'abord, par position, que le livre « mis en avant » : pour Narnia, le tome 2 est alors un volume
+       * double anglais, alors que « Prince Caspian » et ses éditions françaises existent comme autre livre de la même position. Pour les positions
+       * entières qui n'ont pas d'édition dans l'une des deux langues, on va donc chercher les autres livres (1 requête + 1 d'éditions par langue).
+       */
+      const sansEdition = (p) => {
+        const ids = entrees.filter((e) => e.position === p).map((e) => e.book.id);
+        return !ids.some((i) => edFr.has(i)) || !ids.some((i) => edEn.has(i));
+      };
+      const aElargir = [...new Set(entrees.filter((e) => Number.isInteger(e.position) && !e.retrouvee).map((e) => e.position))]
+        .filter(sansEdition).slice(0, MAX_POSITIONS_ELARGIES);
+      if (aElargir.length && hardcover.candidatsPositions) {
+        try {
+          const dejaVus = new Set(entrees.map((e) => e.book.id));
+          const autres = (await hardcover.candidatsPositions(canon, aElargir)).filter((e) => !dejaVus.has(e.book.id));
+          if (autres.length) {
+            const [nouvFr, nouvEn] = await editionsDe(autres.map((e) => e.book.id));
+            edFr = new Map([...edFr, ...nouvFr]);
+            edEn = new Map([...edEn, ...nouvEn]);
+            entrees = entrees.concat(autres);
+          }
+        } catch { /* la saga reste telle que la 1re requête l'a rendue */ }
+      }
+
+      const exclurePositions = ov.series?.[String(canon)]?.exclurePositions || [];
+      const parLangue = {};
+      for (const l of LANGUES) {
+        const [editions, editionsAutre] = l === 'fr' ? [edFr, edEn] : [edEn, edFr];
+        parLangue[l] = construireSerie({ serie: principale, entrees, editions, editionsAutre, lang: l, nom: idx.nom(canon, l, principale.name), exclurePositions });
+        const lignes = [...parLangue[l].tomes, ...parLangue[l].tomes.flatMap((t) => t.parties), ...parLangue[l].horsSerie];
+        await enrichirCouvertures(lignes, { idx, serieId: canon });
+        lignes.forEach((x) => { delete x._couvertureLivre; delete x._couverturePetite; delete x._couvertureVoisine; });
+      }
+      return fusionnerLangues({
+        ...parLangue,
+        noms: { fr: idx.nom(canon, 'fr', principale.name), en: idx.nom(canon, 'en', principale.name) },
+        // « en » = le nom canonique de Hardcover (anglais) : c'est le repli quand aucun nom français n'est enregistré.
+        languesNoms: { fr: idx.nom(canon, 'fr', null) ? 'fr' : 'en', en: 'en' },
+      });
     });
+    if (!bi) return null;
+    return lang === LANGUE_BILINGUE ? bi : projeterSerie(bi, lang);
   }
 
   // ---------------------------------------------------------------- éditions d'un livre
   const titreCourt = (t) => String(t || '').split(/ : | \(/)[0].trim();
 
   async function livre(id, langue) {
+    if (verifierLangueOuDeux(langue) === LANGUE_BILINGUE) {
+      const numero = verifierId(id, 'livre');
+      const r = await enDeuxLangues((l) => livreUne(numero, l));
+      return r.langues.fr?.id || r.langues.en?.id ? { id: numero, ...r } : null;
+    }
+    return livreUne(id, langue);
+  }
+
+  async function livreUne(id, langue) {
     const lang = verifierLangue(langue);
     const numero = verifierId(id, 'livre');
     // Une réponse sans la BnF (panne) ne reste que 1 h en cache : on retentera bientôt.
@@ -365,6 +448,8 @@ export function creerService({ hardcover, bnf = null, cache, overrides = { serie
         resumeLangue: langueResume(nettoyerResume(l.description)),
         serie: serieLien ? { id: idx.idCanonique(serieLien.series.id), nom: idx.nom(idx.idCanonique(serieLien.series.id), lang, serieLien.series.name), position: serieLien.position } : null,
         editions,
+        statut: editions.length ? 'disponible' : 'indisponible_langue',
+        langueTitre: editions.length ? lang : langueDuTitre(l.title),
         sourceBnf,
       };
     });
@@ -483,3 +568,14 @@ export function sansImages(valeur, masquees) {
   return valeur;
 }
 
+
+/** La source `hardcover` dont les recherches (titre, auteur, livres d'un auteur) ne sont posées qu'UNE fois par appel : le deux langues partagent la réponse. */
+export function memoiser(source) {
+  const memo = new Map();
+  const unefois = (nom) => (...args) => {
+    const cle = `${nom}:${JSON.stringify(args)}`;
+    if (!memo.has(cle)) memo.set(cle, source[nom](...args));
+    return memo.get(cle);
+  };
+  return { ...source, rechercher: unefois('rechercher'), rechercherAuteurs: unefois('rechercherAuteurs'), livresDeLAuteur: unefois('livresDeLAuteur') };
+}

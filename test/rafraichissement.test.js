@@ -40,10 +40,10 @@ const lignes = [
 
 test('rafraîchissement : relit les sagas en cours en forçant le cache et consigne le tome nouveau', async () => {
   const appels = [];
-  const service = { async serie(id, lang, opts) { appels.push([id, lang, opts]); return { nom: `Saga ${id}`, disponibles: id === 2 ? 5 : 2 }; } };
+  const service = { async serie(id, lang, opts) { appels.push([id, lang, opts]); return { noms: { fr: `Saga ${id}` }, comptes: { fr: { disponibles: id === 2 ? 5 : 2 } } }; } };
   const cache = cacheMemoire();
   const r = await creerRafraichissement({ url: 'https://x', cle: 'k', service, cache, version: 'v5', fetchImpl: fauxSupabase(lignes) }).executer();
-  assert.deepEqual(appels, [[2, 'fr', { rafraichir: true }], [9, 'fr', { rafraichir: true }]]);
+  assert.deepEqual(appels, [[2, 'both', { rafraichir: true }], [9, 'both', { rafraichir: true }]]);
   assert.equal(r.relues, 2);
   assert.equal(r.nouveautes.length, 1);
   assert.equal(r.nouveautes[0].nom, 'Saga 2');
@@ -59,7 +59,7 @@ test('rafraîchissement : le quota du jour arrête la relecture, sans erreur', a
 
 test('rafraîchissement : une saga qui échoue ne retient pas les suivantes ; le budget de temps arrête la boucle', async () => {
   let n = 0;
-  const service = { async serie(id) { n += 1; if (id === 2) throw new Error('panne'); return { nom: 'x', disponibles: 2 }; } };
+  const service = { async serie(id) { n += 1; if (id === 2) throw new Error('panne'); return { noms: { fr: 'x' }, comptes: { fr: { disponibles: 2 } } }; } };
   const r = await creerRafraichissement({ url: 'https://x', cle: 'k', service, cache: cacheMemoire(), version: 'v5', fetchImpl: fauxSupabase(lignes) }).executer();
   assert.equal(n, 2);
   assert.equal(r.relues, 1);

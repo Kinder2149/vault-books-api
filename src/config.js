@@ -12,6 +12,8 @@ export const TTL = {
 
 export const LANGUES = ['fr', 'en'];
 export const LANGUE_PAR_DEFAUT = 'fr';
+// `lang=both` : les deux langues d'un coup, pour que l'application mémorise les deux et bascule hors ligne sans rien rechercher de nouveau.
+export const LANGUE_BILINGUE = 'both';
 
 export function lireConfig(env = process.env) {
   return {
