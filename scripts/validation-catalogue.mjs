@@ -13,6 +13,8 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { normaliser, nomFamille } from '../src/text.js';
+import { partBlanche } from '../src/images.js';
+import { langueResume } from '../src/resume.js';
 
 const arg = (nom, defaut) => { const i = process.argv.indexOf(`--${nom}`); return i > 0 ? process.argv[i + 1] : defaut; };
 const base = arg('url', 'https://vault-books-api.vercel.app').replace(/\/$/, '');
@@ -55,7 +57,7 @@ function langueDeIsbn(isbn) {
   return 'autre';
 }
 
-function noterSerie(c, serie, lang) {
+async function noterSerie(c, serie, lang, carte) {
   const axes = {};
   const detail = {};
   const tomes = serie.tomes || [];
@@ -92,6 +94,59 @@ function noterSerie(c, serie, lang) {
     const pb = sans + approx + partagees;
     axes.couverture = pb === 0 ? true : (dispos.length && pb / dispos.length <= 0.1 ? 'partiel' : false);
   }
+  const att = c.attendu;
+  // ---- règles de la bibliothèque bilingue (rapport d'essai du 6 octobre 2026)
+  if (att.editionStricte) {   // une édition « dans la langue » dont l'ISBN n'est pas de cette langue (portugais, allemand…) est un défaut
+    const ko = aVerifier.filter((t) => langueDeIsbn(t.edition.isbn13) !== lang);
+    axes.editionStricte = ko.length === 0;
+    if (ko.length) detail.editionsEtrangeres = ko.slice(0, 4).map((t) => `${t.position}:${t.edition.isbn13}`);
+  }
+  if (att.statuts) {   // { statut: [positions] } : chaque position doit porter ce statut
+    const faux = [];
+    for (const [statut, positions] of Object.entries(att.statuts)) for (const p of positions) { const t = tomes.find((x) => x.position === p); if (!t || t.statut !== statut) faux.push(`${p}:${t ? t.statut : 'absent'}≠${statut}`); }
+    axes.statuts = faux.length === 0;
+    if (faux.length) detail.statutsFaux = faux;
+  }
+  if (att.titresInterdits) {
+    const vus = tomes.filter((t) => att.titresInterdits.some((m) => normaliser(t.titre || '').includes(normaliser(m)))).map((t) => t.titre);
+    axes.titresLangue = vus.length === 0;
+    if (vus.length) detail.titresInterdits = vus;
+  }
+  if (att.titreTome) {
+    const t = tomes.find((x) => x.position === att.titreTome.position);
+    axes.titreTome = Boolean(t) && normaliser(t.titre).includes(normaliser(att.titreTome.contient)) && !(att.titreTome.sansSlash && /\//.test(t.titre));
+    detail.titreTome = t ? t.titre : 'absent';
+  }
+  if (att.pasAudio) {
+    const audio = dispos.filter((t) => /audio|\bcd\b|mp3/i.test(t.edition?.format || '')).map((t) => `${t.position}:${t.edition.format}`);
+    axes.pasAudio = audio.length === 0;
+    if (audio.length) detail.audio = audio;
+  }
+  if (att.pasPageBlanche) {   // la couverture de ces tomes n'est ni absente-par-erreur ni une page de titre scannée
+    const blancs = [];
+    for (const p of att.pasPageBlanche) {
+      const t = tomes.find((x) => x.position === p);
+      if (!t || !t.couverture) { blancs.push(`${p}:sans couverture`); continue; }
+      try {
+        const r = await fetch(t.couverture);
+        const part = partBlanche(Buffer.from(await r.arrayBuffer()));
+        if (part !== null && part > 0.75) blancs.push(`${p}:page blanche ${Math.round(part * 100)} %`);
+      } catch { /* image injoignable : on ne juge pas */ }
+    }
+    axes.pasPageBlanche = blancs.length === 0;
+    if (blancs.length) detail.pagesBlanches = blancs;
+  }
+  if (att.bilingue) {   // lang=both : les deux langues, tous les tomes, et la même chose que la réponse à plat
+    const b = await appeler(`/v1/series/${carte.id}?lang=both`);
+    const bi = b.corps;
+    let ok = b.status === 200 && bi && typeof bi.noms?.fr === 'string' && typeof bi.noms?.en === 'string' && Array.isArray(bi.tomes) && bi.tomes.length === tomes.length;
+    const STATUTS = new Set(['disponible', 'indisponible_langue', 'a_paraitre']);
+    if (ok) ok = bi.tomes.every((t) => STATUTS.has(t.langues?.fr?.statut) && STATUTS.has(t.langues?.en?.statut));
+    if (ok) ok = bi.tomes.every((t, i) => t.langues[lang].titre === tomes[i].titre && t.langues[lang].statut === tomes[i].statut);
+    axes.bilingue = Boolean(ok);
+    if (!ok) detail.bilingueRaison = b.status !== 200 ? `HTTP ${b.status}` : 'réponse bilingue incomplète ou différente de la réponse à plat';
+  }
+
   const parasites = tomes.filter((t) => PARASITE.test(t.titre || '')).map((t) => t.titre);
   if (!/coffret|int[eé]grale/.test(c.categorie) && !c.attendu.titresTolere) {
     axes.propre = parasites.length === 0;
@@ -111,11 +166,13 @@ async function jouerRecherche(c) {
   axes.sante = true;
   axes.rapide = r.ms <= LIMITE_LENTEUR_MS ? true : 'partiel';
   const cartes = r.corps.resultats || [];
+  axes.sansNegatif = cartes.every((x) => x.score >= 0);   // jamais de résultat à score négatif
   detail.nbCartes = cartes.length;
   detail.top = cartes.slice(0, 3).map((x) => `[${x.type}] ${x.titre}${x.tomes ? ` (${x.tomes})` : ''} — ${(x.auteurs || []).slice(0, 2).join(', ')}`);
   const rang = cartes.findIndex((x) => memeAuteur(x, c.auteur) && (c.attendu.type === 'livre' ? true : x.type === c.attendu.type));
   detail.rang = rang + 1;
   axes.trouve = rang === 0 ? true : (rang > 0 && rang < 3 ? 'partiel' : false);
+  if (c.attendu.titreCarte && rang >= 0) axes.titreCarte = normaliser(cartes[rang].titre).includes(normaliser(c.attendu.titreCarte)) && rang === 0;
   if (rang < 0) { detail.trouveRaison = 'auteur ou type attendu absent'; return { axes, detail }; }
   const carte = cartes[rang];
   detail.carte = { id: carte.id, titre: carte.titre, type: carte.type };
@@ -128,7 +185,7 @@ async function jouerRecherche(c) {
   const s = await appeler(`/v1/series/${carte.id}?lang=${lang}`);
   detail.msSerie = s.ms;
   if (s.status !== 200 || !s.corps) { axes.sante = false; detail.erreur = `saga : HTTP ${s.status}`; return { axes, detail }; }
-  const noteS = noterSerie(c, s.corps, lang);
+  const noteS = await noterSerie(c, s.corps, lang, carte);
   Object.assign(axes, noteS.axes);
   Object.assign(detail, noteS.detail);
   return { axes, detail };
@@ -173,6 +230,8 @@ async function jouerIsbn(c) {
   if (c.attendu.edition) axes.edition = d.langue === c.attendu.edition;
   if (c.attendu.couverture) axes.couverture = !!d.couverture?.url && !d.couverture.approximative;
   if (c.attendu.pages) axes.pages = !!d.nbPages;
+  if (c.attendu.pagesPlausibles) axes.pagesPlausibles = d.nbPages === null || d.nbPages >= 30;
+  if (c.attendu.resumeLangue) { const l = langueResume(d.resume); axes.resumeLangue = !d.resume || l === d.langue; detail.resume = d.resume ? `${l} (${d.langue})` : 'absent'; }
   if (c.attendu.prefixe) axes.prefixe = groupe(d.isbn13).startsWith(c.attendu.prefixe);
   return { axes, detail };
 }
