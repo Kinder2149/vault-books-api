@@ -10,6 +10,7 @@
     "les archives de roshar": "the stormlight archive",
     "les hommes qui n aimaient pas les femmes": "the girl with the dragon tattoo",
     "les royaumes de feu": "wings of fire",
+    "lord of the rings": "le seigneur des anneaux",
     "millenium": "the girl with the dragon tattoo",
     "une cour d epines et de roses": "a court of thorns and roses"
   },
@@ -36,6 +37,22 @@
       ],
       "exclurePositions": [
         1.5
+      ]
+    },
+    "1185": {
+      "_commentaire": "Validation 2026-10-06 : le tome 8 est la pièce de théâtre (L'Enfant maudit) en lituanien, hors des 7 tomes annoncés",
+      "noms": {},
+      "fusionner": [],
+      "exclurePositions": [
+        8
+      ]
+    },
+    "5193": {
+      "_commentaire": "Validation 2026-10-06 : le tome 8 est un espace réservé « Untitled #8 » sans édition",
+      "noms": {},
+      "fusionner": [],
+      "exclurePositions": [
+        8
       ]
     },
     "25608": {

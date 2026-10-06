@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { sansArticleInitial, candidatsAuteur, auteurCorrespond } from '../src/requete.js';
+import { sansArticleInitial, sansMotsParasites, candidatsAuteur, auteurCorrespond } from '../src/requete.js';
 import { creerService, ErreurRequete } from '../src/service.js';
 import { cacheMemoire } from '../src/cache.js';
 
@@ -193,4 +193,35 @@ test("auteur : l'auteur le plus FOURNI parmi ceux qui correspondent est retenu (
   const hc = fauxAuteurs({ auteurs: [{ id: '1', name: 'Dumas', books_count: 2 }, { id: '2', name: 'Alexandre Dumas', books_count: 800 }, { id: '3', name: 'Pierre Dumas', books_count: 30 }], livres: [] });
   const r = await creerService({ hardcover: hc, cache: cacheMemoire() }).rechercherAuteur('dumas', 'fr');
   assert.equal(r.auteur.id, 2);
+});
+
+// ------------------------------------------------------------------ mots parasites (validation du catalogue, 2026-10-06)
+
+test('mots parasites : « intégrale », « coffret », « tome 2 », « saga »… retirés en tête et en fin ; rien à retirer → null ; jamais tout', () => {
+  assert.equal(sansMotsParasites('le seigneur des anneaux intégrale'), 'le seigneur des anneaux');
+  assert.equal(sansMotsParasites('harry potter coffret'), 'harry potter');
+  assert.equal(sansMotsParasites('coffret harry potter'), 'harry potter');
+  assert.equal(sansMotsParasites('intégrale sherlock holmes'), 'sherlock holmes');
+  assert.equal(sansMotsParasites('dune tome 2'), 'dune');
+  assert.equal(sansMotsParasites('la saga des gardiens trilogie'), 'la saga des gardiens');   // « saga » au milieu : c'est le titre
+  assert.equal(sansMotsParasites('saga'), null);                                              // le seul mot : c'est le titre (comics Saga)
+  assert.equal(sansMotsParasites('harry potter'), null);
+  assert.equal(sansMotsParasites('intégrale coffret'), null);                                 // on ne vide jamais la requête
+});
+
+test("mots parasites : « le seigneur des anneaux intégrale » qui ne rend rien est retenté sans « intégrale »", async () => {
+  const hc = fauxHc({ parRequete: { 'le seigneur des anneaux': [hit(1, 'The Fellowship of the Ring', 'J.R.R. Tolkien', 9932)] } });
+  const r = await creerService({ hardcover: hc, cache: cacheMemoire() }).rechercher('le seigneur des anneaux intégrale', 'fr');
+  assert.deepEqual(cartesDe(r), ['The Fellowship of the Ring']);
+  assert.ok(hc.requetes.includes('livre:le seigneur des anneaux'));
+});
+
+test("mots parasites : une réponse franche n'est jamais reformulée, et le quota bas interdit l'essai de plus", async () => {
+  const franc = fauxHc({ parRequete: { 'harry potter coffret': [hit(1, 'Harry Potter coffret', 'J.K. Rowling', 15000)] } });
+  await creerService({ hardcover: franc, cache: cacheMemoire() }).rechercher('harry potter coffret', 'fr');
+  assert.deepEqual(franc.requetes, ['livre:harry potter coffret']);
+  const bas = fauxHc({ quota: { restantJour: 1500 } });   // sous 2 × le seuil : plus de reformulation (sous le seuil, le service refuse tout appel)
+  const r = await creerService({ hardcover: bas, cache: cacheMemoire() }).rechercher('dune intégrale', 'fr');
+  assert.deepEqual(r.resultats, []);
+  assert.deepEqual(bas.requetes, ['livre:dune intégrale']);
 });
