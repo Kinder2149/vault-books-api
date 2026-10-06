@@ -16,7 +16,7 @@ export const BUDGET_MS = 40_000;
 export const CLE_NOUVEAUTES = 'controle:nouveautes';
 const MAX_EVENEMENTS = 50;
 
-/** « serie:v6:both:25608 » → { lang: 'both', id: 25608 } ; null si la clé n'est pas une clé de saga de cette version (une saga est mise en cache une fois pour les deux langues). */
+/** « serie:v7:both:25608 » → { lang: 'both', id: 25608 } ; null si la clé n'est pas une clé de saga de cette version (une saga est mise en cache une fois pour les deux langues). */
 export function lireCleSerie(cle, version) {
   const m = String(cle).match(new RegExp(`^serie:${version}:(fr|en|both):(\\d+)$`));
   return m ? { lang: m[1], id: Number(m[2]) } : null;

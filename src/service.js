@@ -19,7 +19,7 @@ import { nettoyerResume, langueResume, resumePourLangue } from './resume.js';
 import { utilisable, petite } from './images.js';
 import { formatNormalise, pagesPlausibles } from './formats.js';
 
-export const VERSION_CACHE = 'v6';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
+export const VERSION_CACHE = 'v7';   // à incrémenter quand le tri ou le format change : invalide tout le cache d'un coup
 const MAX_LIVRES_VERIFIES = 60;
 const NB_RESULTATS = 20;
 const CONCURRENCE_COUVERTURES = 4;

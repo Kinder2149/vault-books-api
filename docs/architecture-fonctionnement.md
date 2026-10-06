@@ -31,7 +31,7 @@ Chaque source a **un seul adaptateur** (`src/sources/*.js`) ; remplacer une sour
 | Route | Rend | Cache |
 |---|---|---|
 | `GET /v1/search?q=&lang=fr\|en\|both` | Cartes triées : une par œuvre (`livre`) ou par saga (`serie`). Un livre isolé porte ISBN, éditeur, date. | 7 jours |
-| `GET /v1/series/:id?lang=fr\|en\|both` | La saga : tomes dans l'ordre (volumes coupés en `parties`), édition (ISBN, éditeur) et couverture par tome, `statut`, `langueTitre`, `noms` {fr, en}, `typeSaga`, compteurs `disponibles`/`indisponibles`/`aParaitre`. Calculée UNE fois pour les deux langues (clé de cache `serie:v6:both:<id>`) | 1 jour |
+| `GET /v1/series/:id?lang=fr\|en\|both` | La saga : tomes dans l'ordre (volumes coupés en `parties`), édition (ISBN, éditeur) et couverture par tome, `statut`, `langueTitre`, `noms` {fr, en}, `typeSaga`, compteurs `disponibles`/`indisponibles`/`aParaitre`. Calculée UNE fois pour les deux langues (clé de cache `serie:v7:both:<id>`) | 1 jour |
 | `GET /v1/books/:id?lang=fr\|en\|both` | Toutes les éditions d'un livre (Hardcover + BnF), une par ISBN, couverture par édition | 7 jours (1 h si la BnF n'a pas répondu) |
 | `GET /v1/isbn/:isbn` | L'édition d'un code-barres : éditeur, date, **pages**, langue, couverture, livre, saga. ISBN-10 accepté. **Aucun filtre de langue.** 404 si inconnu | 30 jours (1 j si absent, 5 min si incertain) |
 | `GET /v1/status` | État détaillé (Supabase, Hardcover, quota du jour, statistiques 24 h) ; `?profond=1` teste la BnF | aucun |
