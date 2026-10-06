@@ -116,3 +116,12 @@ Sorceleur (5 romans + recueils, jusqu'à 8), Hypérion (4 romans, +1 novella), M
 - **Node 24** : `node --test test/` échoue (le dossier est lu comme un module) et `node --test` seul ramasse `scripts/test-c.mjs` (script réseau). Utiliser **`node --test test/*.test.js`** → 175 tests, 0 échec. (La CI GitHub, en Node 20, garde `node --test test/`.)
 - La route `/v1/isbn/…` rend **200** (`trouve: true`) pour tout ISBN que Hardcover connaît, même sans édition ni couverture (ex. `9780000000002` = un vieux roman). Un ISBN de forme invalide (clé de contrôle fausse) rend 400.
 - Le quota Hardcover : ≈ 3 000 appels restants sur 5 000 au 2026-10-05 après-midi ; le jeu complet en consomme peu (réponses en cache), mais espacer les appels.
+
+## 6. Mesure 6.2 — jeu complet en ligne après la mise en ligne de la mission bilingue (2026-10-06 après-midi)
+
+**112 réussis / 134 (83,6 %)**, 3 partiels, 19 échoués ; axes 97 %. (Mesure locale M5 : 114/134.) Détail : `sorties/validation-ligne-m5.md` (non versionné). Écart de 2 cas sans lien avec le code, voir ci-dessous.
+
+**Incident constaté — quota Hardcover** : le passage de `VERSION_CACHE` à `v7` a vidé de fait tout le cache d'un coup ; le rejeu complet a ensuite tout relu chez Hardcover. `/v1/status` : **989 requêtes restantes sur 5 000** → **mode économie actif** (le service refuse les recherches non mises en cache : « Le catalogue est en mode économie »). Conséquences relevées : 3 × HTTP 502 sur de grandes sagas à froid (One Piece, Death Note, L'Attaque des Titans ; One Piece et Death Note repassent au rejeu), et des **réponses vides figées en cache 7 jours** (« hary poter », « le seigneur des anneaux intégrale », cas X03, X11, K02).
+**Règle à retenir** : ne pas incrémenter `VERSION_CACHE` puis rejouer le jeu complet le même jour ; espacer (réchauffer progressivement ou attendre la remise à zéro du quota).
+**Correctif prêt, NON DÉPLOYÉ** (branche locale `recherche-vide-courte`, commit `d1ee185`, 222 tests) : une recherche **sans résultat** n'est plus gardée que 1 h (`TTL.rechercheVide`) au lieu de 7 jours.
+**À vérifier après remise à zéro du quota** : « hary poter » rend aussi une liste vide sur une copie locale à cache vide (donc pas seulement un effet du quota) → possible régression de la tolérance aux fautes entre la mesure M5 locale et le code actuel ; à rejouer X03, X11, K02, M04 avec le quota rétabli avant de conclure.
