@@ -1,5 +1,20 @@
 # PROJET_CONTEXTE — « Vault Books API »
 
+## STATUT — fait foi pour les statuts (lu par Pilotage)
+
+```
+STATUT DU PROJET : En production
+MISSION : Phases 0 à 5 — Close
+MISSION : Validation du catalogue (2026-10-05/06) — Close
+MISSION : Bilingue-catalogue (fusionnée et en ligne le 2026-10-06) — Close
+MISSION : Phase 6 (plan-complet.md) — Plan validé
+IDÉES PARQUÉES :
+  - Relevé de fraîcheur de fin octobre
+  - Suggestions et « tome suivant » sans Google (côté application)
+  - Retirer l'ancien code de Vault Read après 2 à 4 semaines d'usage
+```
+*(Bloc ajouté le 2026-10-30, validé par Kinder.)*
+
 > Document de cadrage : pourquoi ce projet existe, ce qui est décidé, où en est-on, **comment reprendre le travail depuis un autre poste** (§6).
 > Le fonctionnement détaillé est dans `docs/architecture-fonctionnement.md`, l'exploitation dans `docs/exploitation.md`, la suite dans `docs/plan-complet.md`,
 > **les actions de Kinder pas à pas dans `docs/a-faire-par-kinder.md`**.
