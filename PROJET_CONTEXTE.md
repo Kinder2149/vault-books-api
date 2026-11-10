@@ -7,7 +7,8 @@ STATUT DU PROJET : En production
 MISSION : Phases 0 à 5 — Close
 MISSION : Validation du catalogue (2026-10-05/06) — Close
 MISSION : Bilingue-catalogue (fusionnée et en ligne le 2026-10-06) — Close
-MISSION : Phase 6 (plan-complet.md) — Plan validé
+MISSION : Phase 6 (plan-complet.md) — Plan prêt
+RANGEMENT : docs\ ne garde que plan-complet.md et exploitation.md ; les autres documents sont dans docsrchive\ (déplacés le 2026-11-10, rien supprimé ; les renvois « docs/xxx.md » du texte se lisent « docs/archive/xxx.md »)
 IDÉES PARQUÉES :
   - Relevé de fraîcheur de fin octobre
   - Suggestions et « tome suivant » sans Google (côté application)
